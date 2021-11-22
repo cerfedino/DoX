@@ -1,1 +1,3 @@
-Team members:
+**Team members:**
+
+* Denis Karev
