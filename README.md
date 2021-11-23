@@ -2,3 +2,4 @@
 
 * Albert Cerfeda
 * Denis Karev
+* Alessandro Gobbetti
