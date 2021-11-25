@@ -1,3 +1,4 @@
-/.idea/
+.idea/
+node_modules/
 # Datasource local storage ignored files
 .env

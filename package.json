@@ -1,0 +1,7 @@
+{
+  "name": "DoX",
+  "version": "1.0.0",
+  "dependencies": {
+    "mongodb": "^4.2.0"
+  }
+}
