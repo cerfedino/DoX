@@ -1,5 +1,7 @@
 .document-view {
     margin-right: 20%;
     margin-left: 20%;
-    border: 1px solid black;
+    border-radius: 5px;
+    border: 1px solid #dddddd;
+    box-shadow: -15px 10px 30px 15px #dddddd;
 }
