@@ -1,0 +1,56 @@
+html, body {
+    height: 100%;
+}
+
+/*
+########################
+    COLOR DEFINITIONS
+########################
+*/
+
+.login-form input[type="submit"] {
+    background: var(--accent);
+}
+body, .login-form input {
+    background-color: var(--bg);
+}
+
+/*
+########################
+*/
+
+body {
+    display: flex;
+    align-items: center;
+}
+
+main.login-form {
+    width: 100%;
+    max-width: 300px;
+    margin: auto;
+}
+
+/* Both login and register forms */
+.login-form input#username {
+    margin-bottom: -1px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Both login and register forms */
+.login-form input#password, .login-form input#confirmPassword {
+    margin-bottom: 15px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* Only register form */
+.login-form input#newPassword {
+    margin-bottom: -1px;
+    border-radius: 0;
+}
+
+/* Both login and register forms */
+.login-form input[type="submit"] {
+    margin-bottom: 10px;
+}
