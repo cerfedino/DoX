@@ -1,0 +1,48 @@
+/*
+    CSS code shared across all the pages.
+*/
+
+/*########################
+    FONTS
+########################*/
+@font-face {
+    font-family: 'jumper_XBdIt';
+    src: url('../media/font/Jumper/jumper-extra-bolditalic-webfont.woff2') format('woff2'),
+    url('../media/font/Jumper/jumper-extra-bolditalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+/*
+########################
+    COLOR THEMES
+########################
+*/
+
+/* TODO: Agree on site color palette */
+
+/* Default */
+body * {
+    --accent: #E63946;
+    --bg: #ffffff;
+    --bg_darker: #e1e1e1;
+    --text: #333333;
+    --contrast-text: #000000;
+}
+
+/* dark-theme */
+body.dark-theme *{
+    --accent: #E63946;
+    --bg: #646464;
+    --bg_darker: #3d3d3d;
+    --text: #cbcbcb;
+    --contrast-text: #ffffff;
+}
+/*
+########################
+*/
+
+svg#logo {
+    fill: var(--accent);
+}
