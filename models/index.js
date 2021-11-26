@@ -10,7 +10,8 @@
  *           {ObjectId} _id, 
  *           {string}   username, 
  *           {string}   password_hash, 
- *           {string}   email 
+ *           {string}   email,
+ *           {boolean}  email_verification_status
  *       } 
  * 
  *
