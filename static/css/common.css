@@ -23,26 +23,43 @@
 /* TODO: Agree on site color palette */
 
 /* Default */
-body * {
+body,body * {
     --accent: #E63946;
+    --accent-darker: #ad2933;
     --bg: #ffffff;
-    --bg_darker: #e1e1e1;
+    --bg-contrast: #c9c9c9;
+    --bg-contrastt: #383838;
     --text: #333333;
     --contrast-text: #000000;
 }
 
 /* dark-theme */
-body.dark-theme *{
+body.dark-theme, body.dark-theme * {
     --accent: #E63946;
-    --bg: #646464;
-    --bg_darker: #3d3d3d;
-    --text: #cbcbcb;
+    --accent-darker: #ad2933;
+    --bg: #1e1e1e;
+    --bg-contrast: #565656;
+    --bg-contrastt: #cbcbcb;
+    --text: #cccccc;
     --contrast-text: #ffffff;
 }
+
 /*
 ########################
 */
+body {
+    background-color: var(--bg);
+}
 
 svg#logo {
     fill: var(--accent);
+}
+
+/* Sets the text color for every kind of text */
+p,input,textarea,select, label,span,h1,h2,h3,h4,h5,h6 {
+    color: var(--text)
+}
+
+#pageheader, #pageheader .container {
+    background: var(--bg-contrastt);
 }

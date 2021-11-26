@@ -3,5 +3,6 @@
     margin-left: 20%;
     border-radius: 5px;
     border: 1px solid #dddddd;
-    box-shadow: -15px 10px 30px 15px #dddddd;
+    box-shadow: -15px 10px 30px 15px var(--bg-contrast);
+    background: white;
 }
