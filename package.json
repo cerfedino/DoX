@@ -1,7 +1,10 @@
 {
+  "name": "DoX",
   "dependencies": {
     "express": "^4.17.1",
     "method-override": "^3.0.0",
+    "bcrypt": "^5.0.1",
+    "fs-extra": "^10.0.0",
     "mongodb": "^4.2.0",
     "morgan": "^1.10.0"
   }
