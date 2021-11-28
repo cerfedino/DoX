@@ -12,4 +12,12 @@ function init_login() {
         // TODO: Remove after demo
         window.location = "/docs"
     })
+
+    document.querySelector("#dark-mode-toggle").addEventListener('change',
+        function() {
+            if(this.checked)
+                document.body.classList.add("dark-theme")
+            else
+                document.body.classList.remove('dark-theme')
+        });
 }
