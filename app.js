@@ -34,7 +34,7 @@ app.set('view engine', 'ejs');
 const routers = require('./routes');
 
 
-// app.use('/', routers.xxx);
+app.use('/', routers.root);
 
 
 //default fallback handlers
