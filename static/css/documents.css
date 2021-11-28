@@ -1,0 +1,36 @@
+/*
+########################
+    COLOR DEFINITIONS
+########################
+*/
+
+.card.document {
+    background: var(--bg);
+    border: var(--text) 2px solid;
+}
+.card.document .card-footer {
+    border-top: var(--contrast-text) 2px solid;
+}
+
+/*
+########################
+*/
+
+
+.form-control-dark:focus {
+    border-color: #fff;
+    box-shadow: 0 0 0 .25rem rgba(255, 255, 255, .25);
+}
+
+.card.document {
+    margin: 10px;
+    width: 12rem;
+}
+
+div.card div.card-body *{
+    color: var(--contrast-text)
+}
+
+svg#logo {
+    height: 3vmax;
+}
