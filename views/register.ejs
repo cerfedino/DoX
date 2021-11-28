@@ -14,7 +14,7 @@
 <main class="login-form">
     <svg id="logo" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595.06 133.62"><defs><style>.cls-1{font-size:175px;font-family:jumper_XBdIt, Jumper;font-weight:700;font-style:italic;}.cls-2{letter-spacing:-0.01em;}</style></defs><text class="cls-1" transform="translate(0 126.81)"><tspan class="cls-2"></tspan><tspan x="102.9" y="0">DoX</tspan></text></svg>
 
-    <form method="post" action="/register">
+    <form method="post" action="/auth/register">
         <h1 class="h3 mb-3 fw-normal">Please register</h1>
         <p id="pwdMatch" class="alert alert-danger p-1 mb-3" hidden>Passwords don't match</p>
         <div class="form-floating">
@@ -45,6 +45,8 @@
                 alert.hidden = pwd1 === pwd2;
         }
     </script>
+    <script onload="init_register()" src="/js/register.js"></script>
+
 </main>
 </body>
 </html>
