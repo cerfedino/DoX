@@ -63,3 +63,10 @@ p,input,textarea,select, label,span,h1,h2,h3,h4,h5,h6 {
 #pageheader, #pageheader .container {
     background: var(--bg-contrastt);
 }
+
+
+#dark-mode-toggle {
+    position: absolute;
+    bottom: 1vh;
+    right: 1vh;
+}
