@@ -3,5 +3,3 @@ node_modules/
 yarn.lock
 # Datasource local storage ignored files
 .env
-
-db/
