@@ -7,7 +7,7 @@ const MongoClient = mongodb.MongoClient;
 
 ///// PARAMETERS
 const mongodb_uri = "mongodb://localhost:27017"
-const db_name     = "DoX_db"; // TODO: Remove placeholder
+const db_name     = "DoX_db";
 const collections = ["users","docs"];
 ////////////////////
 
