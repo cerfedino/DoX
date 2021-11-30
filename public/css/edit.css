@@ -32,3 +32,7 @@
     color: #1818ff;
     background-color: #dbdbff;
 }
+
+.ProseMirror:focus {
+    outline: none;
+}
