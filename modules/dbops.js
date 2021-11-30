@@ -1,5 +1,6 @@
 const {model} = require('../models')
 const auth = require("./auth.js")
+const {ObjectId} = require("mongodb");
 
 /**
  * Contains all database operations.
@@ -87,10 +88,10 @@ function create_user(username,email,hash) {
 /**
  * Creates and inserts a new document in the database.
  * @param {String} owner_id the owner of the newly created document.
- * @param {String="Untitled"} name the name of the newly created document.
+ * @param {String="Untitled"} title the title of the newly created document.
  * @returns {Promise<object>} the data of the new document.
  */
-function create_doc(owner_id, name="Untitled") {
+function create_doc(owner_id, title="Untitled") {
     // Pwd hashing
     return new Promise(async (resolve, reject)=>{
         if(!(await user_exists({_id:owner_id}))) {
@@ -103,7 +104,7 @@ function create_doc(owner_id, name="Untitled") {
 
         const new_doc = {
 
-            name : name,
+            title : title,
 
             path : create_doc_file(), 
             
@@ -179,11 +180,12 @@ function document_exists(filter={}) {
  * @returns {Promise<[]>} resolves with the documents that are available to the user.
  */
 function get_docs_available(user_id) {
+    const userid = ObjectId(user_id)
     const filter = {
         $or:[
-            {perm_read : {$elemMatch : {$eq : user_id}}},
-            {perm_edit : {$elemMatch : {$eq : user_id}}},
-            {owner : {$elemMatch : {$eq : user_id}}}
+            {perm_read : {$elemMatch : {$eq : userid}}},
+            {perm_edit : {$elemMatch : {$eq : userid}}},
+            {owner : {$elemMatch : {$eq : userid}}}
         ]
     }
     return run_find(model.docs, filter)

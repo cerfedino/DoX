@@ -1,3 +1,31 @@
+<%
+if(!docs) {
+    console.log("Docs is not defined")
+    var docs = []
+}
+//
+//
+var doc_cards = ""
+docs.forEach(doc=>{
+    doc_cards += generate_document_card(doc)
+})
+
+ function generate_document_card(doc) {
+     return `<div class="card document">
+                <div class="card-body">
+                    <h6 class="card-title">${doc.title}</h6>
+                    <p class="card-text">${doc.body}</p>
+                </div>
+                <div class="card-footer">
+                    <a href="/docs/${doc._id}" class="btn btn-sm btn-primary">Edit</a>
+                    <form method="DELETE" action="/docs/${doc._id}"> <a href="#" class="btn btn-sm btn-danger">Delete</a> </form>
+                </div>
+            </div>`
+ }
+
+
+ %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,39 +53,17 @@
     </header>
 
     <main class="documents ps-3 d-flex flex-wrap">
-        <div class="card document">
-            <div class="card-body">
-                <h6 class="card-title">Lorem Ipsum</h6>
-                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas euismod scelerisque molestie duis.</p>
-            </div>
-            <div class="card-footer">
-                <a href="/docs/XXX" class="btn btn-sm btn-primary">Edit</a>
-                <a href="#" class="btn btn-sm btn-danger">Delete</a>
-            </div>
-        </div>
-        <div class="card document">
-            <div class="card-body">
-                <h6 class="card-title">Document 2</h6>
-                <p class="card-text"></p>
-            </div>
-            <div class="card-footer">
-                <a href="/docs/XXX" class="btn btn-sm btn-primary">Edit</a>
-                <a href="#" class="btn btn-sm btn-danger">Delete</a>
-            </div>
-        </div>
-        <div class="card document">
-            <div class="card-body">
-                <h6 class="card-title">Some fancy name</h6>
-                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sed massa turpis. Cras fringilla sed.</p>
-            </div>
-            <div class="card-footer">
-                <a href="/docs/XXX" class="btn btn-sm btn-primary">Edit</a>
-                <a href="#" class="btn btn-sm btn-danger">Delete</a>
-            </div>
-        </div>
+        <%- doc_cards %>
     </main>
 
-    <input id="dark-mode-toggle" type="checkbox">
-    <script onload="init_documents()" src="/js/documents.js"></script>
+<input id="dark-mode-toggle" type="checkbox">
+
+
+<script src="/js/common.mjs"></script>
+<script onload="init_documents()" src="/js/documents.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
 </html>

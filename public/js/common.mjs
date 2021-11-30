@@ -1,5 +1,5 @@
 /**
- * Contains functions to be used across the site.
+ * Contains declarations to be used across the site.
  */
 
 
@@ -9,11 +9,11 @@
  * @param {HTMLElement} container the HTML element to put the newly generated alert in.
  * @param {String} alert_type the type of the warning, in the Bootstrap 4 specification the allowed values are:
  *  "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark"
- * @param {String} text the text body of the alert.
+ * @param {String=""} text the text body of the alert.
  * @param {boolean=true} append whether to append the alert to the container element or
  *  to remove all previous alerts first.
  */
-function showAlert(container, alert_type="warning", text, append=true) {
+function showAlert(container, alert_type="warning", text="", append=true) {
     const alert =
         `<div class="alert alert-${alert_type} alert-dismissible fade show" role="alert">
               ${text}

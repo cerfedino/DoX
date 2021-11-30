@@ -10,6 +10,9 @@ const path = require("path");
 const router = express.Router();
 const fs = require('fs-extra')
 
+const dbops = require('../modules/dbops.js')
+
+
 module.exports = router;
 
 // PARAMETERS
@@ -61,12 +64,14 @@ router.get('/register', function (req, res) {
     IF the user only has read access to it, renders accordingly.
         IF the user has NO access to it, denies access to it.
  */
-router.get('/docs/:id?', function (req, res) {
-    if(req.params.id) {
+router.get('/docs/:id?', async function (req, res) {
+    if (req.params.id) {
         // TODO: Check if user is allowed to view/edit document
         res.render('../views/edit.ejs')
-    } else {
-        res.render('../views/documents.ejs')
+    } else { // Render document list
+
+        // TODO: Retrieve user through token ?
+        res.render('../views/documents.ejs', {docs: await dbops.get_docs_available('61a51a6337c40eddc9f417fb')})
     }
 
 })
