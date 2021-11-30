@@ -3,7 +3,7 @@ const {Plugin, EditorState} = require('prosemirror-state');
 const {EditorView} = require('prosemirror-view');
 const {undo, redo, history} = require('prosemirror-history');
 const {keymap} = require('prosemirror-keymap');
-const {baseKeymap, toggleMark} = require('prosemirror-commands');
+const {baseKeymap, toggleMark, setBlockType} = require('prosemirror-commands');
 
 /**
  * Menu component
@@ -37,8 +37,8 @@ class MenuView {
                 if (activeMarks.includes(item.name)) item.dom.classList.add('active');
                 else item.dom.classList.remove('active');
             } else {
-                let active = item.command(this.editorView.state, null, this.editorView)
-                if (active) item.dom.classList.add('active');
+                let inactive = item.command(this.editorView.state, null, this.editorView)
+                if (!inactive) item.dom.classList.add('active');
                 else item.dom.classList.remove('active');
             }
         });
@@ -61,6 +61,21 @@ function initEditor() {
                     return ['p', 0]
                 },
                 parseDOM: [{tag: 'p'}]
+            },
+            heading: {
+                group: 'block',
+                content: 'text*',
+                attrs: {
+                    level: 1
+                },
+                toDOM(node) {
+                    return ['h' + node.attrs.level, 0]
+                },
+                parseDOM: [
+                    {tag: 'h1', attrs: {level: 1}},
+                    {tag: 'h2', attrs: {level: 2}},
+                    {tag: 'h3', attrs: {level: 3}}
+                ]
             },
             doc: {
                 content: '(block)+'
@@ -105,6 +120,30 @@ function initEditor() {
             type: 'mark',
             command: toggleMark(schema.marks.underline),
             dom: document.getElementById('action-underline')
+        },
+        {
+            name: 'p',
+            type: 'block',
+            command: setBlockType(schema.nodes.paragraph),
+            dom: document.getElementById('action-p')
+        },
+        {
+            name: 'h1',
+            type: 'block',
+            command: setBlockType(schema.nodes.heading, {level: 1}),
+            dom: document.getElementById('action-h1')
+        },
+        {
+            name: 'h2',
+            type: 'block',
+            command: setBlockType(schema.nodes.heading, {level: 2}),
+            dom: document.getElementById('action-h2')
+        },
+        {
+            name: 'h3',
+            type: 'block',
+            command: setBlockType(schema.nodes.heading, {level: 3}),
+            dom: document.getElementById('action-h3')
         }
     ])
     let keys = keymap({
