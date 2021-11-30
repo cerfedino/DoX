@@ -8,20 +8,31 @@
     <style type="text/css">
         @import url("/css/common.css");
         @import url("/css/edit.css");
+        @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css");
     </style>
 </head>
 <body class="">
-<header id="pageheader" class="p-3 mb-5 text-white">
-    <div class="container">
-        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <div class="h3 me-auto col-auto">DoX — New document</div>
-            <form class="col-auto">
-                <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
-            </form>
-            <div class="text-end ms-3">
-                <button type="button" class="btn btn-success me-1">Save</button>
-                <button type="button" class="btn btn-danger">Delete</button>
+<header>
+    <div id="pageheader" class="py-4 text-white">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <div class="h3 me-auto col-auto">DoX — New document</div>
+                <form class="col-auto">
+                    <input type="search" class="form-control form-control-dark" placeholder="Search..."
+                           aria-label="Search">
+                </form>
+                <div class="text-end ms-3">
+                    <button type="button" class="btn btn-success me-1">Save</button>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </div>
             </div>
+        </div>
+    </div>
+    <div class="py-2 border-bottom mb-5 bg-light">
+        <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start">
+            <i id="action-bold" class="bi-type-bold"></i>
+            <i id="action-italic" class="bi-type-italic"></i>
+            <i id="action-underline" class="bi-type-underline"></i>
         </div>
     </div>
 </header>

@@ -6,3 +6,29 @@
     box-shadow: -15px 10px 30px 15px var(--bg-contrast);
     background: white;
 }
+
+.action-icons {
+    font-size: 1.3rem;
+}
+
+.action-icons > i {
+    padding-right: 5px;
+    padding-left: 5px;
+    margin-right: 2px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.action-icons > i.active {
+    color: #1818ff;
+    background-color: #dbdbff;
+}
+
+.action-icons > i:hover {
+    background-color: #e5e5e5;
+}
+
+.action-icons > i.active:hover {
+    color: #1818ff;
+    background-color: #dbdbff;
+}
