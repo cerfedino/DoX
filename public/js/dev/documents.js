@@ -36,10 +36,14 @@ class MenuView {
             if (item.type === 'mark') {
                 if (activeMarks.includes(item.name)) item.dom.classList.add('active');
                 else item.dom.classList.remove('active');
-            } else {
+            } else if (item.type === 'heading') {
                 let inactive = item.command(this.editorView.state, null, this.editorView)
-                if (!inactive) item.dom.classList.add('active');
-                else item.dom.classList.remove('active');
+                if (!inactive) {
+                    item.dom.classList.add('active');
+                    document.getElementById('headingMenu').innerText = item.dom.innerText;
+                } else {
+                    item.dom.classList.remove('active');
+                }
             }
         });
     }
@@ -74,7 +78,10 @@ function initEditor() {
                 parseDOM: [
                     {tag: 'h1', attrs: {level: 1}},
                     {tag: 'h2', attrs: {level: 2}},
-                    {tag: 'h3', attrs: {level: 3}}
+                    {tag: 'h3', attrs: {level: 3}},
+                    {tag: 'h4', attrs: {level: 4}},
+                    {tag: 'h5', attrs: {level: 5}},
+                    {tag: 'h6', attrs: {level: 6}}
                 ]
             },
             doc: {
@@ -123,43 +130,43 @@ function initEditor() {
         },
         {
             name: 'p',
-            type: 'block',
+            type: 'heading',
             command: setBlockType(schema.nodes.paragraph),
             dom: document.getElementById('action-p')
         },
         {
             name: 'h1',
-            type: 'block',
+            type: 'heading',
             command: setBlockType(schema.nodes.heading, {level: 1}),
             dom: document.getElementById('action-h1')
         },
         {
             name: 'h2',
-            type: 'block',
+            type: 'heading',
             command: setBlockType(schema.nodes.heading, {level: 2}),
             dom: document.getElementById('action-h2')
         },
         {
             name: 'h3',
-            type: 'block',
+            type: 'heading',
             command: setBlockType(schema.nodes.heading, {level: 3}),
             dom: document.getElementById('action-h3')
         },
         {
             name: 'h4',
-            type: 'block',
+            type: 'heading',
             command: setBlockType(schema.nodes.heading, {level: 4}),
             dom: document.getElementById('action-h4')
         },
         {
             name: 'h5',
-            type: 'block',
+            type: 'heading',
             command: setBlockType(schema.nodes.heading, {level: 5}),
             dom: document.getElementById('action-h5')
         },
         {
             name: 'h6',
-            type: 'block',
+            type: 'heading',
             command: setBlockType(schema.nodes.heading, {level: 6}),
             dom: document.getElementById('action-h6')
         }
