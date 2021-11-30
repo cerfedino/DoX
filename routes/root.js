@@ -59,6 +59,21 @@ router.get('/register', function (req, res) {
     }
 })
 
+
+/*
+    GET /docs/new
+    Creates a new document and redirects to GET /docs/:id.
+ */
+router.get('/docs/new', async function (req, res) {
+    const newdoc = await dbops.create_doc(ObjectId('61a66271ceec42204e460cdd'))
+
+    if(req.accepts("text/html")) {
+        res.redirect(`/docs/${newdoc._id.toHexString()}`)
+    } else if(req.accepts("application/json")) {
+        res.json(newdoc)
+    }
+})
+
 /*
     GET /docs/:id
     Renders the document edit view for the specified document.
@@ -77,7 +92,7 @@ router.get('/docs/:id?', async function (req, res) {
     } else { // Render document list
 
         // TODO: Retrieve user through token ?
-        res.render('../views/documents.ejs', {docs: await dbops.get_docs_available(ObjectId('61a654dc0472e44a7c3d0232'))})
+        res.render('../views/documents.ejs', {docs: await dbops.get_docs_available(ObjectId('61a66271ceec42204e460cdd'))})
     }
 
 })
