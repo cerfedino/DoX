@@ -134,6 +134,23 @@ function create_doc(owner_id, title="Untitled") {
     })
 }
 
+/**
+ * Deletes a user in the database.
+ * @param {ObjectId} user_id the user to delete.
+ * @returns { Promise<DeleteResult>} resolves when the action has been performed.
+ */
+function delete_user(user_id) {
+    return model.docs.deleteOne({_id:user_id})
+}
+
+/**
+ * Deletes a document in the database.
+ * @param {ObjectId} doc_id the document to delete.
+ * @returns { Promise<DeleteResult>} resolves when the action has been performed.
+ */
+function delete_doc(doc_id) {
+    return model.docs.deleteOne({_id:doc_id})
+}
 
 // ######################
 
@@ -225,6 +242,8 @@ module.exports = {
     get_document,
     create_user,
     create_doc,
+    delete_user,
+    delete_doc,
     user_exists,
     document_exists,
     get_docs_available,
