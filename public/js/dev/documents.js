@@ -3,7 +3,7 @@ const {EditorState} = require('prosemirror-state');
 const {EditorView} = require('prosemirror-view')
 
 let state = EditorState.create({schema});
-let view = new EditorView(document.body, {state});
+let view = new EditorView(document.getElementById("editor"), {state});
 
 document.querySelector("#dark-mode-toggle").addEventListener('change',
     function () {
