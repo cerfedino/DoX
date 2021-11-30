@@ -1,4 +1,4 @@
-const {schema} = require('prosemirror-schema-basic');
+const {Schema} = require('prosemirror-model');
 const {Plugin, EditorState} = require('prosemirror-state');
 const {EditorView} = require('prosemirror-view');
 const {undo, redo, history} = require('prosemirror-history');
@@ -48,6 +48,45 @@ class MenuView {
 initEditor();
 
 function initEditor() {
+    let schema = new Schema({
+        nodes: {
+            text: {
+                group: 'inline',
+                inline: true
+            },
+            paragraph: {
+                group: 'block',
+                content: 'text*',
+                toDOM() {
+                    return ['p', 0]
+                },
+                parseDOM: [{tag: 'p'}]
+            },
+            doc: {
+                content: '(block)+'
+            }
+        },
+        marks: {
+            strong: {
+                toDOM() {
+                    return ['strong', 0]
+                },
+                parseDOM: [{tag: 'strong'}]
+            },
+            em: {
+                toDOM() {
+                    return ['em', 0]
+                },
+                parseDOM: [{tag: 'em'}]
+            },
+            underline: {
+                toDOM() {
+                    return ['u', 0]
+                },
+                parseDOM: [{tag: 'u'}]
+            }
+        }
+    })
     let menu = menuPlugin([
         {
             name: 'strong',
@@ -60,15 +99,28 @@ function initEditor() {
             type: 'mark',
             command: toggleMark(schema.marks.em),
             dom: document.getElementById('action-italic')
+        },
+        {
+            name: 'underline',
+            type: 'mark',
+            command: toggleMark(schema.marks.underline),
+            dom: document.getElementById('action-underline')
         }
     ])
+    let keys = keymap({
+        'Mod-z': undo,
+        'Mod-y': redo,
+        'Mod-b': toggleMark(schema.marks.strong),
+        'Mod-i': toggleMark(schema.marks.em),
+        'Mod-u': toggleMark(schema.marks.underline)
+    });
 
     let state = EditorState.create({
         schema,
         plugins: [
             history(),
-            keymap({'Mod-z': undo, 'Mod-y': redo}),
             keymap(baseKeymap),
+            keys,
             menu
         ]
     });
@@ -94,7 +146,7 @@ function menuPlugin(items) {
  * Gets active marks on the current selection
  * @author https://github.com/PierBover/
  */
-function getActiveMarkCodes (view) {
+function getActiveMarkCodes(view) {
     const isEmpty = view.state.selection.empty;
     const state = view.state;
 
