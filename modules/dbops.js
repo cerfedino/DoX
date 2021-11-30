@@ -1,6 +1,5 @@
 const {model} = require('../models')
 const auth = require("./auth.js")
-const {ObjectId} = require("mongodb");
 
 /**
  * Contains all database operations.
@@ -39,7 +38,7 @@ function run_find(collection, filter) {
 
 /**
  * Returns a certain document in the database.
- * @param {String} _id the ID of the document to look for.
+ * @param {ObjectId} _id the ID of the document to look for.
  * @returns {Promise<[]>} A Promise that resolves with the fetched document. Resolves undefined if the document cant be found
  */
  function get_document(_id) {
@@ -87,7 +86,7 @@ function create_user(username,email,hash) {
 
 /**
  * Creates and inserts a new document in the database.
- * @param {String} owner_id the owner of the newly created document.
+ * @param {ObjectId} owner_id the owner of the newly created document.
  * @param {String="Untitled"} title the title of the newly created document.
  * @returns {Promise<object>} the data of the new document.
  */
@@ -176,16 +175,15 @@ function document_exists(filter={}) {
 // Get documents available to user
 /**
  * Returns all the documents available for a specific user.
- * @param {String} user_id the user to return the documents for.
+ * @param {ObjectId} user_id the user to return the documents for.
  * @returns {Promise<[]>} resolves with the documents that are available to the user.
  */
 function get_docs_available(user_id) {
-    const userid = ObjectId(user_id)
     const filter = {
         $or:[
-            {perm_read : {$elemMatch : {$eq : userid}}},
-            {perm_edit : {$elemMatch : {$eq : userid}}},
-            {owner : {$elemMatch : {$eq : userid}}}
+            {perm_read : {$elemMatch : {$eq : user_id}}},
+            {perm_edit : {$elemMatch : {$eq : user_id}}},
+            {owner : {$elemMatch : {$eq : user_id}}}
         ]
     }
     return run_find(model.docs, filter)
@@ -196,8 +194,8 @@ function get_docs_available(user_id) {
 // Get permissions of user over document
 /**
  * Returns the permissions of a user over a document.
- * @param {String} user_id the user id.
- * @param {String} doc_id the document id.
+ * @param {ObjectId} user_id the user id.
+ * @param {ObjectId} doc_id the document id.
  * @returns {Promise<["read"|"edit"|"owner"]>} Returns an array containing all the permissions of the user over the document.
  *  E.g  ["read","write","owner"]
  */

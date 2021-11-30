@@ -11,6 +11,7 @@ const router = express.Router();
 const fs = require('fs-extra')
 
 const dbops = require('../modules/dbops.js')
+const {ObjectId} = require("mongodb");
 
 
 module.exports = router;
@@ -66,19 +67,24 @@ router.get('/register', function (req, res) {
  */
 router.get('/docs/:id?', async function (req, res) {
     if (req.params.id) {
+        if(!(await dbops.document_exists({_id:ObjectId(req.params.id)}))) {
+            res.status(404).end()
+            return
+        }
+
         // TODO: Check if user is allowed to view/edit document
-        res.render('../views/edit.ejs')
+        res.render('../views/edit.ejs',{doc: await dbops.get_document(ObjectId(req.params.id))})
     } else { // Render document list
 
         // TODO: Retrieve user through token ?
-        res.render('../views/documents.ejs', {docs: await dbops.get_docs_available('61a51a6337c40eddc9f417fb')})
+        res.render('../views/documents.ejs', {docs: await dbops.get_docs_available(ObjectId('61a5fee0f6127164187fc7b1'))})
     }
 
 })
 
 /*
     GET /*
-    Serves the files in the /public folder, if tehy exist.
+    Serves the files in the /public folder.
  */
 router.get("/*", (req,res)=>{
     const path = `${public}${req.path}`
@@ -98,7 +104,8 @@ router.get("/*", (req,res)=>{
     Authenticates a user with credentials
  */
 router.post("/auth",(req,res)=>{
-
+    console.log("AUTH ATTEMPT")
+    res.json("")
 })
 
 /*
@@ -106,5 +113,6 @@ router.post("/auth",(req,res)=>{
     Registers a new user
  */
 router.post("/auth/register",(req,res)=>{
-
+    console.log("REGISTER ATTEMPT")
+    res.json("")
 })
