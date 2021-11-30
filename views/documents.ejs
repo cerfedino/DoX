@@ -1,27 +1,30 @@
 <%
 if(!docs) {
-    console.log("Docs is not defined")
     var docs = []
 }
-//
-//
+
 var doc_cards = ""
 docs.forEach(doc=>{
     doc_cards += generate_document_card(doc)
 })
 
- function generate_document_card(doc) {
-     return `<div class="card document">
-                <div class="card-body">
-                    <h6 class="card-title">${doc.title}</h6>
-                    <p class="card-text">${doc.body}</p>
-                </div>
-                <div class="card-footer">
-                    <a href="/docs/${doc._id}" class="btn btn-sm btn-primary">Edit</a>
-                    <form _method="DELETE" action="/docs/${doc._id}" class="delete-doc"> <input type="submit" href="#" class="btn btn-sm btn-danger" value="Delete"></input> </form>
-                </div>
-            </div>`
- }
+/**
+ * Generates the html code for a document card.
+ * @param {object} doc the document to generate the card from.
+ * @returns {string} the generated html code.
+ */
+function generate_document_card(doc) {
+    return `<div class="card document">
+            <div class="card-body">
+                <h6 class="card-title">${doc.title}</h6>
+                <p class="card-text">${doc.body}</p>
+            </div>
+            <div class="card-footer">
+                <a href="/docs/${doc._id}" class="btn btn-sm btn-primary">Edit</a>
+                <form _method="DELETE" action="/docs/${doc._id}" class="delete-doc"> <input type="submit" href="#" class="btn btn-sm btn-danger" value="Delete"></input> </form>
+            </div>
+        </div>`
+}
 
 
  %>

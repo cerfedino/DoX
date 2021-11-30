@@ -1,14 +1,17 @@
 function init_login() {
     const form = document.querySelector(".login-form form")
 
+    // Submission of the LOGIN form
     form.addEventListener("submit",function(e){
         e.preventDefault()
-        // TODO: Send login fields to POST /auth
+
+        // Check for invalid fields
         const mistakes = validateForm(this)
         if(mistakes) {
             showAlert(document.querySelector(".form-alerts.top"),"danger",mistakes,false)
             return
         }
+        //
 
         fetch(this.action,
             {
@@ -26,6 +29,10 @@ function init_login() {
             })
     })
 
+    /**
+     * Validates the form input fields and returns and returns an unordered list of errors.
+     * @returns {string} unordered list containing a list of errors, or the empty string if the form fields are all valid.
+     */
     function validateForm() {
         var mistakes = ""
 
@@ -38,14 +45,6 @@ function init_login() {
         if (pwd === "") {
             mistakes += "<li> Username cannot be empty </li>"
         }
-        return mistakes? `Please fix the following:<ul>${mistakes}</ul>` : undefined;
+        return mistakes? `Please fix the following:<ul>${mistakes}</ul>` : "";
     }
-
-    document.querySelector("#dark-mode-toggle").addEventListener('change',
-        function() {
-            if(this.checked)
-                document.body.classList.add("dark-theme")
-            else
-                document.body.classList.remove('dark-theme')
-        });
 }

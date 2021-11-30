@@ -17,7 +17,7 @@
  *
  *       DOCS
  *       {
- *           {String} name,
+ *           {String} title,
  *           {ObjectId} _id, 
  *           {URL} path, 
  *           perm_read: [],

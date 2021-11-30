@@ -1,14 +1,17 @@
 function init_register() {
     const form = document.querySelector(".login-form form")
 
+    // Submission of the register form
     form.addEventListener("submit",function(e) {
         e.preventDefault()
-        // TODO: Send register fields to POST /auth/register
+
+        // Check for invalid fields
         const mistakes = validateForm(this)
         if(mistakes) {
             showAlert(document.querySelector(".form-alerts.top"),"danger",mistakes,false)
             return
         }
+        //
 
         fetch(this.action,
             {
@@ -27,7 +30,10 @@ function init_register() {
             })
     })
 
-
+    /**
+     * Validates the form input fields and returns and returns an unordered list of errors.
+     * @returns {string} unordered list containing a list of errors, or the empty string if the form fields are all valid.
+     */
     function validateForm(form) {
         var mistakes = ""
 
@@ -41,25 +47,6 @@ function init_register() {
         if (username === "") {
             mistakes += "<li> Username cannot be empty </li>"
         }
-        return mistakes? `Please fix the following:<ul>${mistakes}</ul>` : undefined;
+        return mistakes? `Please fix the following:<ul>${mistakes}</ul>` : "";
     }
-
-
-
-
-
-
-
-
-
-
-
-
-    document.querySelector("#dark-mode-toggle").addEventListener('change',
-        function() {
-            if(this.checked)
-                document.body.classList.add("dark-theme")
-            else
-                document.body.classList.remove('dark-theme')
-        });
 }

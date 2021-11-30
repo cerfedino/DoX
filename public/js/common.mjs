@@ -27,3 +27,12 @@ function showAlert(container, alert_type="warning", text="", append=true) {
     } else
         container.innerHTML = alert
 }
+
+// Dark-theme toggle
+document.querySelector("#dark-mode-toggle")?.addEventListener('change',
+    function() {
+        if(this.checked)
+            document.body.classList.add("dark-theme")
+        else
+            document.body.classList.remove('dark-theme')
+    });
