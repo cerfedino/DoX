@@ -18,7 +18,7 @@ docs.forEach(doc=>{
                 </div>
                 <div class="card-footer">
                     <a href="/docs/${doc._id}" class="btn btn-sm btn-primary">Edit</a>
-                    <form method="DELETE" action="/docs/${doc._id}"> <a href="#" class="btn btn-sm btn-danger">Delete</a> </form>
+                    <form _method="DELETE" action="/docs/${doc._id}" class="delete-doc"> <input type="submit" href="#" class="btn btn-sm btn-danger" value="Delete"></input> </form>
                 </div>
             </div>`
  }

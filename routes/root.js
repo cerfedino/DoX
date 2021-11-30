@@ -67,17 +67,17 @@ router.get('/register', function (req, res) {
  */
 router.get('/docs/:id?', async function (req, res) {
     if (req.params.id) {
-        if(!(await dbops.document_exists({_id:ObjectId(req.params.id)}))) {
+        if (!(await dbops.document_exists({_id: ObjectId(req.params.id)}))) {
             res.status(404).end()
             return
         }
 
-        // TODO: Check if user is allowed to view/edit document
+        // TODO: AUTH. Check if user is allowed to view/edit document
         res.render('../views/edit.ejs',{doc: await dbops.get_document(ObjectId(req.params.id))})
     } else { // Render document list
 
         // TODO: Retrieve user through token ?
-        res.render('../views/documents.ejs', {docs: await dbops.get_docs_available(ObjectId('61a5fee0f6127164187fc7b1'))})
+        res.render('../views/documents.ejs', {docs: await dbops.get_docs_available(ObjectId('61a654dc0472e44a7c3d0232'))})
     }
 
 })
@@ -115,4 +115,25 @@ router.post("/auth",(req,res)=>{
 router.post("/auth/register",(req,res)=>{
     console.log("REGISTER ATTEMPT")
     res.json("")
+})
+
+// ###############
+// DELETE REQUESTS
+// ###############
+
+
+/*
+    DELETE /docs/:id
+    Deletes a document.
+ */
+router.delete("/docs/:id", async (req, res) => {
+    if (!(await dbops.document_exists({_id: ObjectId(req.params.id)}))) {
+        res.status(404).end()
+        return
+    }
+
+    // TODO: Check if user is owner of document.
+    if(true)
+        await dbops.delete_doc(ObjectId(req.params.id))
+    res.end()
 })
