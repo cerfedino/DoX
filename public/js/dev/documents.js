@@ -144,6 +144,24 @@ function initEditor() {
             type: 'block',
             command: setBlockType(schema.nodes.heading, {level: 3}),
             dom: document.getElementById('action-h3')
+        },
+        {
+            name: 'h4',
+            type: 'block',
+            command: setBlockType(schema.nodes.heading, {level: 4}),
+            dom: document.getElementById('action-h4')
+        },
+        {
+            name: 'h5',
+            type: 'block',
+            command: setBlockType(schema.nodes.heading, {level: 5}),
+            dom: document.getElementById('action-h5')
+        },
+        {
+            name: 'h6',
+            type: 'block',
+            command: setBlockType(schema.nodes.heading, {level: 6}),
+            dom: document.getElementById('action-h6')
         }
     ])
     let keys = keymap({
