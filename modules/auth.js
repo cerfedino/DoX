@@ -1,30 +1,26 @@
-const {model} = require("../models/")
-const dbops = require("./dbops.js")
-
 // Hashing
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-//
+
+/**
+ * To encrypt a password
+ * @param {String} pwd the password to encrypt 
+ * @returns a crypted version of the given password
+ */
 function encrypt_pwd(pwd) {
     return bcrypt.hash(pwd, saltRounds)
 }
-function check_pwd(pwd,hash) {
-    return bcrypt.compare(pwd,hash)
-}
 
 /**
- * Authenticates a user.
- * @param {String} user_id the user to authenticate.
- * @param hash the hashed password.
- * @returns {Promise<boolean>} whether the user has been successfully authenticated or not.
+ * To decrypt a password
+ * @param {String} pwd password to check
+ * @param {String} hash hash to compare with
+ * @returns true if password match
  */
-function auth_usr(user_id, hash) {
-    return new Promise(async (resolve)=>{
-        const user = await dbops.get_user({_id:user_id})
-        return user.password == hash
-        // To be continued
-    })
+function check_pwd(pwd,hash) {
+    return bcrypt.compareSync(pwd,hash)
 }
 
 
-module.exports = {encrypt_pwd, check_pwd, auth_usr}
+
+module.exports = {encrypt_pwd, check_pwd}
