@@ -49,14 +49,11 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
 }));
+
 // INIT passport on every route call.
 app.use(passport.initialize());
 // allow passport to use "express-session".
 app.use(passport.session());
-
-
-
-
 
 // log-in
 passport.use('local-login', new LocalStrategy(passportStrategies.authUser))
@@ -82,9 +79,6 @@ app.use(flash());
 // Custom middleware authentication and flash message view middleware
 app.use(userInViews)
 app.use(flashMessageInViews)
-
-
-
 
 
 
