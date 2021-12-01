@@ -36,8 +36,8 @@ const flashMessageInViews = require('./modules/auth_middleware/flashMessageInvie
 const app = express();
 
 var flash = require('connect-flash');
-
 app.use(flash());
+
 // initialize session
 app.use(session({
     secret: "secret",
