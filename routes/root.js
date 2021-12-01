@@ -27,9 +27,9 @@ function checkAuthenticated(req, res, next) {
 }
 
 function checkLoggedIn(req, res, next) {
-    // if (req.isAuthenticated()) {
-    //      return res.redirect("/docs")
-    // }
+    if (req.isAuthenticated()) {
+        return res.redirect("/docs")
+    }
     next()
 }
 

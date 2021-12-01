@@ -24,9 +24,9 @@ const passportStrategies = require('./modules/passportStrategies.js');
 const LocalStrategy = require('passport-local').Strategy;
 
 // Custom middleware authentication and flash message view middleware 
+const flash = require('connect-flash');
 const userInViews = require('./modules/auth_middleware/UserInviews.js')
 const flashMessageInViews = require('./modules/auth_middleware/flashMessageInviews.js')
-var flash = require('connect-flash');
 
 
 

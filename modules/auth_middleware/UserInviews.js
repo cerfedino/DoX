@@ -8,5 +8,8 @@
  */
 module.exports = (req, res, next) => {
     res.locals.user = req.isAuthenticated()
+    if(req.isAuthenticated()) {
+        res.locals.userid = req.user.user_id;
+    }
     next()
 }
