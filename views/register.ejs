@@ -29,9 +29,19 @@
             <input class="form-control" type="password" oninput="checkPassword()" id="confirmPassword" name="confirmPassword" placeholder="Confirm password">
             <label for="confirmPassword">Confirm password</label>
         </div>
+        <div class="form-floating">
+            <input class="form-control" type="text" id="email" name="email" placeholder="email">
+            <label for="email">Email</label>
+        </div>
         <input type="submit" class="btn btn-primary w-100 btn-lg" value="Sign up">
         <p>Already registered? <a href="/login">Sign in</a></p>
     </form>
+    <div style="background-color: red">    
+        aaa <%= messageFailure %>
+    </div>
+    <div style="background-color: green">    
+        bbb <%= messageSuccess %>
+    </div>
 
     <script>
         function checkPassword() {
