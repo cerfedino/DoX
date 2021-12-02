@@ -35,7 +35,6 @@ class MenuView {
     update() {
         let activeMarks = getActiveMarkCodes(this.editorView);
         let availableNodes = getAvailableBlockTypes(this.editorView, this.editorView.state.schema);
-        console.log(activeMarks);
 
         // Update marks
         for (let item of this.items) {
@@ -129,11 +128,22 @@ function initEditor() {
         }
     })*/
 
-    let schema = new Schema({
+    let base = {
         nodes: addListNodes(basicSchema.schema.spec.nodes, 'paragraph block*', 'block'),
         marks: basicSchema.schema.spec.marks
+    }
+
+    // Extended features
+    base.marks = base.marks.addToEnd('underline', {
+        toDOM() {
+            return ['u', 0]
+        },
+        parseDOM: [{tag: 'u'}]
     })
 
+    let schema = new Schema(base);
+
+    debugger
     let menu = menuPlugin([
         {
             name: 'strong',
