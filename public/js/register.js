@@ -1,35 +1,34 @@
 function init_register() {
-  
     const form = document.querySelector(".login-form form")
 
     // Submission of the register form
-    form.addEventListener("submit",function(e) {
-        e.preventDefault()
+    // form.addEventListener("submit",function(e) {
+    //     e.preventDefault()
 
-        // Check for invalid fields
-        const mistakes = validateForm(this)
-        if(mistakes) {
-            showAlert(document.querySelector(".form-alerts.top"),"danger",mistakes,false)
-            return
-        }
-        //
+    //     // Check for invalid fields
+    //     const mistakes = validateForm(this)
+    //     if(mistakes) {
+    //         showAlert(document.querySelector(".form-alerts.top"),"danger",mistakes,false)
+    //         return
+    //     }
+    //     //
 
-        fetch(this.action,
-            {
-                method: this.method,
-                headers: {  "Accept":"application/json"},
-                body: new FormData(this)
-            }).then(res=>{return res.json()})
-            .then(res => {
-                if(true) {      // TODO: If register successful
-                    window.location = "/login"
-                } else {
+    //     fetch(this.action,
+    //         {
+    //             method: this.method,
+    //             headers: {  "Accept":"application/json"},
+    //             body: new FormData(this)
+    //         }).then(res=>{return res.json()})
+    //         .then(res => {
+    //             if(true) {      // TODO: If register successful
+    //                 window.location = "/login"
+    //             } else {
 
-                    // Display error message under form
-                    showAlert(document.querySelector(".form-alerts.top"),"warning","Register unsuccessful",false)
-                }
-            })
-    })
+    //                 // Display error message under form
+    //                 showAlert(document.querySelector(".form-alerts.top"),"warning","Register unsuccessful",true)
+    //             }
+    //         })
+    // })
 
     /**
      * Validates the form input fields and returns and returns an unordered list of errors.

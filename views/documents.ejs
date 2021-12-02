@@ -62,19 +62,22 @@ function generate_document_card(doc) {
             <a href="/docs/new"><i class="far fa-plus-square"></i></a>
         </div>
 
-
-        <div style="background-color: red">    
-            aaa <%= isUserAuthenticated %>
-        </div>
-        <div style="background-color: green">    
-            bbb <%= userid %>
-        </div>
-        <div style="background-color: red">    
-            aaa <%= messageFailure %>
-        </div>
-        <div style="background-color: green">    
-            bbb <%= messageSuccess %>
-        </div>
+        <% if (messageFailure != '') { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= messageFailure %>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+        <% } %>
+        <% if (messageSuccess != '') { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= messageSuccess %> : <%= userid %>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+        <% } %>
 
         <%- doc_cards %>
     </main>

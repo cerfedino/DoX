@@ -41,32 +41,32 @@ function init_login() {
     // })
   
     // Submission of the LOGIN form
-    form.addEventListener("submit",function(e){
-        e.preventDefault()
+    // form.addEventListener("submit",function(e){
+    //     e.preventDefault()
 
-        // Check for invalid fields
-        const mistakes = validateForm(this)
-        if(mistakes) {
-            showAlert(document.querySelector(".form-alerts.top"),"danger",mistakes,false)
-            return
-        }
-        //
+    //     // Check for invalid fields
+    //     const mistakes = validateForm(this)
+    //     if(mistakes) {
+    //         showAlert(document.querySelector(".form-alerts.top"),"danger",mistakes,false)
+    //         return
+    //     }
+    //     //
 
-        fetch(this.action,
-            {
-                method: this.method,
-                headers: {  "Accept":"application/json"},
-                body: new FormData(this)
-            }).then(res=>{return res.json()})
-            .then(res => {
-                if(true) { // TODO: If auth successful
-                    window.location = "/docs"
-                } else {
-                    // Display error message under form
-                    showAlert(document.querySelector(".form-alerts.top"),"warning","Login unsuccessful",false)
-                }
-            })
-    })
+    //     fetch(this.action,
+    //         {
+    //             method: this.method,
+    //             headers: {  "Accept":"application/json"},
+    //             body: new FormData(this)
+    //         }).then(res=>{return res.json()})
+    //         .then(res => {
+    //             if(true) { // TODO: If auth successful
+    //                 window.location = "/docs"
+    //             } else {
+    //                 // Display error message under form
+    //                 showAlert(document.querySelector(".form-alerts.top"),"warning","Login unsuccessful",false)
+    //             }
+    //         })
+    // })
 
     /**
      * Validates the form input fields and returns and returns an unordered list of errors.
@@ -84,6 +84,6 @@ function init_login() {
         if (pwd === "") {
             mistakes += "<li> Username cannot be empty </li>"
         }
-        return mistakes? `Please fix the following:<ul>${mistakes}</ul>` : "";
+        return mistakes ? `Please fix the following:<ul>${mistakes}</ul>` : "";
     }
 }
