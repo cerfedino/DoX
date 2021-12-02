@@ -25,6 +25,12 @@
     background-color: #dbdbff;
 }
 
+.action-icons > i.disabled {
+    cursor: auto;
+    color: #a3a3a3;
+    background-color: #e5e5e5;
+}
+
 .action-icons > i:hover {
     background-color: #e5e5e5;
 }
@@ -32,6 +38,11 @@
 .action-icons > i.active:hover {
     color: #1818ff;
     background-color: #dbdbff;
+}
+
+.action-icons > i.disabled:hover {
+    color: #a3a3a3;
+    background-color: #e5e5e5;
 }
 
 .ProseMirror:focus {

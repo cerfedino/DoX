@@ -3,7 +3,7 @@ const {Plugin, EditorState} = require('prosemirror-state');
 const {EditorView} = require('prosemirror-view');
 const {undo, redo, history} = require('prosemirror-history');
 const {keymap} = require('prosemirror-keymap');
-const {baseKeymap, toggleMark, setBlockType} = require('prosemirror-commands');
+const {baseKeymap, toggleMark, setBlockType, lift} = require('prosemirror-commands');
 const basicSchema = require('prosemirror-schema-basic')
 const {wrapInList, addListNodes, splitListItem} = require("prosemirror-schema-list");
 
@@ -36,16 +36,6 @@ class MenuView {
         let activeMarks = getActiveMarkCodes(this.editorView);
         let availableNodes = getAvailableBlockTypes(this.editorView, this.editorView.state.schema);
 
-        // Update marks
-        for (let item of this.items) {
-            if (item.type === 'mark') {
-                if (activeMarks.includes(item.name))
-                    item.dom.classList.add('active');
-                else
-                    item.dom.classList.remove('active');
-            }
-        }
-
         // Update heading dropdown menu
         let currentLevel;
         // If availableNodes === [] the selection includes a list
@@ -61,6 +51,18 @@ class MenuView {
                     document.getElementById('headingMenu').innerText = item.dom.innerText;
                 } else {
                     item.dom.classList.remove('active');
+                }
+            } else if (item.type === 'mark') {
+                if (activeMarks.includes(item.name))
+                    item.dom.classList.add('active');
+                else
+                    item.dom.classList.remove('active');
+            } else {
+                // Will return false, if the command can't be executed
+                if (!item.command(this.editorView.state, null, this.editorView)) {
+                    item.dom.classList.add('disabled');
+                } else {
+                    item.dom.classList.remove('disabled');
                 }
             }
         }
@@ -234,6 +236,7 @@ function initEditor() {
 
 function buildKeymap(schema) {
     let keys = {}
+
     function bind(key, cmd) {
         keys[key] = cmd;
     }
@@ -302,7 +305,7 @@ function getActiveMarkCodes(view) {
  * Check the current available node types
  * @author https://github.com/PierBover/
  */
-function getAvailableBlockTypes (editorView, schema) {
+function getAvailableBlockTypes(editorView, schema) {
     // get all the available nodeTypes in the schema
     const nodeTypes = schema.nodes;
 
