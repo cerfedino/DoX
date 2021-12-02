@@ -243,7 +243,7 @@ function buildKeymap(schema) {
 
     bind('Mod-b', toggleMark(schema.marks.strong));
     bind('Mod-i', toggleMark(schema.marks.em));
-    // underline
+    bind('Mod-u', toggleMark(schema.marks.underline));
 
     bind('Enter', splitListItem(schema.nodes.list_item));
 
