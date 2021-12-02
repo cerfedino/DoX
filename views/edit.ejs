@@ -30,28 +30,51 @@
     </div>
     <div class="py-2 border-bottom mb-5 bg-light">
         <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
-            <i id="action-bold" class="bi-type-bold"></i>
-            <i id="action-italic" class="bi-type-italic"></i>
-            <i id="action-underline" class="bi-type-underline me-2"></i>
+            <i id="action-bold" class="bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Bold (Ctrl-B)"></i>
+            <i id="action-italic" class="bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Italic (Ctrl-I)"></i>
+            <i id="action-underline" class="bi-type-underline me-2" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Underline (Ctrl-U)"></i>
 
             <div class="dropdown me-2">
                 <button class="btn-sm btn-secondary dropdown-toggle" type="button" id="headingMenu"
-                        data-bs-toggle="dropdown" aria-expanded="false">Normal text</button>
+                        data-bs-toggle="dropdown" aria-expanded="false">Normal text
+                </button>
                 <ul class="dropdown-menu" aria-labelledby="headingMenu">
-                    <li><button id="action-h1" class="dropdown-item h1">Heading 1</button></li>
-                    <li><button id="action-h2" class="dropdown-item h2">Heading 2</button></li>
-                    <li><button id="action-h3" class="dropdown-item h3">Heading 3</button></li>
-                    <li><button id="action-h4" class="dropdown-item h4">Heading 4</button></li>
-                    <li><button id="action-h5" class="dropdown-item h5">Heading 5</button></li>
-                    <li><button id="action-h6" class="dropdown-item h6">Heading 6</button></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><button id="action-p" class="dropdown-item">Normal text</button></li>
+                    <li>
+                        <button id="action-h1" class="dropdown-item h1">Heading 1</button>
+                    </li>
+                    <li>
+                        <button id="action-h2" class="dropdown-item h2">Heading 2</button>
+                    </li>
+                    <li>
+                        <button id="action-h3" class="dropdown-item h3">Heading 3</button>
+                    </li>
+                    <li>
+                        <button id="action-h4" class="dropdown-item h4">Heading 4</button>
+                    </li>
+                    <li>
+                        <button id="action-h5" class="dropdown-item h5">Heading 5</button>
+                    </li>
+                    <li>
+                        <button id="action-h6" class="dropdown-item h6">Heading 6</button>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <button id="action-p" class="dropdown-item">Normal text</button>
+                    </li>
                 </ul>
             </div>
 
-            <i id="action-lift-item" class="bi-text-indent-left disabled"></i>
-            <i id="action-bullet-list" class="bi-list-ul"></i>
-            <i id="action-ordered-list" class="bi-list-ol"></i>
+            <i id="action-lift-item" class="bi-text-indent-left" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Lift list item"></i>
+            <i id="action-bullet-list" class="bi-list-ul" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Create bullet list"></i>
+            <i id="action-ordered-list" class="bi-list-ol" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Create ordered list"></i>
         </div>
     </div>
 </header>
@@ -65,6 +88,12 @@
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>
 <script type="module" src="/js/build-documents.js"></script>
+<script>
+    let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
 
 </body>
 </html>
