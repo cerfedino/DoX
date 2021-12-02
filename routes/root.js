@@ -6,36 +6,47 @@
  */
 
 const express = require('express');
-const path = require("path");
 const router = express.Router();
-const fs = require('fs-extra')
+
+const dbops = require('../modules/dbops.js')
+const {ObjectId} = require("mongodb");
+
+const passport = require('passport');
+
 
 module.exports = router;
 
-// PARAMETERS
-const public = path.resolve(__dirname, "../public/")
+
 ////////////////
+
+/*
+    Middleware to check if the user is authenticated 
+ */
+function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) { return next() }
+    res.redirect("/login")
+}
+
+/*
+    Middleware to check if the user is already logged in
+ */
+function checkLoggedIn(req, res, next) {
+    if (req.isAuthenticated()) {
+        return res.redirect("/docs")
+    }
+    next()
+}
 
 // ###############
 // GET REQUESTS
 // ###############
 
-/*
-    GET /
-    If authentication is succesfull, redirects to the documents view.
-        Otherwise, redirects to the GET /login
- */
-router.get('/', function (req, res) {
-    //TODO: Implement auth
-
-    res.redirect("/login")
-})
 
 /*
     GET /login
     Renders the login form.
  */
-router.get('/login', function (req, res) {
+router.get('/login', checkLoggedIn, function (req, res) {
     if (req.accepts("text/html")) {
         res.render('../views/login.ejs', {});
     } else {
@@ -56,32 +67,51 @@ router.get('/register', function (req, res) {
 })
 
 /*
+    GET /
+    If authentication is succesfull, redirects to the documents view.
+        Otherwise, redirects to the GET /login
+ */
+router.get('/', function (req, res) {
+    res.redirect('/docs')
+})
+        
+
+/*
+    GET /docs/new
+    Creates a new document and redirects to GET /docs/:id.
+ */
+router.get('/docs/new', checkAuthenticated, async function (req, res) {
+    const newdoc = await dbops.create_doc(ObjectId(req.user.user_id))
+
+    if(req.accepts("text/html")) {
+        res.redirect(`/docs/${newdoc._id.toHexString()}`)
+    } else if(req.accepts("application/json")) {
+        res.json(newdoc)
+    }
+})
+
+/*
     GET /docs/:id
     Renders the document edit view for the specified document.
     IF the user only has read access to it, renders accordingly.
         IF the user has NO access to it, denies access to it.
  */
-router.get('/docs/:id?', function (req, res) {
-    if(req.params.id) {
-        // TODO: Check if user is allowed to view/edit document
-        res.render('../views/edit.ejs')
-    } else {
-        res.render('../views/documents.ejs')
+router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
+    if (req.params.id) {
+        if (!(await dbops.document_exists({_id: ObjectId(req.params.id)}))) {
+            res.status(404).end()
+            return
+        }
+
+        // TODO: AUTH. Check if user is allowed to view/edit document
+        if(true)
+            res.render('../views/edit.ejs',{doc: await dbops.get_document(ObjectId(req.params.id))})
+    } else { // Render document list
+        res.render('../views/documents.ejs', {docs: await dbops.get_docs_available(ObjectId(req.user.user_id))})
     }
 
 })
 
-/*
-    GET /*
-    Serves the files in the /public folder, if tehy exist.
- */
-router.get("/*", (req,res)=>{
-    const path = `${public}${req.path}`
-    if (fs.pathExistsSync(path)) {
-        res.status(200).sendFile(path)
-    } else
-        res.status(404).end()
-})
 
 
 // ###############
@@ -92,14 +122,86 @@ router.get("/*", (req,res)=>{
     POST /auth
     Authenticates a user with credentials
  */
-router.post("/auth",(req,res)=>{
+router.post("/auth", passport.authenticate('local-login', {
+    successRedirect: "/docs",
+    failureRedirect: "/login",
+    failureFlash: {
+        type: 'messageFailure',
+        message: 'Invalid username and/or password.'
+    },
+    successFlash: {
+        type: 'messageSuccess',
+        message: 'Successfully logged in.'
+    }
+}))
 
-})
+
+// router.get("/auth/status",(req,res)=>{
+//     let auth = {}
+//     if(req.flash('messageSuccess')) {
+//         auth.status="ok"
+//     } else if(req.flash('messageFailure')) {
+//         auth.status
+//     }
+//     if(req.flash('messageFailure') || req.flash('messageSuccess')) {
+//         auth.status = 
+//     }
+//     res.json({
+        
+//     })
+// })
+
 
 /*
     POST /auth/register
     Registers a new user
  */
-router.post("/auth/register",(req,res)=>{
+router.post("/auth/register", passport.authenticate('local-signup', {
+    successRedirect: '/login',
+    failureRedirect: '/register',
+    failureFlash: {
+        type: 'messageFailure',
+        message: 'Username already taken.'
+    },
+    successFlash: {
+        type: 'messageSuccess',
+        message: 'Successfully signed up.'
+    }
+}))
 
+
+
+
+  
+// ###############
+// DELETE REQUESTS
+// ###############
+
+/*
+DELETE /logout
+Log-out user
+*/
+router.delete("/logout", (req,res) => {
+    req.logOut()
+    req.flash('messageSuccess', 'Successfully logged out')
+    res.redirect("/login")
+})
+
+
+/*
+    DELETE /docs/:id
+    Deletes a document.
+ */
+router.delete("/docs/:id", async (req, res) => {
+    if (!(await dbops.document_exists({_id: ObjectId(req.params.id)}))) {
+        res.status(404).end()
+        return
+    }
+
+    const doc = await dbops.get_document(ObjectId(req.params.id))
+
+    if(doc.owner == req.user.user_id)
+        await dbops.delete_doc(ObjectId(req.params.id))
+    
+    res.end()
 })

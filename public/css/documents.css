@@ -31,6 +31,23 @@ div.card div.card-body *{
     color: var(--contrast-text)
 }
 
+div.card div.card-footer *{
+    display: inline-block;
+    opacity: 0;
+}
+.card.document:hover .card-footer *{
+    opacity: 1;
+}
+
+.card.document.document-create {
+    display: flex;
+    justify-content: center;
+}
+.card.document.document-create a {
+    width: 40%;
+    margin: 0 auto;
+}
+
 svg#logo {
     height: 3vmax;
 }
