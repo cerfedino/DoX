@@ -143,7 +143,6 @@ function initEditor() {
 
     let schema = new Schema(base);
 
-    debugger
     let menu = menuPlugin([
         {
             name: 'strong',
