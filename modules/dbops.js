@@ -164,7 +164,7 @@ function delete_doc(doc_id) {
  * @returns {Promise<boolean>} whether at least a user exists for the specified filter.
  */
 function user_exists(filter={}) {
-    return new Promise(async (resolve, reject)=> {
+    return new Promise((resolve, reject)=> {
         model.users.countDocuments(filter,(err,count)=>{
             if (err) reject(err)
             resolve(count>0)
@@ -181,7 +181,7 @@ function user_exists(filter={}) {
  * @returns {Promise<boolean>} whether at least a document exists for the specified filter.
  */
 function document_exists(filter={}) {
-    return new Promise(async (resolve, reject)=>{
+    return new Promise( (resolve, reject)=>{
         model.docs.countDocuments(filter,(err,count)=>{
             if (err) reject(err)
             resolve(count>0)
