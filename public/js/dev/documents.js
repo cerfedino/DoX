@@ -5,7 +5,7 @@ const {undo, redo, history} = require('prosemirror-history');
 const {keymap} = require('prosemirror-keymap');
 const {baseKeymap, toggleMark, setBlockType, lift} = require('prosemirror-commands');
 const basicSchema = require('prosemirror-schema-basic')
-const {wrapInList, addListNodes, splitListItem} = require("prosemirror-schema-list");
+const {wrapInList, addListNodes, splitListItem, liftListItem} = require("prosemirror-schema-list");
 
 /**
  * Menu component
@@ -217,6 +217,12 @@ function initEditor() {
             type: 'list',
             command: wrapInList(schema.nodes.ordered_list, {level: 1}),
             dom: document.getElementById('action-ordered-list')
+        },
+        {
+            name: 'lift_item',
+            type: 'list',
+            command: liftListItem(schema.nodes.list_item),
+            dom: document.getElementById('action-lift-item')
         }
     ])
 
