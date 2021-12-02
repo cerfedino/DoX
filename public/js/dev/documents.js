@@ -4,6 +4,8 @@ const {EditorView} = require('prosemirror-view');
 const {undo, redo, history} = require('prosemirror-history');
 const {keymap} = require('prosemirror-keymap');
 const {baseKeymap, toggleMark, setBlockType} = require('prosemirror-commands');
+const basicSchema = require('prosemirror-schema-basic')
+const {wrapInList, addListNodes, splitListItem} = require("prosemirror-schema-list");
 
 /**
  * Menu component
@@ -32,6 +34,7 @@ class MenuView {
 
     update() {
         let activeMarks = getActiveMarkCodes(this.editorView);
+        console.log(activeMarks);
         this.items.forEach(item => {
             if (item.type === 'mark') {
                 if (activeMarks.includes(item.name)) item.dom.classList.add('active');
@@ -44,6 +47,8 @@ class MenuView {
                 } else {
                     item.dom.classList.remove('active');
                 }
+            } else if (item.type === 'list') {
+
             }
         });
     }
@@ -52,7 +57,7 @@ class MenuView {
 initEditor();
 
 function initEditor() {
-    let schema = new Schema({
+    /*let schema = new Schema({
         nodes: {
             text: {
                 group: 'inline',
@@ -86,7 +91,7 @@ function initEditor() {
             },
             doc: {
                 content: '(block)+'
-            }
+            },
         },
         marks: {
             strong: {
@@ -108,7 +113,13 @@ function initEditor() {
                 parseDOM: [{tag: 'u'}]
             }
         }
+    })*/
+
+    let schema = new Schema({
+        nodes: addListNodes(basicSchema.schema.spec.nodes, 'paragraph block*', 'block'),
+        marks: basicSchema.schema.spec.marks
     })
+
     let menu = menuPlugin([
         {
             name: 'strong',
@@ -169,28 +180,45 @@ function initEditor() {
             type: 'heading',
             command: setBlockType(schema.nodes.heading, {level: 6}),
             dom: document.getElementById('action-h6')
+        },
+        {
+            name: 'bullet_list',
+            type: 'list',
+            command: wrapInList(schema.nodes.bullet_list, {}),
+            dom: document.getElementById('action-bullet-list')
         }
     ])
-    let keys = keymap({
-        'Mod-z': undo,
-        'Mod-y': redo,
-        'Mod-b': toggleMark(schema.marks.strong),
-        'Mod-i': toggleMark(schema.marks.em),
-        'Mod-u': toggleMark(schema.marks.underline)
-    });
 
     let state = EditorState.create({
         schema,
         plugins: [
             history(),
+            keymap(buildKeymap(schema)),
             keymap(baseKeymap),
-            keys,
             menu
         ]
     });
     let editorView = new EditorView(document.getElementById("editor"), {state});
 
     editorView.focus();
+}
+
+function buildKeymap(schema) {
+    let keys = {}
+    function bind(key, cmd) {
+        keys[key] = cmd;
+    }
+
+    bind('Mod-z', undo)
+    bind('Shift-Mod-z', redo)
+
+    bind('Mod-b', toggleMark(schema.marks.strong));
+    bind('Mod-i', toggleMark(schema.marks.em));
+    // underline
+
+    bind('Enter', splitListItem(schema.nodes.list_item));
+
+    return keys;
 }
 
 /**
