@@ -38,7 +38,7 @@ function find_user(filter) {
 
 /**
  * Returns a certain document in the database.
- * @param {String} _id the ID of the document to look for.
+ * @param {ObjectId} _id the ID of the document to look for.
  * @returns {Promise<[]>} A Promise that resolves with the fetched document. Resolves undefined if the document cant be found
  */
  function get_document(_id) {
@@ -86,11 +86,11 @@ function create_user(username,email,hash) {
 
 /**
  * Creates and inserts a new document in the database.
- * @param {String} owner_id the owner of the newly created document.
- * @param {String="Untitled"} name the name of the newly created document.
+ * @param {ObjectId} owner_id the owner of the newly created document.
+ * @param {String="Untitled"} title the title of the newly created document.
  * @returns {Promise<object>} the data of the new document.
  */
-function create_doc(owner_id, name="Untitled") {
+function create_doc(owner_id, title="Untitled") {
     // Pwd hashing
     return new Promise(async (resolve, reject)=>{
         if(!(await user_exists({_id:owner_id}))) {
@@ -103,7 +103,7 @@ function create_doc(owner_id, name="Untitled") {
 
         const new_doc = {
 
-            name : name,
+            title : title,
 
             path : create_doc_file(), 
             
@@ -134,6 +134,23 @@ function create_doc(owner_id, name="Untitled") {
     })
 }
 
+/**
+ * Deletes a user in the database.
+ * @param {ObjectId} user_id the user to delete.
+ * @returns { Promise<DeleteResult>} resolves when the action has been performed.
+ */
+function delete_user(user_id) {
+    return model.docs.deleteOne({_id:user_id})
+}
+
+/**
+ * Deletes a document in the database.
+ * @param {ObjectId} doc_id the document to delete.
+ * @returns { Promise<DeleteResult>} resolves when the action has been performed.
+ */
+function delete_doc(doc_id) {
+    return model.docs.deleteOne({_id:doc_id})
+}
 
 // ######################
 
@@ -175,7 +192,7 @@ function document_exists(filter={}) {
 // Get documents available to user
 /**
  * Returns all the documents available for a specific user.
- * @param {String} user_id the user to return the documents for.
+ * @param {ObjectId} user_id the user to return the documents for.
  * @returns {Promise<[]>} resolves with the documents that are available to the user.
  */
 function get_docs_available(user_id) {
@@ -194,8 +211,8 @@ function get_docs_available(user_id) {
 // Get permissions of user over document
 /**
  * Returns the permissions of a user over a document.
- * @param {String} user_id the user id.
- * @param {String} doc_id the document id.
+ * @param {ObjectId} user_id the user id.
+ * @param {ObjectId} doc_id the document id.
  * @returns {Promise<["read"|"edit"|"owner"]>} Returns an array containing all the permissions of the user over the document.
  *  E.g  ["read","write","owner"]
  */
@@ -225,6 +242,8 @@ module.exports = {
     get_document,
     create_user,
     create_doc,
+    delete_user,
+    delete_doc,
     user_exists,
     document_exists,
     get_docs_available,

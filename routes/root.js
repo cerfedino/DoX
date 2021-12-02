@@ -9,6 +9,10 @@ const express = require('express');
 const path = require("path");
 const router = express.Router();
 
+const dbops = require('../modules/dbops.js')
+const {ObjectId} = require("mongodb");
+
+
 module.exports = router;
 
 
@@ -72,20 +76,41 @@ router.get('/register', function (req, res) {
     }
 })
 
+
+/*
+    GET /docs/new
+    Creates a new document and redirects to GET /docs/:id.
+ */
+router.get('/docs/new', async function (req, res) {
+    const newdoc = await dbops.create_doc(ObjectId('61a66271ceec42204e460cdd'))
+
+    if(req.accepts("text/html")) {
+        res.redirect(`/docs/${newdoc._id.toHexString()}`)
+    } else if(req.accepts("application/json")) {
+        res.json(newdoc)
+    }
+})
+
 /*
     GET /docs/:id
     Renders the document edit view for the specified document.
     IF the user only has read access to it, renders accordingly.
         IF the user has NO access to it, denies access to it.
  */
-router.get('/docs/:id?', checkAuthenticated, function (req, res) {
-    if(req.params.id) {
-        // TODO: Check if user is allowed to view/edit document
-        res.render('../views/edit.ejs')
-    } else if (req.accepts('text/html')) {
-        res.render('../views/documents.ejs',[])
-    } else {
-        res.status(406).end(); // not accettable
+
+router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
+    if (req.params.id) {
+        if (!(await dbops.document_exists({_id: ObjectId(req.params.id)}))) {
+            res.status(404).end()
+            return
+        }
+
+        // TODO: AUTH. Check if user is allowed to view/edit document
+        res.render('../views/edit.ejs',{doc: await dbops.get_document(ObjectId(req.params.id))})
+    } else { // Render document list
+
+        // TODO: Retrieve user through token ?
+        res.render('../views/documents.ejs', {docs: await dbops.get_docs_available(ObjectId('61a66271ceec42204e460cdd'))})
     }
 
 })
@@ -182,6 +207,7 @@ router.post("/auth", passport.authenticate('local-login', {
 //     })
 // })
 
+
 /*
     POST /auth/register
     Registers a new user
@@ -208,4 +234,25 @@ router.delete("/logout", (req,res) => {
     req.logOut()
     req.flash('messageSuccess', 'Successfully logged out')
     res.redirect("/login")
+
+  
+// ###############
+// DELETE REQUESTS
+// ###############
+
+
+/*
+    DELETE /docs/:id
+    Deletes a document.
+ */
+router.delete("/docs/:id", async (req, res) => {
+    if (!(await dbops.document_exists({_id: ObjectId(req.params.id)}))) {
+        res.status(404).end()
+        return
+    }
+
+    // TODO: Check if user is owner of document.
+    if(true)
+        await dbops.delete_doc(ObjectId(req.params.id))
+    res.end()
 })
