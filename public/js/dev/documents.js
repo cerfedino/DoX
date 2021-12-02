@@ -186,6 +186,12 @@ function initEditor() {
             type: 'list',
             command: wrapInList(schema.nodes.bullet_list, {}),
             dom: document.getElementById('action-bullet-list')
+        },
+        {
+            name: 'ordered_list',
+            type: 'list',
+            command: wrapInList(schema.nodes.ordered_list, {level: 1}),
+            dom: document.getElementById('action-ordered-list')
         }
     ])
 

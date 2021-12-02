@@ -1,6 +1,7 @@
 .document-view {
     margin-right: 20%;
     margin-left: 20%;
+    margin-bottom: 10%;
     border-radius: 5px;
     border: 1px solid #dddddd;
     box-shadow: -15px 10px 30px 15px var(--bg-contrast);
@@ -35,4 +36,8 @@
 
 .ProseMirror:focus {
     outline: none;
+}
+
+.ProseMirror ol, .ProseMirror ul {
+    line-height: 0.7em;
 }
