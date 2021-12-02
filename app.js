@@ -16,8 +16,8 @@ const methodOverride = require('method-override');
 // Passport and Express-Session library
 const passport = require('passport');
 const session = require('express-session');
-// passport strategies for authentication
-const passportStrategies = require('./modules/passportStrategies.js');
+// Passport strategies for authentication
+const passportStrategies = require('./modules/auth_strategies.js');
 
 
 //Import the secondary "Strategy" library
@@ -25,8 +25,7 @@ const LocalStrategy = require('passport-local').Strategy;
 
 // Custom middleware authentication and flash message view middleware 
 const flash = require('connect-flash');
-const userInViews = require('./modules/auth_middleware/UserInviews.js')
-const flashMessageInViews = require('./modules/auth_middleware/flashMessageInviews.js')
+const serve_auth_info_toViews = require('./modules/auth_middleware/auth_info_views_middleware.js')
 
 
 
@@ -77,8 +76,7 @@ passport.deserializeUser((userObj, done) => {
 // flash messages
 app.use(flash());
 // Custom middleware authentication and flash message view middleware
-app.use(userInViews)
-app.use(flashMessageInViews)
+app.use(serve_auth_info_toViews);
 
 
 
