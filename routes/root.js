@@ -6,7 +6,6 @@
  */
 
 const express = require('express');
-const path = require("path");
 const router = express.Router();
 
 const dbops = require('../modules/dbops.js')
@@ -20,18 +19,17 @@ module.exports = router;
 
 ////////////////
 
-/**
- * 
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- * @returns 
+/*
+    Middleware to check if the user is authenticated 
  */
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) { return next() }
     res.redirect("/login")
 }
 
+/*
+    Middleware to check if the user is already logged in
+ */
 function checkLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
         return res.redirect("/docs")
@@ -119,59 +117,6 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
 // ###############
 // POST REQUESTS
 // ###############
-
-
-// router.post("/auth", function(req, res) {
-//     passport.authenticate('local-login', function(err, user, info) {
-    //     console.log('err : ',err)
-    //     console.log('user : ',user)
-    //     console.log('info : ',info)
-        
-    //     if (err) {
-    //         res.status(404).json(err);
-    //         return;
-    //     }
-    //     if (user) {
-    //         res.status(200);
-    //         res.json(user);
-    //     } else {
-    //         res.status(401).json({
-    //             type: 'messageFailure',
-    //             message: 'Invalid username and/or password.'
-    //         });
-    //     }
-    // }) (req, res);
-// })
-
-// {
-//     successRedirect: "/docs",
-//     failureRedirect: "/login",
-//     failureFlash: {
-//         type: 'messageFailure',
-//         message: 'Invalid username and/or password.'
-//     },
-//     successFlash: {
-//         type: 'messageSuccess',
-//         message: 'Successfully logged in.'
-//     }
-// }))
-
-
-// router.post("/auth", function(req, res, next) {
-//     passport.authenticate('local-login', function(err, user, info) {
-//         console.log('err : ',err)
-//         console.log('user : ',user)
-//         console.log('info : ',info)
-//         if (err) { return next(err); }
-//         if (!user) { return res.status(401).json(info); }
-//         req.logIn(user, function(err) {
-//                 if (err) { return next(err); }
-//                 req.flash('messageSuccess', 'Successfully logged in')
-//                 console.log('loggedin')
-//                 return res.redirect('/docs');
-//         });
-//     })(req, res, next);
-//   });
 
 /*
     POST /auth
