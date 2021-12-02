@@ -7,7 +7,7 @@
  * @param {function} next next function
  */
 module.exports = (req, res, next) => {
-    res.locals.user = req.isAuthenticated()
+    res.locals.isUserAuthenticated = req.isAuthenticated()
     if(req.isAuthenticated()) {
         res.locals.userid = req.user.user_id;
     }

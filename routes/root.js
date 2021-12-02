@@ -52,7 +52,7 @@ router.get('/', function (req, res) {
     GET /login
     Renders the login form.
  */
-router.get('/login',checkLoggedIn,  function (req, res) {
+router.get('/login', checkLoggedIn, function (req, res) {
     if (req.accepts("text/html")) {
         res.render('../views/login.ejs', {});
     } else {
@@ -82,8 +82,10 @@ router.get('/docs/:id?', checkAuthenticated, function (req, res) {
     if(req.params.id) {
         // TODO: Check if user is allowed to view/edit document
         res.render('../views/edit.ejs')
+    } else if (req.accepts('text/html')) {
+        res.render('../views/documents.ejs',[])
     } else {
-        res.render('../views/documents.ejs')
+        res.status(406).end(); // not accettable
     }
 
 })
@@ -100,7 +102,57 @@ router.get('/docs/:id?', checkAuthenticated, function (req, res) {
  */
 const passport = require('passport');
 
+// router.post("/auth", function(req, res) {
+//     passport.authenticate('local-login', function(err, user, info) {
+    //     console.log('err : ',err)
+    //     console.log('user : ',user)
+    //     console.log('info : ',info)
+        
+    //     if (err) {
+    //         res.status(404).json(err);
+    //         return;
+    //     }
+    //     if (user) {
+    //         res.status(200);
+    //         res.json(user);
+    //     } else {
+    //         res.status(401).json({
+    //             type: 'messageFailure',
+    //             message: 'Invalid username and/or password.'
+    //         });
+    //     }
+    // }) (req, res);
+// })
 
+// {
+//     successRedirect: "/docs",
+//     failureRedirect: "/login",
+//     failureFlash: {
+//         type: 'messageFailure',
+//         message: 'Invalid username and/or password.'
+//     },
+//     successFlash: {
+//         type: 'messageSuccess',
+//         message: 'Successfully logged in.'
+//     }
+// }))
+
+
+// router.post("/auth", function(req, res, next) {
+//     passport.authenticate('local-login', function(err, user, info) {
+//         console.log('err : ',err)
+//         console.log('user : ',user)
+//         console.log('info : ',info)
+//         if (err) { return next(err); }
+//         if (!user) { return res.status(401).json(info); }
+//         req.logIn(user, function(err) {
+//                 if (err) { return next(err); }
+//                 req.flash('messageSuccess', 'Successfully logged in')
+//                 console.log('loggedin')
+//                 return res.redirect('/docs');
+//         });
+//     })(req, res, next);
+//   });
 
 router.post("/auth", passport.authenticate('local-login', {
     successRedirect: "/docs",
@@ -114,6 +166,21 @@ router.post("/auth", passport.authenticate('local-login', {
         message: 'Successfully logged in.'
     }
 }))
+
+// router.get("/auth/status",(req,res)=>{
+//     let auth = {}
+//     if(req.flash('messageSuccess')) {
+//         auth.status="ok"
+//     } else if(req.flash('messageFailure')) {
+//         auth.status
+//     }
+//     if(req.flash('messageFailure') || req.flash('messageSuccess')) {
+//         auth.status = 
+//     }
+//     res.json({
+        
+//     })
+// })
 
 /*
     POST /auth/register

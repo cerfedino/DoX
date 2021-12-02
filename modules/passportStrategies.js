@@ -9,15 +9,21 @@ const dbops = require('./dbops.js');
  * Search the user, password in the DB to authenticate the user
  * @param {String} user  the username to authenticate
  * @param {String} password  the password 
- * @param {function(<err>, <user>)} done the function to return
- * @returns {done(<err>, <user>)}
+ * @param {function(<err>, <user>, <info>)} done the function to return
+ * @returns {done(<err>, <user>, <info>)}
  */
 async function authUser(user, password, done) {
     const filter = {username : user}
     models.users.findOne(filter).then(registered_user => {
-        authenticated_user = false;
+
+        if(!registered_user) {
+            return done(null, false, {
+                type: 'messageFailure',
+                message: 'Invalid username'
+            });
+        }
+
         let passwordValid = registered_user && auth.check_pwd(password, registered_user.password) 
-        
         // If password valid call done and serialize user.id to req.user property
         if (passwordValid) {
             return done(null, { user_id: registered_user._id })
@@ -25,7 +31,7 @@ async function authUser(user, password, done) {
         // If invalid call done with false and flash message
         return done(null, false, {
             type: 'messageFailure',
-            message: 'Invalid username and/or password'
+            message: 'Wrong password'
         });
     })
 }
@@ -37,11 +43,10 @@ async function authUser(user, password, done) {
  * @param {Object} req the browser request
  * @param {String} user the username of the new user
  * @param {String} password the  
- * @param {function(<err>, <user>)} done the function to return
- * @returns {done(<err>, <user>)}
+ * @param {function(<err>, <user>, <info>)} done the function to return
+ * @returns {done(<err>, <user>, <info>)}
  */
 async function registerUser(req, user, password, done) {
-    
     const filter = {username : user}
     let registered_user = await models.users.findOne(filter)//.then(registered_user => {
     // Return false if user already exists - failureRedirect
