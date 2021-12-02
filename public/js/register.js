@@ -2,33 +2,44 @@ function init_register() {
     const form = document.querySelector(".login-form form")
 
     // Submission of the register form
-    // form.addEventListener("submit",function(e) {
-    //     e.preventDefault()
+    form.addEventListener("submit",function(e) {
+        e.preventDefault()
 
-    //     // Check for invalid fields
-    //     const mistakes = validateForm(this)
-    //     if(mistakes) {
-    //         showAlert(document.querySelector(".form-alerts.top"),"danger",mistakes,false)
-    //         return
-    //     }
-    //     //
+        // Check for invalid fields
+        const mistakes = validateForm(this)
+        if(mistakes) {
+            showAlert(document.querySelector("#alerts"),"warning",mistakes,false)
+            return
+        }
+        //
 
-    //     fetch(this.action,
-    //         {
-    //             method: this.method,
-    //             headers: {  "Accept":"application/json"},
-    //             body: new FormData(this)
-    //         }).then(res=>{return res.json()})
-    //         .then(res => {
-    //             if(true) {      // TODO: If register successful
-    //                 window.location = "/login"
-    //             } else {
-
-    //                 // Display error message under form
-    //                 showAlert(document.querySelector(".form-alerts.top"),"warning","Register unsuccessful",true)
-    //             }
-    //         })
-    // })
+        console.log(this.method, this.action)
+        fetch(this.action,
+            {
+                method: this.method,
+                headers: {
+                    "Content-Type" : "application/json",
+                    "Accept":"application/json"
+                },
+                body: JSON.stringify({
+                    username: form.querySelector("input[name='username']").value,
+                    password: form.querySelector("input[name='password']").value,
+                    email: form.querySelector("input[name='email']").value
+                })
+            }).then(res=>{return res.json()})
+            .then(auth => {
+                console.log("Auth response: ",auth)
+                switch(auth.status) {
+                    case "success": 
+                        window.location = "/login"
+                    break;
+                    case "neutral":
+                    case "fail":
+                        showAlert(document.querySelector("#alerts"),auth.status=="neutral"?"primary":"danger",auth.message,false)
+                        break;
+                }
+            })
+    })
 
     /**
      * Validates the form input fields and returns and returns an unordered list of errors.

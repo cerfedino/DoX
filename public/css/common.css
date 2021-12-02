@@ -70,3 +70,15 @@ p,input,textarea,select, label,span,h1,h2,h3,h4,h5,h6 {
     bottom: 1vh;
     right: 1vh;
 }
+
+#alerts {
+    position : absolute;
+
+    width: 20%;
+
+    right : 1vh;
+    bottom: 1vh;
+}
+#alerts *{
+    position : block;
+}

@@ -122,52 +122,37 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
     POST /auth
     Authenticates a user with credentials
  */
-router.post("/auth", passport.authenticate('local-login', {
-    successRedirect: "/docs",
-    failureRedirect: "/login",
-    failureFlash: {
-        type: 'messageFailure',
-        message: 'Invalid username and/or password.'
-    },
-    successFlash: {
-        type: 'messageSuccess',
-        message: 'Successfully logged in.'
-    }
-}))
-
-
-// router.get("/auth/status",(req,res)=>{
-//     let auth = {}
-//     if(req.flash('messageSuccess')) {
-//         auth.status="ok"
-//     } else if(req.flash('messageFailure')) {
-//         auth.status
-//     }
-//     if(req.flash('messageFailure') || req.flash('messageSuccess')) {
-//         auth.status = 
-//     }
-//     res.json({
+router.post("/auth", function(req, res, next) {
+    passport.authenticate('local-login', function(err, user, info ) {
+        if (err) { return next(err); }
         
-//     })
-// })
+        if (info.status == 'fail') { return res.status(401).json(info); }
 
+        req.logIn(user, function(err) {
+            if (err) { return next(err); }
+            req.flash('messageSuccess', 'Successfully logged in')
+            res.json(info);
+        });
+    })(req, res, next);
+});
 
 /*
     POST /auth/register
     Registers a new user
  */
-router.post("/auth/register", passport.authenticate('local-signup', {
-    successRedirect: '/login',
-    failureRedirect: '/register',
-    failureFlash: {
-        type: 'messageFailure',
-        message: 'Username already taken.'
-    },
-    successFlash: {
-        type: 'messageSuccess',
-        message: 'Successfully signed up.'
-    }
-}))
+router.post("/auth/register",  function(req, res, next) {
+    passport.authenticate('local-signup', function(err, user, info ) {
+        if (err) { return next(err); }
+        
+        if (info.status == 'fail') { return res.status(401).json(info); }
+
+        // req.logIn(user, function(err) {
+        //     if (err) { return next(err); }
+        req.flash('messageSuccess', 'Successfully registered')
+        res.json(info);
+        // });
+    })(req, res, next);
+});
 
 
 
