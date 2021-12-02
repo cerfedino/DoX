@@ -34,23 +34,37 @@ class MenuView {
 
     update() {
         let activeMarks = getActiveMarkCodes(this.editorView);
+        let availableNodes = getAvailableBlockTypes(this.editorView, this.editorView.state.schema);
         console.log(activeMarks);
-        this.items.forEach(item => {
+
+        // Update marks
+        for (let item of this.items) {
             if (item.type === 'mark') {
-                if (activeMarks.includes(item.name)) item.dom.classList.add('active');
-                else item.dom.classList.remove('active');
-            } else if (item.type === 'heading') {
-                let inactive = item.command(this.editorView.state, null, this.editorView)
-                if (!inactive) {
+                if (activeMarks.includes(item.name))
+                    item.dom.classList.add('active');
+                else
+                    item.dom.classList.remove('active');
+            }
+        }
+
+        // Update heading dropdown menu
+        let currentLevel;
+        // If availableNodes === [] the selection includes a list
+        if (availableNodes.length !== 0)
+            currentLevel = getCurrentHeaderLevel(this.editorView, this.editorView.state.schema.nodes.heading);
+        else
+            currentLevel = 'p';
+
+        for (let item of this.items) {
+            if (item.type === 'heading') {
+                if (item.name === currentLevel) {
                     item.dom.classList.add('active');
                     document.getElementById('headingMenu').innerText = item.dom.innerText;
                 } else {
                     item.dom.classList.remove('active');
                 }
-            } else if (item.type === 'list') {
-
             }
-        });
+        }
     }
 }
 
@@ -273,6 +287,40 @@ function getActiveMarkCodes(view) {
 
         return Array.from(activeMarks);
     }
+}
+
+/**
+ * Check the current available node types
+ * @author https://github.com/PierBover/
+ */
+function getAvailableBlockTypes (editorView, schema) {
+    // get all the available nodeTypes in the schema
+    const nodeTypes = schema.nodes;
+
+    // iterate all the nodeTypes and check which ones can be applied
+    return Object.keys(nodeTypes).filter((key) => {
+        const nodeType = nodeTypes[key];
+        // setBlockType() returns a function which returns false when a node can't be applied
+        return setBlockType(nodeType)(editorView.state, null, editorView);
+    });
+}
+
+/**
+ * Returns current heading level
+ * @param editorView
+ * @param headingNode Heading node from schema
+ * @returns {string} Level of header
+ */
+function getCurrentHeaderLevel(editorView, headingNode) {
+    // Iterate through each available heading level (1-6)
+    for (let i = 1; i <= 6; ++i) {
+        // setBlockType() returns a function which returns false when a node can't be applied
+        if (!setBlockType(headingNode, {level: i})(editorView.state, null, editorView))
+            return 'h' + i;
+    }
+
+    // If the function hasn't return anything in the cycle, the selection isn't a heading
+    return 'p';
 }
 
 // Dark mode
