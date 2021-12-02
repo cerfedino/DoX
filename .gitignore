@@ -7,3 +7,6 @@ yarn.lock
 .env
 
 db/
+
+# Log files
+*.log
