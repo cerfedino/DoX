@@ -30,7 +30,7 @@ function run_find(collection, filter) {
  * @param {object} filter the filter of the user to look for.
  * @returns {Promise<[]>} A Promise that resolves with the fetched user. Resolves undefined if the user cant be found
  */
- function find_user(filter) {
+function find_user(filter) {
     return model.users.findOne(filter);
 }
 

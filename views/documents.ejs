@@ -61,6 +61,21 @@ function generate_document_card(doc) {
         <div class="card document document-create">
             <a href="/docs/new"><i class="far fa-plus-square"></i></a>
         </div>
+
+
+        <div style="background-color: red">    
+            aaa <%= isUserAuthenticated %>
+        </div>
+        <div style="background-color: green">    
+            bbb <%= userid %>
+        </div>
+        <div style="background-color: red">    
+            aaa <%= messageFailure %>
+        </div>
+        <div style="background-color: green">    
+            bbb <%= messageSuccess %>
+        </div>
+
         <%- doc_cards %>
     </main>
 

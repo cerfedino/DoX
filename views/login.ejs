@@ -22,13 +22,15 @@
 
         </div>
         <div class="form-floating">
-            <input required class="form-control" type="text" id="username" placeholder="Username">
+            <input required class="form-control" type="text" id="username" name="username" placeholder="Username">
+            <label for="username">Username</label>
+        </div>
+        <div class="form-floating">
+            <input required class="form-control" type="password" id="password" name="password" placeholder="Password">
             <label for="username">Username</label>
         </div>
         <div class="form-floating">
             <input required class="form-control" type="password" id="password" placeholder="Password">
-            <label for="password">Password</label>
-        </div>
         <input type="submit" class="btn btn-primary w-100 btn-lg" value="Sign in">
         <p>Not registered? <a href="/register">Sign up</a></p>
         <div class="form-alerts bottom">
@@ -36,6 +38,13 @@
         </div>
     </form>
 
+    <div style="background-color: red">    
+        aaa <%= messageFailure %>
+    </div>
+    <div style="background-color: green">    
+        bbb <%= messageSuccess %>
+    </div>
+    
     <input id="dark-mode-toggle" type="checkbox">
 
     <script src="/js/common.mjs"></script>

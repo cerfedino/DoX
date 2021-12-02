@@ -1,4 +1,5 @@
 function init_register() {
+  
     const form = document.querySelector(".login-form form")
 
     // Submission of the register form
