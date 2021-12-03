@@ -88,7 +88,7 @@ async function registerUser(req, user, password, done) {
         user_token
     )
 
-    let verification_link = `localhost:8888/verify/${new_user._id}/${new_user.token}`
+    let verification_link = `http://localhost:8888/verify/${new_user._id}/${new_user.token}`
     // send email with verification link
     mailing.send_mail(user, req.body.email, verification_link)
 
