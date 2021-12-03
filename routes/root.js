@@ -12,6 +12,10 @@ const fs = require('fs-extra')
 
 module.exports = router;
 
+// PARAMETERS
+const public = path.resolve(__dirname, "../public/")
+////////////////
+
 // ###############
 // GET REQUESTS
 // ###############
@@ -66,6 +70,19 @@ router.get('/docs/:id?', function (req, res) {
     }
 
 })
+
+/*
+    GET /*
+    Serves the files in the /public folder, if tehy exist.
+ */
+router.get("/*", (req,res)=>{
+    const path = `${public}${req.path}`
+    if (fs.pathExistsSync(path)) {
+        res.status(200).sendFile(path)
+    } else
+        res.status(404).end()
+})
+
 
 // ###############
 // POST REQUESTS
