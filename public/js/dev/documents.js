@@ -69,67 +69,14 @@ class MenuView {
     }
 }
 
+// Editor setup
 initEditor();
 
+/**
+ * Initializes an editor inside of the element with ID 'editor'
+ */
 function initEditor() {
-    /*let schema = new Schema({
-        nodes: {
-            text: {
-                group: 'inline',
-                inline: true
-            },
-            paragraph: {
-                group: 'block',
-                content: 'text*',
-                toDOM() {
-                    return ['p', 0]
-                },
-                parseDOM: [{tag: 'p'}]
-            },
-            heading: {
-                group: 'block',
-                content: 'text*',
-                attrs: {
-                    level: 1
-                },
-                toDOM(node) {
-                    return ['h' + node.attrs.level, 0]
-                },
-                parseDOM: [
-                    {tag: 'h1', attrs: {level: 1}},
-                    {tag: 'h2', attrs: {level: 2}},
-                    {tag: 'h3', attrs: {level: 3}},
-                    {tag: 'h4', attrs: {level: 4}},
-                    {tag: 'h5', attrs: {level: 5}},
-                    {tag: 'h6', attrs: {level: 6}}
-                ]
-            },
-            doc: {
-                content: '(block)+'
-            },
-        },
-        marks: {
-            strong: {
-                toDOM() {
-                    return ['strong', 0]
-                },
-                parseDOM: [{tag: 'strong'}]
-            },
-            em: {
-                toDOM() {
-                    return ['em', 0]
-                },
-                parseDOM: [{tag: 'em'}]
-            },
-            underline: {
-                toDOM() {
-                    return ['u', 0]
-                },
-                parseDOM: [{tag: 'u'}]
-            }
-        }
-    })*/
-
+    // Base scheme loaded from prosemirror-scheme-basic and prosemirror-scheme-list
     let base = {
         nodes: addListNodes(basicSchema.schema.spec.nodes, 'paragraph block*', 'block'),
         marks: basicSchema.schema.spec.marks
@@ -142,9 +89,9 @@ function initEditor() {
         },
         parseDOM: [{tag: 'u'}]
     })
-
     let schema = new Schema(base);
 
+    // Menu setup
     let menu = menuPlugin([
         {
             name: 'strong',
@@ -240,6 +187,9 @@ function initEditor() {
     editorView.focus();
 }
 
+/**
+ * Generates a keymap for the editor
+ */
 function buildKeymap(schema) {
     let keys = {}
 
@@ -271,6 +221,8 @@ function menuPlugin(items) {
         }
     })
 }
+
+
 
 /**
  * Gets active marks on the current selection
