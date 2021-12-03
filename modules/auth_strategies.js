@@ -102,7 +102,9 @@ async function registerUser(req, user, password, done) {
 }
 
 function generate_random_token() {
-    return Math.random().toString(36).substr(2);
+    const dateString = Date.now().toString(36);
+    const randomness = Math.random().toString(36).substr(2);
+    return dateString + randomness;
 };
 
 module.exports = { authUser, registerUser }
