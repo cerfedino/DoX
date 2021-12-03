@@ -6,9 +6,7 @@ const MongoClient = mongodb.MongoClient;
 */
 
 ///// PARAMETERS
-const mongodb_uri = "mongodb://localhost:27017"
-const db_name     = "DoX_db";
-const collections = ["users","docs"];
+const {mongodb_uri, db_name, collections} = require('../config.js').database
 ////////////////////
 
 

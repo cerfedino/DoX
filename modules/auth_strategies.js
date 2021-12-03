@@ -3,6 +3,7 @@ const models = require('../models').model;
 
 const auth = require('./auth.js');
 const dbops = require('./dbops.js');
+const mailing = require('./mailing.js');
 
 
 /**
@@ -25,10 +26,17 @@ async function authUser(user, password, done) {
                     message: 'Invalid username'
                 });
         }
-
+        
         let passwordValid = registered_user && auth.check_pwd(password, registered_user.password)
-        // If password valid call done and serialize user.id to req.user property
-        if (passwordValid) {
+
+        if(registered_user && !registered_user.email_verification_status) {
+            return done(null,
+                false,
+                {
+                    status: 'fail',
+                    message: 'Verify your email first'
+                });
+        } else if (passwordValid) { // If password valid call done and serialize user.id to req.user property
             return done(null,
                 {
                     user_id: registered_user._id
@@ -49,7 +57,6 @@ async function authUser(user, password, done) {
 }
 
 
-
 /**
  * To register a new user
  * @param {Object} req the browser request
@@ -60,7 +67,7 @@ async function authUser(user, password, done) {
  */
 async function registerUser(req, user, password, done) {
     const filter = { username: user }
-    let registered_user = await dbops.find_user(filter)
+    let registered_user = await dbops.user_find(filter)
     // Return false if user already exists - failureRedirect
     if (registered_user) {
         return done(null,
@@ -70,21 +77,35 @@ async function registerUser(req, user, password, done) {
                 message: 'Username already taken'
             });
     }
-    // Create new user and return the user - successRedirect
-    let new_user = await dbops.create_user(
+    // Create new user and return the user
+
+    let user_token = generate_random_token();
+
+    let new_user = await dbops.user_create(
         user,
         req.body.email,
-        password
+        password,
+        user_token
     )
+
+    let verification_link = `http://localhost:8888/auth/verify/${new_user._id}/${new_user.token}`
+    // send email with verification link
+    mailing.send_mail(user, req.body.email, verification_link)
+
+
     return done(null,
-        { 
-            user_id: new_user._id
-        },{
+        false,   // still do not authorize user { user_id: new_user._id }
+        {
             status: 'neutral',
             message: 'Check your email for confirmation'
         })
 }
 
-
+// to generate a random token used to check email
+function generate_random_token() {
+    const dateString = Date.now().toString(36);
+    const randomness = Math.random().toString(36).substr(2);
+    return dateString + randomness;
+};
 
 module.exports = { authUser, registerUser }

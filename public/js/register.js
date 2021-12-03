@@ -8,7 +8,7 @@ function init_register() {
         // Check for invalid fields
         const mistakes = validateForm(this)
         if(mistakes) {
-            showAlert(document.querySelector("#alerts"),"warning",mistakes,false)
+            // showAlert(document.querySelector("#alerts"),"warning",mistakes,false)
             return
         }
         //
@@ -46,18 +46,27 @@ function init_register() {
      * @returns {string} unordered list containing a list of errors, or the empty string if the form fields are all valid.
      */
     function validateForm(form) {
-        var mistakes = ""
+        var mistakes = false
 
         const username = form.querySelector("input#username").value.trim()
         const pwd = form.querySelector("#newPassword").value
         const confirm_pwd = form.querySelector("#confirmPassword").value
+        const email = form.querySelector("#email").value
+
+        const mailformat = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!email.match(mailformat)) {
+            showAlert(document.querySelector("#alerts"),"warning","Please insert a valid email",true)
+            mistakes = true;
+        }
 
         if(pwd !== confirm_pwd) {
-            mistakes += "<li> Passwords are not matching </li>"
+            showAlert(document.querySelector("#alerts"),"warning","Passwords are not matching",true)
+            mistakes = true;
         }
         if (username === "") {
-            mistakes += "<li> Username cannot be empty </li>"
+            showAlert(document.querySelector("#alerts"),"warning","Username cannot be empty",true)
+            mistakes = true;
         }
-        return mistakes? `Please fix the following:<ul>${mistakes}</ul>` : "";
+        return mistakes;
     }
 }

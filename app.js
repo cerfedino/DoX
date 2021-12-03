@@ -12,6 +12,10 @@ const path = require('path');
 const logger = require('morgan');
 const methodOverride = require('method-override');
 
+// Application config import
+const {webserver} = require('./config.js')
+
+var setDomain = require('express-set-domain');
 
 // Passport and Express-Session library
 const passport = require('passport');
@@ -32,6 +36,11 @@ const serve_auth_info_toViews = require('./modules/auth_middleware/auth_info_vie
 /////////////////////////////////////////////////////////////////////////////////////
 // INIT framework
 const app = express();
+
+
+// add middleware to force requests to domain
+const domain = webserver.domain
+app.use(setDomain(domain));
 
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -86,6 +95,7 @@ app.use(serve_auth_info_toViews);
 //this will automatically load all routers found in the routes folder
 const routers = require('./routes');
 
+app.use('/auth', routers.router_auth);
 app.use('/', routers.root);
 
 // Static folders
@@ -114,16 +124,15 @@ app.use(function(err, req, res, next) {
 
 
 
-
 /////////////////////////////////////////////////////////////////////////////////////
 // Start server
-app.set('port', process.env.PORT || 8888);
+app.set('port', process.env.PORT || webserver.port || 8888)
 
 var server = require('http').createServer(app);
 
 
 server.on('listening', function() {
-	console.log('Express server listening on port ' + server.address().port);
+	console.log(`Express server listening on ${domain}:${server.address().port}`);
 });
 
 server.listen(app.get('port'));
