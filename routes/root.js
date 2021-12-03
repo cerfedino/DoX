@@ -115,13 +115,17 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
 
 /*
     GET /verify/:id/:token
+    Check the link sent by email to the user
+    if user not found : 404
+    If user is valid and token matches: redirect to login page and allow user authentication
+    if token not valid : 401
  */
 router.get('/verify/:id/:token', async function(req, res) {
     console.log(req.params.id, req.params.token)
     let user = await dbops.find_user({_id : ObjectId(req.params.id)});
     console.log(user)
-    if (!user) {
-        console.log('user does not exists')
+    if (!user) { // this case should not happen (only if the user manually modify the link)
+        res.status(404).send('User does not exists. Check if there is a typo in the link');
         return
     }
 
@@ -130,6 +134,8 @@ router.get('/verify/:id/:token', async function(req, res) {
             req.flash('messageSuccess', 'Email verified!')
             res.redirect('/login');
         })
+    } else {
+        res.status(401).send('Token does not match. Check if there is a typo in the link');
     }
 })
 
@@ -167,6 +173,7 @@ router.post("/auth/register",  function(req, res, next) {
         
         if (info.status == 'fail') { return res.status(401).json(info); }
 
+        // do not log in user (email verification is needed)
         // req.logIn(user, function(err) {
         //     if (err) { return next(err); }
         req.flash('messageSuccess', 'Successfully registered')
