@@ -51,6 +51,12 @@ function init_register() {
         const username = form.querySelector("input#username").value.trim()
         const pwd = form.querySelector("#newPassword").value
         const confirm_pwd = form.querySelector("#confirmPassword").value
+        const email = form.querySelector("#email").value
+
+        var mailformat = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!email.match(mailformat)) {
+            mistakes += "<li> Please insert a valid email </li>"
+        }
 
         if(pwd !== confirm_pwd) {
             mistakes += "<li> Passwords are not matching </li>"
