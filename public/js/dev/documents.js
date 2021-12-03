@@ -77,7 +77,6 @@ document.getElementById('insertImageModal').addEventListener('shown.bs.modal', (
     document.getElementById('image-src').focus();
 });
 document.getElementById('insertImageModal').addEventListener('hidden.bs.modal', () => {
-    console.log('123')
     editor.focus();
 })
 document.getElementById('insert-image-form').addEventListener('submit', insertImage);
