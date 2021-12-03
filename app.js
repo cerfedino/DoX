@@ -86,6 +86,7 @@ app.use(serve_auth_info_toViews);
 //this will automatically load all routers found in the routes folder
 const routers = require('./routes');
 
+app.use('/auth', routers.router_auth);
 app.use('/', routers.root);
 
 

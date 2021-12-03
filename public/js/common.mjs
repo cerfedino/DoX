@@ -31,7 +31,7 @@ function showAlert(container, alert_type="warning", text="", append=true, auto_d
     if (auto_dismiss) {
         setTimeout(function() {
             $(".alert").alert('close');
-        }, 5000);
+        }, 8000);
     }
 }
 

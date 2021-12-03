@@ -67,7 +67,7 @@ async function authUser(user, password, done) {
  */
 async function registerUser(req, user, password, done) {
     const filter = { username: user }
-    let registered_user = await dbops.find_user(filter)
+    let registered_user = await dbops.user_find(filter)
     // Return false if user already exists - failureRedirect
     if (registered_user) {
         return done(null,
@@ -81,14 +81,14 @@ async function registerUser(req, user, password, done) {
 
     let user_token = generate_random_token();
 
-    let new_user = await dbops.create_user(
+    let new_user = await dbops.user_create(
         user,
         req.body.email,
         password,
         user_token
     )
 
-    let verification_link = `http://localhost:8888/verify/${new_user._id}/${new_user.token}`
+    let verification_link = `http://localhost:8888/auth/verify/${new_user._id}/${new_user.token}`
     // send email with verification link
     mailing.send_mail(user, req.body.email, verification_link)
 
