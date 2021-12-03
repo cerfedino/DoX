@@ -70,7 +70,8 @@ class MenuView {
 }
 
 // Editor setup
-initEditor();
+let editor = initEditor();
+document.getElementById('insert-image-form').addEventListener('submit', insertImage);
 
 /**
  * Initializes an editor inside of the element with ID 'editor'
@@ -185,6 +186,7 @@ function initEditor() {
     let editorView = new EditorView(document.getElementById("editor"), {state});
 
     editorView.focus();
+    return editorView;
 }
 
 /**
@@ -222,7 +224,34 @@ function menuPlugin(items) {
     })
 }
 
+/**
+ * Event listener for the insert image form submission
+ * @param e Click event
+ */
+function insertImage(e) {
+    e.preventDefault();
+    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('insertImageModal'));
 
+    let src = document.getElementById('image-src');
+    let alt = document.getElementById('image-alt');
+
+    if (src.value === '') {
+        alert('Please provide image source')
+        return;
+    }
+
+    editor.dispatch(
+        editor.state.tr.replaceSelectionWith(
+            editor.state.schema.nodes.image.createAndFill({src: src.value, alt: alt.value}),
+            false
+        ));
+    editor.focus();
+
+    // Clear form and hide the modal
+    src.value = '';
+    alt.value = '';
+    modal.hide();
+}
 
 /**
  * Gets active marks on the current selection
