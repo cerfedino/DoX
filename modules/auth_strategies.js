@@ -101,6 +101,7 @@ async function registerUser(req, user, password, done) {
         })
 }
 
+// to generate a random token used to check email
 function generate_random_token() {
     const dateString = Date.now().toString(36);
     const randomness = Math.random().toString(36).substr(2);
