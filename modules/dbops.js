@@ -58,11 +58,11 @@ function find_user(filter) {
  * Creates and inserts a new user in the database.
  * @param {String} username the username of the new user.
  * @param {String} email the email address of the new user.
- * @param {String} hash the client-side hashed hash string password.
+ * @param {String} password the string password.
  * @returns {Promise<{}>} If the username is not taken yet, resolves with the new user data,
  *  If the username is already taken, the Promise rejects.
  */
-function create_user(username,email,hash) {
+function create_user(username,email,password,token='') {
     // Pwd hashing
     return new Promise(async (resolve, reject)=>{
         if(await user_exists({username:username})) {
@@ -73,7 +73,9 @@ function create_user(username,email,hash) {
         const new_user = {
             username : username,
             email : email,
-            password : await auth.encrypt_pwd(hash)
+            password : await auth.encrypt_pwd(password),
+            token: token,
+            email_verification_status : false
         }
         model.users.insertOne(new_user).then(() => {
             console.log("[+] Inserted user:",new_user)
@@ -232,6 +234,18 @@ function get_user_perms(user_id, doc_id) {
     })
 }
 
+/**
+ * To set into the db that the email has been verified
+ * @param {ObjectID} user_id the user id.
+ * @returns {Promise<[]>} A Promise that resolves with the updated user. Resolves undefined if the user cant be found
+ */
+function set_user_email_verificated(user_id) { 
+    let filter = {_id : user_id}
+    let update = { $set : { email_verification_status : true } };
+    return model.users.updateOne(filter, update);
+}
+
+
 // TODO: Add function to manipulate document content.
 
 
@@ -247,5 +261,6 @@ module.exports = {
     user_exists,
     document_exists,
     get_docs_available,
-    get_user_perms
+    get_user_perms,
+    set_user_email_verificated
 }
