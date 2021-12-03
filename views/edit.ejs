@@ -73,8 +73,13 @@
                title="Lift list item"></i>
             <i id="action-bullet-list" class="bi-list-ul" data-bs-toggle="tooltip" data-bs-placement="top"
                title="Create bullet list"></i>
-            <i id="action-ordered-list" class="bi-list-ol" data-bs-toggle="tooltip" data-bs-placement="top"
+            <i id="action-ordered-list" class="bi-list-ol me-2" data-bs-toggle="tooltip" data-bs-placement="top"
                title="Create ordered list"></i>
+
+            <a data-bs-toggle="modal" data-bs-target="#insertImageModal">
+                <i class="bi-image" data-bs-toggle="tooltip" data-bs-placement="top"
+                   title="Insert image"></i>
+            </a>
         </div>
     </div>
 </header>
@@ -82,6 +87,41 @@
     <div id="editor" class="p-5">
     </div>
 </main>
+
+<!-- Insert image modal -->
+<div class="modal fade" id="insertImageModal" tabindex="-1" aria-labelledby="insertImageLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="insertImageLabel">Insert image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row mb-3">
+                        <label for="image-src" class="col-3 col-form-label">Image source</label>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id="image-src"
+                                   placeholder="https://example.com/image.jpeg">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="image-alt" class="col-3 col-form-label">Alternate text</label>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id="image-alt"
+                                   placeholder="Example image">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="action-insert-image">Insert</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <input id="dark-mode-toggle" type="checkbox">
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
