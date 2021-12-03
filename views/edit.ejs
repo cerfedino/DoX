@@ -91,34 +91,35 @@
 <!-- Insert image modal -->
 <div class="modal fade" id="insertImageModal" tabindex="-1" aria-labelledby="insertImageLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <form class="modal-content" method="post" action="/" id="insert-image-form">
             <div class="modal-header">
                 <h5 class="modal-title" id="insertImageLabel">Insert image</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
-                    <div class="row mb-3">
-                        <label for="image-src" class="col-3 col-form-label">Image source</label>
-                        <div class="col-9">
-                            <input type="text" class="form-control" id="image-src"
-                                   placeholder="https://example.com/image.jpeg">
+                <div class="row mb-3">
+                    <label for="image-src" class="col-3 col-form-label">Image source</label>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="image-src"
+                               placeholder="https://example.com/image.jpeg" required>
+                        <div class="invalid-feedback">
+                            Please provide the source of the image
                         </div>
                     </div>
-                    <div class="row">
-                        <label for="image-alt" class="col-3 col-form-label">Alternate text</label>
-                        <div class="col-9">
-                            <input type="text" class="form-control" id="image-alt"
-                                   placeholder="Example image">
-                        </div>
+                </div>
+                <div class="row">
+                    <label for="image-alt" class="col-3 col-form-label">Alternate text</label>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="image-alt"
+                               placeholder="Example image">
                     </div>
-                </form>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="action-insert-image">Insert</button>
+                <input type="submit" class="btn btn-primary" id="action-insert-image" value="Insert">
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -132,7 +133,7 @@
     let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+    });
 </script>
 
 </body>

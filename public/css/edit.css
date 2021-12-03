@@ -52,3 +52,7 @@
 .ProseMirror ol, .ProseMirror ul {
     line-height: 0.7em;
 }
+
+.ProseMirror img {
+    display: block;
+}
