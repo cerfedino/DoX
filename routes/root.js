@@ -121,11 +121,15 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
     if token not valid : 401
  */
 router.get('/verify/:id/:token', async function(req, res) {
-    console.log(req.params.id, req.params.token)
+
+    if (!ObjectId.isValid(req.params.id)) {
+        res.status(404).send('Invalid user ID. Check if there is a typo in: ' + req.url);
+        return
+    }
+
     let user = await dbops.find_user({_id : ObjectId(req.params.id)});
-    console.log(user)
     if (!user) { // this case should not happen (only if the user manually modify the link)
-        res.status(404).send('User does not exists. Check if there is a typo in the link');
+        res.status(404).send('User does not exists. Check if there is a typo in: ' + req.url);
         return
     }
 
@@ -135,7 +139,7 @@ router.get('/verify/:id/:token', async function(req, res) {
             res.redirect('/login');
         })
     } else {
-        res.status(401).send('Token does not match. Check if there is a typo in the link');
+        res.status(401).send('Token does not match. Check if there is a typo in: ' +  req.url);
     }
 })
 
