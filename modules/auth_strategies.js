@@ -3,6 +3,7 @@ const models = require('../models').model;
 
 const auth = require('./auth.js');
 const dbops = require('./dbops.js');
+const mailing = require('./mailing.js');
 
 
 /**
@@ -25,10 +26,17 @@ async function authUser(user, password, done) {
                     message: 'Invalid username'
                 });
         }
-
+        
         let passwordValid = registered_user && auth.check_pwd(password, registered_user.password)
-        // If password valid call done and serialize user.id to req.user property
-        if (passwordValid) {
+
+        if(registered_user && !registered_user.email_verification_status) {
+            return done(null,
+                false,
+                {
+                    status: 'fail',
+                    message: 'Verify your email first'
+                });
+        } else if (passwordValid) { // If password valid call done and serialize user.id to req.user property
             return done(null,
                 {
                     user_id: registered_user._id
@@ -47,7 +55,6 @@ async function authUser(user, password, done) {
             });
     })
 }
-
 
 
 /**
@@ -70,21 +77,32 @@ async function registerUser(req, user, password, done) {
                 message: 'Username already taken'
             });
     }
-    // Create new user and return the user - successRedirect
+    // Create new user and return the user
+
+    let user_token = generate_random_token();
+
     let new_user = await dbops.create_user(
         user,
         req.body.email,
-        password
+        password,
+        user_token
     )
+
+    let verification_link = `localhost:8888/verify/${new_user._id}/${new_user.token}`
+    // send email with verification link
+    mailing.send_mail(user, req.body.email, verification_link)
+
+
     return done(null,
-        { 
-            user_id: new_user._id
-        },{
+        false,   // still do not authorize user { user_id: new_user._id }
+        {
             status: 'neutral',
             message: 'Check your email for confirmation'
         })
 }
 
-
+function generate_random_token() {
+    return Math.random().toString(36).substr(2);
+};
 
 module.exports = { authUser, registerUser }
