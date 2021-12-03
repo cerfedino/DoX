@@ -7,22 +7,22 @@ const dbops = require('../modules/dbops.js')
  */
 async function populate_db() {
 
-    await dbops.create_user("Username1","mail1", "hash1")
-    await dbops.create_user("Username2","mail2", "hash2")
-    await dbops.create_user("Username3","mail3", "hash3")
-    await dbops.create_user("Username4","mail4", "hash4")
-    await dbops.create_user("Username5","mail5", "hash5")
-    await dbops.create_user("Username6","mail6", "hash6")
-    await dbops.create_user("Username7","mail7", "hash7")
+    await dbops.user_create("Username1","mail1", "hash1")
+    await dbops.user_create("Username2","mail2", "hash2")
+    await dbops.user_create("Username3","mail3", "hash3")
+    await dbops.user_create("Username4","mail4", "hash4")
+    await dbops.user_create("Username5","mail5", "hash5")
+    await dbops.user_create("Username6","mail6", "hash6")
+    await dbops.user_create("Username7","mail7", "hash7")
 
 
-    await dbops.create_doc((await (dbops.find_user({username:"Username1"})))._id)
-    await dbops.create_doc((await (dbops.find_user({username:"Username1"})))._id)
-    await dbops.create_doc((await (dbops.find_user({username:"Username2"})))._id)
-    await dbops.create_doc((await (dbops.find_user({username:"Username3"})))._id)
-    await dbops.create_doc((await (dbops.find_user({username:"Username4"})))._id)
-    await dbops.create_doc((await (dbops.find_user({username:"Username5"})))._id)
-    await dbops.create_doc((await (dbops.find_user({username:"Username5"})))._id)
+    await dbops.doc_create((await (dbops.user_find({username:"Username1"})))._id)
+    await dbops.doc_create((await (dbops.user_find({username:"Username1"})))._id)
+    await dbops.doc_create((await (dbops.user_find({username:"Username2"})))._id)
+    await dbops.doc_create((await (dbops.user_find({username:"Username3"})))._id)
+    await dbops.doc_create((await (dbops.user_find({username:"Username4"})))._id)
+    await dbops.doc_create((await (dbops.user_find({username:"Username5"})))._id)
+    await dbops.doc_create((await (dbops.user_find({username:"Username5"})))._id)
     
     // fs.emptyDir(dir, err =>{
     //     if (err) return console.error(err);

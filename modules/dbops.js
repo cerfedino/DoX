@@ -30,7 +30,7 @@ function run_find(collection, filter) {
  * @param {object} filter the filter of the user to look for.
  * @returns {Promise<[]>} A Promise that resolves with the fetched user. Resolves undefined if the user cant be found
  */
-function find_user(filter) {
+function user_find(filter) {
     return model.users.findOne(filter);
 }
 
@@ -41,7 +41,7 @@ function find_user(filter) {
  * @param {ObjectId} _id the ID of the document to look for.
  * @returns {Promise<[]>} A Promise that resolves with the fetched document. Resolves undefined if the document cant be found
  */
- function get_document(_id) {
+ function doc_get(_id) {
     return model.docs.findOne({_id})
 }
 
@@ -58,11 +58,11 @@ function find_user(filter) {
  * Creates and inserts a new user in the database.
  * @param {String} username the username of the new user.
  * @param {String} email the email address of the new user.
- * @param {String} hash the client-side hashed hash string password.
+ * @param {String} password the string password.
  * @returns {Promise<{}>} If the username is not taken yet, resolves with the new user data,
  *  If the username is already taken, the Promise rejects.
  */
-function create_user(username,email,hash) {
+function user_create(username,email,password,token='') {
     // Pwd hashing
     return new Promise(async (resolve, reject)=>{
         if(await user_exists({username:username})) {
@@ -73,7 +73,9 @@ function create_user(username,email,hash) {
         const new_user = {
             username : username,
             email : email,
-            password : await auth.encrypt_pwd(hash)
+            password : await auth.encrypt_pwd(password),
+            token: token,
+            email_verification_status : false
         }
         model.users.insertOne(new_user).then(() => {
             console.log("[+] Inserted user:",new_user)
@@ -90,7 +92,7 @@ function create_user(username,email,hash) {
  * @param {String="Untitled"} title the title of the newly created document.
  * @returns {Promise<object>} the data of the new document.
  */
-function create_doc(owner_id, title="Untitled") {
+function doc_create(owner_id, title="Untitled") {
     // Pwd hashing
     return new Promise(async (resolve, reject)=>{
         if(!(await user_exists({_id:owner_id}))) {
@@ -139,7 +141,7 @@ function create_doc(owner_id, title="Untitled") {
  * @param {ObjectId} user_id the user to delete.
  * @returns { Promise<DeleteResult>} resolves when the action has been performed.
  */
-function delete_user(user_id) {
+function user_delete(user_id) {
     return model.docs.deleteOne({_id:user_id})
 }
 
@@ -148,7 +150,7 @@ function delete_user(user_id) {
  * @param {ObjectId} doc_id the document to delete.
  * @returns { Promise<DeleteResult>} resolves when the action has been performed.
  */
-function delete_doc(doc_id) {
+function doc_delete(doc_id) {
     return model.docs.deleteOne({_id:doc_id})
 }
 
@@ -180,7 +182,7 @@ function user_exists(filter={}) {
  * @param filter the filter of the document to look for.
  * @returns {Promise<boolean>} whether at least a document exists for the specified filter.
  */
-function document_exists(filter={}) {
+function doc_exists(filter={}) {
     return new Promise( (resolve, reject)=>{
         model.docs.countDocuments(filter,(err,count)=>{
             if (err) reject(err)
@@ -195,7 +197,7 @@ function document_exists(filter={}) {
  * @param {ObjectId} user_id the user to return the documents for.
  * @returns {Promise<[]>} resolves with the documents that are available to the user.
  */
-function get_docs_available(user_id) {
+function docs_available(user_id) {
     const filter = {
         $or:[
             {perm_read : {$elemMatch : {$eq : user_id}}},
@@ -216,9 +218,9 @@ function get_docs_available(user_id) {
  * @returns {Promise<["read"|"edit"|"owner"]>} Returns an array containing all the permissions of the user over the document.
  *  E.g  ["read","write","owner"]
  */
-function get_user_perms(user_id, doc_id) {
+function user_get_perms(user_id, doc_id) {
     return new Promise(async (resolve, reject) => {
-        const doc = await get_document(doc_id);
+        const doc = await doc_get(doc_id);
 
         var ret = []
         if(doc.perm_read.includes(user_id))
@@ -232,20 +234,33 @@ function get_user_perms(user_id, doc_id) {
     })
 }
 
+/**
+ * To set into the db that the email has been verified
+ * @param {ObjectID} user_id the user id.
+ * @returns {Promise<[]>} A Promise that resolves with the updated user. Resolves undefined if the user cant be found
+ */
+function user_set_email_verification(user_id) { 
+    let filter = {_id : user_id}
+    let update = { $set : { email_verification_status : true } };
+    return model.users.updateOne(filter, update);
+}
+
+
 // TODO: Add function to manipulate document content.
 
 
 
 module.exports = {
-    run_query: run_find,
-    find_user,
-    get_document,
-    create_user,
-    create_doc,
-    delete_user,
-    delete_doc,
+    run_find,
+    user_find,
+    doc_get: doc_get,
+    user_create,
+    doc_create,
+    user_delete,
+    doc_delete,
     user_exists,
-    document_exists,
-    get_docs_available,
-    get_user_perms
+    doc_exists,
+    docs_available,
+    user_get_perms,
+    user_set_email_verification
 }

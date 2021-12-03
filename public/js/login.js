@@ -9,7 +9,7 @@ function init_login() {
         // Check for invalid fields
         const mistakes = validateForm(this)
         if(mistakes) {
-            showAlert(document.querySelector("#alerts"),"warning",mistakes,false)
+            // showAlert(document.querySelector("#alerts"),"warning",mistakes,false)
             return
         }
         //
@@ -47,17 +47,19 @@ function init_login() {
      * @returns {string} unordered list containing a list of errors, or the empty string if the form fields are all valid.
      */
     function validateForm() {
-        var mistakes = ""
+        var mistakes = false
 
         const username = form.querySelector("input#username").value.trim()
         const pwd = form.querySelector("#password").value.trim()
 
         if(username === "") {
-            mistakes += "<li> Username cannot be empty </li>"
+            showAlert(document.querySelector("#alerts"),"warning","Username cannot be empty",true)
+            mistakes = true;
         }
         if (pwd === "") {
-            mistakes += "<li> Password cannot be empty </li>"
+            showAlert(document.querySelector("#alerts"),"warning","Password cannot be empty",true)
+            mistakes = true;
         }
-        return mistakes ? `Please fix the following:<ul>${mistakes}</ul>` : "";
+        return mistakes;
     }
 }

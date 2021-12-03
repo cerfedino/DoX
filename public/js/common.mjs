@@ -12,8 +12,9 @@
  * @param {String=""} text the text body of the alert.
  * @param {boolean=true} append whether to append the alert to the container element or
  *  to remove all previous alerts first.
+ * @param {boolean=true} auto_dismiss true to auto dismiss the alert, false otherwise
  */
-function showAlert(container, alert_type="warning", text="", append=true) {
+function showAlert(container, alert_type="warning", text="", append=true, auto_dismiss=true) {
     const alert =
         `<div class="alert alert-${alert_type} alert-dismissible fade show" role="alert">
               ${text}
@@ -21,11 +22,17 @@ function showAlert(container, alert_type="warning", text="", append=true) {
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>`
-
+        
     if(append) {
         container.insertAdjacentHTML("afterbegin",alert)
-    } else
+    } else {
         container.innerHTML = alert
+    }
+    if (auto_dismiss) {
+        setTimeout(function() {
+            $(".alert").alert('close');
+        }, 8000);
+    }
 }
 
 // Dark-theme toggle
