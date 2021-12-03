@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer');
 
 const email_credentials = require('../.email-credentials.js')
 
+// to send email, it provides the service and the email credentials
 var transporter = nodemailer.createTransport({
 	service: 'gmail',
   	auth: email_credentials
@@ -9,7 +10,13 @@ var transporter = nodemailer.createTransport({
 
 
 
-
+/**
+ * Generates a text message (for users who do not support html)
+ * @param {String} user the username
+ * @param {String} address the email
+ * @param {String} verification_link the link to check email confirmation
+ * @returns {String} a text mail content
+ */
 function generate_text_message(user, address, verification_link) {
 	return `DoX
 	
@@ -30,6 +37,13 @@ DoX, Lugano, Switzerland, ${new Date().toUTCString()}
 }
 
 
+/**
+ * Generates an html message 
+ * @param {String} user the username
+ * @param {String} address the email
+ * @param {String} verification_link the link to check email confirmation
+ * @returns {String} an html mail content
+ */
 function generate_html_message(user, address, verification_link) {
 	return `<!DOCTYPE html>
 	<header style="padding:30px; background-color: rgb(53, 163, 253);"><h1>DoX (logo?)</h1></header>
@@ -69,7 +83,12 @@ function generate_html_message(user, address, verification_link) {
 
 
 
-
+/**
+ * To send emails
+ * @param {String} user the username
+ * @param {String} address the email
+ * @param {String} verification_link the link to check email confirmation
+ */
 function send_mail(user, address, verification_link) {
 	let mailOptions = {
 		from: 'noreply.mailserver.dox@gmail.com',
