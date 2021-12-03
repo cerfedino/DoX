@@ -10,45 +10,132 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     <title>DoX — Edit — New document</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <!-- SVG FontAwesome Icons -->
-    <script defer src="/media/fontawesome-free-5.15.4-web/js/all.js"></script>
-    <style type="text/css">
-        @import url("/css/common.css");
-        @import url("/css/edit.css");
-    </style>
+    <link href="/css/common.css" rel="stylesheet">
+    <link href="/css/edit.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="">
-<header id="pageheader" class="p-3 mb-5 text-white">
-    <div class="container">
-        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <div class="h3 me-auto col-auto">DoX — New document</div>
-            <form class="col-auto">
-                <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
-            </form>
-            <div class="text-end ms-3">
-                <button type="button" class="btn btn-success me-1">Save</button>
-                <button type="button" class="btn btn-danger">Delete</button>
+<header>
+    <div id="pageheader" class="py-4 text-white">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <div class="h3 me-auto col-auto">New document</div>
+                <div class="text-end ms-3">
+                    <button type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i> Save</button>
+                </div>
             </div>
+        </div>
+    </div>
+    <div class="py-2 border-bottom mb-5 bg-light">
+        <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
+            <i id="action-bold" class="bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Bold (Ctrl-B)"></i>
+            <i id="action-italic" class="bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Italic (Ctrl-I)"></i>
+            <i id="action-underline" class="bi-type-underline me-2" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Underline (Ctrl-U)"></i>
+
+            <div class="dropdown me-2">
+                <button class="btn-sm btn-secondary dropdown-toggle" type="button" id="headingMenu"
+                        data-bs-toggle="dropdown" aria-expanded="false">Normal text
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="headingMenu">
+                    <li>
+                        <button id="action-h1" class="dropdown-item h1">Heading 1</button>
+                    </li>
+                    <li>
+                        <button id="action-h2" class="dropdown-item h2">Heading 2</button>
+                    </li>
+                    <li>
+                        <button id="action-h3" class="dropdown-item h3">Heading 3</button>
+                    </li>
+                    <li>
+                        <button id="action-h4" class="dropdown-item h4">Heading 4</button>
+                    </li>
+                    <li>
+                        <button id="action-h5" class="dropdown-item h5">Heading 5</button>
+                    </li>
+                    <li>
+                        <button id="action-h6" class="dropdown-item h6">Heading 6</button>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <button id="action-p" class="dropdown-item">Normal text</button>
+                    </li>
+                </ul>
+            </div>
+
+            <i id="action-lift-item" class="bi-text-indent-left" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Lift list item"></i>
+            <i id="action-bullet-list" class="bi-list-ul" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Create bullet list"></i>
+            <i id="action-ordered-list" class="bi-list-ol me-2" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Create ordered list"></i>
+
+            <a data-bs-toggle="modal" data-bs-target="#insertImageModal">
+                <i class="bi-image" data-bs-toggle="tooltip" data-bs-placement="top"
+                   title="Insert image"></i>
+            </a>
         </div>
     </div>
 </header>
 <main class="document-view">
-    <div id="editorjs" class="pt-5">
+    <div id="editor" class="p-5">
     </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+<!-- Insert image modal -->
+<div class="modal fade" id="insertImageModal" tabindex="-1" aria-labelledby="insertImageLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="post" action="/" id="insert-image-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="insertImageLabel">Insert image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <label for="image-src" class="col-3 col-form-label">Image source</label>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="image-src"
+                               placeholder="https://example.com/image.jpeg" required>
+                        <div class="invalid-feedback">
+                            Please provide the source of the image
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="image-alt" class="col-3 col-form-label">Alternate text</label>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="image-alt"
+                               placeholder="Example image">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary" id="action-insert-image" value="Insert">
+            </div>
+        </form>
+    </div>
+</div>
+
+<input id="dark-mode-toggle" type="checkbox">
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+<script type="module" src="/js/build-documents.js"></script>
 <script>
-    const editor = new EditorJS();
+    let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
 </script>
 
 
-<div id="alerts"></div>
-<input id="dark-mode-toggle" type="checkbox">
-
-
 <script src="/js/common.mjs"></script>
-<script onload="init_edit()" src="/js/edit.js"></script>
 
 <%- messagesuccess %>
 <%- messagefailure %>

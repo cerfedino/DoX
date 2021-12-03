@@ -1,8 +1,58 @@
 .document-view {
     margin-right: 20%;
     margin-left: 20%;
+    margin-bottom: 10%;
     border-radius: 5px;
     border: 1px solid #dddddd;
     box-shadow: -15px 10px 30px 15px var(--bg-contrast);
     background: white;
+}
+
+.action-icons {
+    font-size: 1.3rem;
+}
+
+.action-icons i {
+    padding-right: 5px;
+    padding-left: 5px;
+    margin-right: 2px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.action-icons i.active {
+    color: #1818ff;
+    background-color: #dbdbff;
+}
+
+.action-icons i.disabled {
+    cursor: auto;
+    color: #a3a3a3;
+    background-color: #e5e5e5;
+}
+
+.action-icons i:hover {
+    background-color: #e5e5e5;
+}
+
+.action-icons i.active:hover {
+    color: #1818ff;
+    background-color: #dbdbff;
+}
+
+.action-icons i.disabled:hover {
+    color: #a3a3a3;
+    background-color: #e5e5e5;
+}
+
+.ProseMirror:focus {
+    outline: none;
+}
+
+.ProseMirror ol, .ProseMirror ul {
+    line-height: 0.7em;
+}
+
+.ProseMirror img {
+    display: block;
 }
