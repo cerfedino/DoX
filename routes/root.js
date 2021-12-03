@@ -58,7 +58,7 @@ router.get('/login', checkLoggedIn, function (req, res) {
     GET /register
     Renders the register form.
  */
-router.get('/register', function (req, res) {
+router.get('/register', checkLoggedIn, function (req, res) {
     if (req.accepts("text/html")) {
         res.render("../views/register.ejs")
     } else {
@@ -110,6 +110,27 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
         res.render('../views/documents.ejs', {docs: await dbops.get_docs_available(ObjectId(req.user.user_id))})
     }
 
+})
+
+
+/*
+    GET /verify/:id/:token
+ */
+router.get('/verify/:id/:token', async function(req, res) {
+    console.log(req.params.id, req.params.token)
+    let user = await dbops.find_user({_id : ObjectId(req.params.id)});
+    console.log(user)
+    if (!user) {
+        console.log('user does not exists')
+        return
+    }
+
+    if (user.token == req.params.token) {
+        dbops.set_user_email_verificated(user._id).then( () => {
+            req.flash('messageSuccess', 'Email verified!')
+            res.redirect('/login');
+        })
+    }
 })
 
 
