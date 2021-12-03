@@ -116,6 +116,7 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
 /*
     GET /verify/:id/:token
     Check the link sent by email to the user
+    if id not valid : 404 (searching into db will crash the server)
     if user not found : 404
     If user is valid and token matches: redirect to login page and allow user authentication
     if token not valid : 401
