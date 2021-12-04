@@ -30,6 +30,7 @@ const settings = {
     }
 
 }
+console.log(settings)
 
 const deepFreeze = obj => {
     Object.keys(obj).forEach(prop => {
