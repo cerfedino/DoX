@@ -1,5 +1,8 @@
 {
   "name": "DoX",
+  "scripts" : {
+    "start" : "node app.js"
+  },
   "dependencies": {
     "bcrypt": "^5.0.1",
     "connect-flash": "^0.1.1",
