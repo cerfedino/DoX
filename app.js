@@ -13,7 +13,7 @@ const logger = require('morgan');
 const methodOverride = require('method-override');
 
 // Application config import
-const {webserver} = require('./config.js')
+const {webserver} = require('./config/config.js')
 
 var setDomain = require('express-set-domain');
 
@@ -40,7 +40,7 @@ const app = express();
 
 // add middleware to force requests to domain
 const domain = webserver.domain
-// app.use(setDomain(domain));
+app.use(setDomain(domain));
 
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -133,4 +133,4 @@ server.on('listening', function() {
 	console.log(`Express server listening on ${domain}:${server.address().port}`);
 });
 
-server.listen(app.get('port'));
+module.exports = app

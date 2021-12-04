@@ -42,7 +42,7 @@ const MongoClient = mongodb.MongoClient;
  */
 
 ///// PARAMETERS
-const {mongodb_uri, db_name, collections} = require('../config.js').database
+const {mongodb_uri, db_name, collections} = require('../config/config.js').database
 ////////////////////
 
 const model = {}
