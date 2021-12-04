@@ -1,7 +1,8 @@
 {
   "name": "DoX",
   "scripts" : {
-    "start" : "node app.js"
+    "local" : "node app.js local",
+    "start" : "node app.js remote"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",

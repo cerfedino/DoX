@@ -5,9 +5,11 @@
 */
 const url = require('url')
 
+const arg = process.argv[2]
 ///////////////////
 const PORT = process.env.PORT || 8888
-const HOST = process.env.HOST || "localhost"
+const HOST = (arg !== "remote") ? "localhost" : "doxeditor.herokuapp.com"
+const MONGODB_URI = (arg !== "remote") ? "mongodb://localhost:27017" : "mongodb+srv://doxdatabase:a0ouQ1k2jPbaeYvOyvdR@doxeditor.0rima.mongodb.net/test"
 ///////////////////
 
 const settings = {
@@ -17,7 +19,7 @@ const settings = {
     },
 
     database : {
-        mongodb_uri : "mongodb+srv://doxdatabase:a0ouQ1k2jPbaeYvOyvdR@doxeditor.0rima.mongodb.net/test",
+        mongodb_uri : MONGODB_URI,
         db_name     : "DoX_db",
         collections : ["users","docs"]
     },
