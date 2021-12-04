@@ -111,7 +111,7 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
 
         // TODO: AUTH. Check if user is allowed to view/edit document
         if(true)
-            res.render('../views/edit.ejs',{doc: await dbops.doc_get(ObjectId(req.params.id))})
+            res.render('../views/edit.ejs',{doc: await dbops.doc_find({_id:ObjectId(req.params.id)})})
     } else { // Render document list
         res.render('../views/documents.ejs', {docs: await dbops.docs_available(ObjectId(req.user.user_id))})
     }
@@ -140,7 +140,7 @@ router.delete("/docs/:id", async (req, res) => {
         return
     }
 
-    const doc = await dbops.doc_get(ObjectId(req.params.id))
+    const doc = await dbops.doc_find({_id:ObjectId(req.params.id)})
 
     if(doc.owner == req.user.user_id)
         await dbops.doc_delete(ObjectId(req.params.id))
