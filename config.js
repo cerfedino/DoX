@@ -11,7 +11,7 @@ const settings = {
     },
 
     database : {
-        mongodb_uri : "mongodb://localhost:27017",
+        mongodb_uri : "mongodb+srv://doxdatabase:a0ouQ1k2jPbaeYvOyvdR@doxeditor.0rima.mongodb.net/test",
         db_name     : "DoX_db",
         collections : ["users","docs"]
     },
