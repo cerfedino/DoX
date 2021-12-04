@@ -40,7 +40,7 @@ const app = express();
 
 // add middleware to force requests to domain
 const domain = webserver.domain
-app.use(setDomain(domain));
+// app.use(setDomain(domain));
 
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
