@@ -3,11 +3,17 @@
  * Contains all the application settings and/or parameters.
  * 
 */
+const url = require('url')
+
+///////////////////
+const PORT = process.env.PORT || 8888
+const HOST = process.env.HOST || "localhost"
+///////////////////
 
 const settings = {
     webserver : {
-        domain: "localhost",
-        port: 8888
+        domain: HOST,
+        port: PORT
     },
 
     database : {
@@ -22,7 +28,6 @@ const settings = {
     }
 
 }
-
 
 const deepFreeze = obj => {
     Object.keys(obj).forEach(prop => {
