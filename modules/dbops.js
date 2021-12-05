@@ -253,7 +253,7 @@ function doc_set_content(doc_id, content={}, returnnew=true) {
 
 /**
  * Adds read/edit permissions to an array of users.
- * @param {ObjectId} doc_id the specific document to be updated.
+ * @param {String} doc_id the specific document to be updated.
  * @param {object} perms an object containing the incremental permission updates.
  *  The object is structured as follows:
  *      {
@@ -277,7 +277,7 @@ function doc_add_permissions(doc_id, perms={perm_read_add:[], perm_edit_add:[]},
 }
 /**
  * Removes read/edit permissions to an array of users.
- * @param {ObjectId} doc_id the specific document to be updated.
+ * @param {String} doc_id the specific document to be updated.
  * @param {object} perms an object containing the incremental permission updates.
  *  The object is structured as follows:
  *      {
