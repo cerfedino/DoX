@@ -1,7 +1,7 @@
-<% 
+<%
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
-%> 
+%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -20,8 +20,11 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <div class="h3 me-auto col-auto"><%= doc.title %></div>
-                <div class="text-end ms-3">
-                    <button type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i> Save</button>
+                <div class="text-end d-flex flex-wrap ms-3">
+                    <p id="message-save" class="mt-auto mb-auto me-3"></p>
+                    <button id="button-save" type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i>
+                        Save
+                    </button>
                 </div>
             </div>
         </div>
@@ -78,6 +81,12 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <i class="bi-image" data-bs-toggle="tooltip" data-bs-placement="top"
                    title="Insert image"></i>
             </a>
+
+            <div class="ms-auto d-flex flex-wrap">
+                <button type="button" class="btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal">
+                    Rename
+                </button>
+            </div>
         </div>
     </div>
 </header>
@@ -120,12 +129,35 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         </form>
     </div>
 </div>
-
-<input id="dark-mode-toggle" type="checkbox">
+<!-- Rename modal -->
+<div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="post" action="/" id="rename-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renameLabel">Rename file</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <label for="image-src" class="col-3 col-form-label">New name</label>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="image-src"
+                               placeholder="<%= doc.title %>" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary" id="action-insert-image" value="Rename">
+            </div>
+        </form>
+    </div>
+</div>
 
 <script>
-    // Get document state as a global varaiable
-    const documentState = JSON.parse('<%- JSON.stringify(doc.content)%>');
+    // Get document state and ID as a global varaiable
+    const documentID = '<%- doc._id %>'
+    const documentState = JSON.parse('<%- doc.content %>');
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
