@@ -185,6 +185,57 @@ function doc_exists(filter={}) {
         })
     })
 }
+
+/**
+ * Takes an array of hexadecimal strings and returns an array containing every ObjectId representation, if the HEX string is valid.  
+ * @param {String[]} hex_arr the array of hexadecimal strings representing the ObjectId's
+ * @param {Promise<boolean>} filtering_promise the promise that takes the HEX string and returns whether its valid or not.
+ *  Expected to be a reference to either:
+ *      function isValidUser()
+ *      function isValidDocument()
+ * @returns {ObjectId[]} an array containing al the valid ObjectIds.
+ */
+function getValidObjectIds(hex_arr=[], filtering_promise) {
+    return new Promise(async (resolve,reject)=>{
+        var ret = []
+
+        for(idx in hex_arr) {
+            if (await (filtering_promise(hex_arr[idx]))) {
+                ret.push(ObjectId(hex_arr[idx]))
+            } 
+        }
+
+        resolve(ret)
+    })
+    
+}
+
+/**
+ * Takes a HEX string and checks whether its a valid USER ID.
+ * @param {String} user_id the HEX string to validate.
+ * @returns {Promise<boolean>} resolves on whether the HEX string is a valid USER ID or not.
+ */
+function isValidUser(user_id) {
+    return new Promise(async (resolve, reject) => {
+        resolve(ObjectId.isValid(user_id) && await user_exists({_id : ObjectId(user_id)}))
+    })  
+}
+/**
+ * Takes a HEX string and checks whether its a valid DOCUMENT ID.
+ * @param {String} doc_id the HEX string to validate.
+ * @returns {Promise<boolean>} resolves on whether the HEX string is a valid USER ID or not.
+ */
+function isValidDocument(doc_id) {
+    return new Promise(async (resolve, reject) => {
+        resolve(ObjectId.isValid(doc_id) && await doc_exists({_id : ObjectId(doc_id)}))
+    })  
+}
+
+
+
+
+
+
 //
 
 // Get documents available to user
@@ -198,7 +249,7 @@ function docs_available(user_id) {
         $or:[
             {perm_read : {$elemMatch : {$eq : user_id}}},
             {perm_edit : {$elemMatch : {$eq : user_id}}},
-            {owner : {$elemMatch : {$eq : user_id}}}
+            {owner : {$eq : user_id}}
         ]
     }
     return run_find(model.docs, filter)
@@ -253,50 +304,55 @@ function doc_set_content(doc_id, content={}, returnnew=true) {
 
 /**
  * Adds read/edit permissions to an array of users.
- * @param {String} doc_id the specific document to be updated.
+ * @param {ObjectId} doc_id the specific document to be updated.
  * @param {object} perms an object containing the incremental permission updates.
  *  The object is structured as follows:
  *      {
- *          {String[]} perm_read_add    : array containing all the user ID's to add to the read permission array of the document.
- *          {String[]} perm_edit_add    : array containing all the user ID's to add to the edit permission array of the document.
+ *          {ObjectId[]} perm_read_add    : array containing all the user ID's to add to the read permission array of the document.
+ *          {ObjectId[]} perm_edit_add    : array containing all the user ID's to add to the edit permission array of the document.
  *      }
  * @param {boolean=true} returnnew whether to return the updated document data.
  * @returns {Promise<object>} a promise resolving with the updated document data or with undefined.
  */
 function doc_add_permissions(doc_id, perms={perm_read_add:[], perm_edit_add:[]}, returnnew=true) {
     return new Promise(async (resolve, reject)=>{
-        if (!(await doc_exists(ObjectId(doc_id))))
+        if (!(await doc_exists({_id : doc_id})))
             reject("Document does not exist")
 
         model.docs.findOneAndUpdate (
-            {_id : ObjectId(doc_id)},
+            {_id :doc_id},
             { $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
                     perm_read: { $each: perms.perm_read_add || []} }})
-        resolve(returnnew ? await doc_find({_id:ObjectId(doc_id)}) : undefined)
+        resolve(returnnew ? await doc_find({_id:doc_id}) : undefined)
     })
 }
 /**
  * Removes read/edit permissions to an array of users.
- * @param {String} doc_id the specific document to be updated.
+ * @param {ObjectId} doc_id the specific document to be updated.
  * @param {object} perms an object containing the incremental permission updates.
  *  The object is structured as follows:
  *      {
- *          {String[]} perm_read_remove    : array containing all the user ID's to remove from the read permission array of the document.
- *          {String[]} perm_edit_remove    : array containing all the user ID's to remove from the edit permission array of the document.
+ *          {ObjectId[]} perm_read_remove    : array containing all the user ID's to remove from the read permission array of the document.
+ *          {ObjectId[]} perm_edit_remove    : array containing all the user ID's to remove from the edit permission array of the document.
  *      }
  * @param {boolean=true} returnnew whether to return the updated document data.
  * @returns {Promise<object>} a promise resolving with the updated document data or with undefined.
  */
 function doc_remove_permissions(doc_id, perms={perm_read_remove:[], perm_edit_remove:[]}, returnnew=true) {
     return new Promise(async (resolve, reject)=>{
-        if (!(await doc_exists(ObjectId(doc_id))))
+        if (!(await doc_exists({_id : doc_id})))
             reject("Document does not exist")
-
+        
+        console.log(await model.docs.findOne({_id : doc_id}))
         model.docs.findOneAndUpdate (
-            {_id : ObjectId(doc_id)},
-            { $pull: { perm_edit: { $in: perms.perm_edit_add || []},
-                       perm_read: { $in: perms.perm_read_add || []} }})
-        resolve(returnnew ? await doc_find({_id:ObjectId(doc_id)}) : undefined)
+            {_id : doc_id},
+            {  "$pullAll": { perm_edit: perms.perm_edit_remove || [],
+                             perm_read: perms.perm_read_remove || [] }})
+        
+        
+        console.log(await model.docs.findOne({_id : doc_id}))
+
+        resolve(returnnew ? await doc_find({_id: doc_id}) : undefined)
     })
 }
 
@@ -313,14 +369,16 @@ function user_get_perms(user_id, doc_id) {
         const doc = await doc_find({_id:doc_id});
 
         var ret = []
-        if(doc.perm_read.includes(user_id))
+        if(doc.perm_read.some((usr)=>{return usr.toHexString() == user_id.toHexString()})) {
             ret.push("read")
-        if(doc.perm_edit.includes(user_id))
+        }
+        if(doc.perm_edit.some((usr)=>{return usr.toHexString() == user_id.toHexString()})) {
             ret.push("edit")
-        if(doc.owner == user_id)
+        }
+        if(doc.owner.toHexString() == user_id.toHexString())
             ret.push("owner")
 
-        return ret
+        resolve(ret)
     })
 }
 
@@ -334,9 +392,6 @@ function user_set_email_verification(user_id) {
 }
 
 
-// TODO: Add function to manipulate document content.
-
-
 
 module.exports = {
     run_find,
@@ -347,6 +402,10 @@ module.exports = {
     user_exists,
     user_delete,
     user_set,
+
+    getValidObjectIds,
+    isValidUser,
+    isValidDocument,
 
     doc_create,
     doc_exists,
