@@ -49,10 +49,9 @@
     outline: none;
 }
 
-.ProseMirror ol, .ProseMirror ul {
-    line-height: 0.7em;
-}
-
 .ProseMirror img {
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
     display: block;
 }
