@@ -1,0 +1,42 @@
+<% 
+var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
+var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
+%> 
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DoX - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <!-- SVG FontAwesome Icons -->
+    <script defer src="/media/fontawesome-free-5.15.4-web/js/all.js"></script>
+    <style type="text/css">
+        @import url("/css/common.css");
+        @import url("/css/login_register.css");
+    </style>
+</head>
+<body class="text-center">
+<main class="login-form">
+    <svg id="logo" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595.06 133.62"><defs><style>.cls-1{font-size:175px;font-family:jumper_XBdIt, Jumper;font-weight:700;font-style:italic;}.cls-2{letter-spacing:-0.01em;}</style></defs><text class="cls-1" transform="translate(0 126.81)"><tspan class="cls-2"></tspan><tspan x="102.9" y="0">DoX</tspan></text></svg>
+    <p>ERROR <b><%= s %></b></p> 
+    <p><%= m %></p>
+    <a href="/docs"> Go back</a>
+    
+</main>
+
+<div id="alerts"></div>
+
+<input id="dark-mode-toggle" type="checkbox">
+
+<%- messagesuccess %>
+<%- messagefailure %>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
+

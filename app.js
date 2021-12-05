@@ -98,6 +98,8 @@ const routers = require('./routes');
 app.use('/auth', routers.router_auth);
 app.use('/', routers.root);
 
+// Static folders
+app.use('/', express.static('public'));
 
 //default fallback handlers
 // catch 404 and forward to error handler
