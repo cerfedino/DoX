@@ -54,7 +54,7 @@ router.get('/verify/:id/:token', async function(req, res) {
     }
 
     if (user.token == req.params.token) {
-        dbops.user_set_email_verification(user._id).then( () => {
+        dbops.user_set_email_verification(ObjectId(user._id)).then( () => {
             
             req.flash('messageSuccess', 'Email verified!')
             res.redirect('/login');

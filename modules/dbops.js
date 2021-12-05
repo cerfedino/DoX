@@ -1,5 +1,6 @@
 const {model} = require('../models')
 const auth = require("./auth.js")
+const {ObjectId} = require("mongodb");
 
 /**
  * Contains all database operations.
@@ -30,7 +31,7 @@ function run_find(collection, filter) {
  * @param {object} filter the filter of the user to look for.
  * @returns {Promise<[]>} A Promise that resolves with the fetched user. Resolves undefined if the user cant be found
  */
-function user_find(filter) {
+function user_find(filter={}) {
     return model.users.findOne(filter);
 }
 
@@ -38,11 +39,11 @@ function user_find(filter) {
 
 /**
  * Returns a certain document in the database.
- * @param {ObjectId} _id the ID of the document to look for.
+ * @param {object} filter the filter of the user to look for.
  * @returns {Promise<[]>} A Promise that resolves with the fetched document. Resolves undefined if the document cant be found
  */
- function doc_get(_id) {
-    return model.docs.findOne({_id})
+ function doc_find(filter={}) {
+    return model.docs.findOne(filter)
 }
 
 
@@ -59,10 +60,11 @@ function user_find(filter) {
  * @param {String} username the username of the new user.
  * @param {String} email the email address of the new user.
  * @param {String} password the string password.
+ * @param {boolean=true} returnnew whether to return the new database element.
  * @returns {Promise<{}>} If the username is not taken yet, resolves with the new user data,
  *  If the username is already taken, the Promise rejects.
  */
-function user_create(username,email,password,token='') {
+function user_create(username,email,password,token='', returnnew=true) {
     // Pwd hashing
     return new Promise(async (resolve, reject)=>{
         if(await user_exists({username:username})) {
@@ -80,7 +82,7 @@ function user_create(username,email,password,token='') {
         model.users.insertOne(new_user).then(() => {
             console.log("[+] Inserted user:",new_user)
 
-            resolve(new_user)
+            resolve(returnnew? new_user : undefined)
         });
         
     })
@@ -90,9 +92,10 @@ function user_create(username,email,password,token='') {
  * Creates and inserts a new document in the database.
  * @param {ObjectId} owner_id the owner of the newly created document.
  * @param {String="Untitled"} title the title of the newly created document.
+ * @param {boolean=true} returnnew whether to return the new database element.
  * @returns {Promise<object>} the data of the new document.
  */
-function doc_create(owner_id, title="Untitled") {
+function doc_create(owner_id, title="Untitled", returnnew=true) {
     // Pwd hashing
     return new Promise(async (resolve, reject)=>{
         if(!(await user_exists({_id:owner_id}))) {
@@ -107,7 +110,7 @@ function doc_create(owner_id, title="Untitled") {
 
             title : title,
 
-            path : create_doc_file(), 
+            content : {},
             
             perm_read : [owner_id], 
             perm_edit : [owner_id],
@@ -124,14 +127,8 @@ function doc_create(owner_id, title="Untitled") {
         model.docs.insertOne(new_doc).then( (res) => {
             console.log("[+] Inserted doc:",new_doc)
             
-            resolve(new_doc)
+            resolve(returnnew? new_doc: undefined)
         });
-        
-
-        // returns the path to the created file
-        function create_doc_file() {
-            // TODO: Implement doc writing on file.
-        }
         
     })
 }
@@ -174,8 +171,6 @@ function user_exists(filter={}) {
     })
 }
 
-// 
-
 // Document exists ?
 /**
  * Checks whether a certain document exists.
@@ -190,6 +185,7 @@ function doc_exists(filter={}) {
         })
     })
 }
+//
 
 // Get documents available to user
 /**
@@ -208,7 +204,101 @@ function docs_available(user_id) {
     return run_find(model.docs, filter)
 }
 
+/**
+ * Sets any parameter of a specific user and resolves with the updated user data.
+ * @param {ObjectId} user_id the specific user to be updated.
+ * @param {object} tags an object containing the updated fields to write on the user.
+ * @param {boolean=true} returnnew whether to return the updated user data.
+ * @returns {Promise<object>} a promise resolving with the updated user data.
+ */
+function user_set(user_id, tags, returnnew=true) {
+    return new Promise(async (resolve, reject) => {
+        if (!(await user_exists({_id:user_id}))) {
+            reject("Document does not exist")
+            return
+        }
+        await model.users.findOneAndUpdate({_id:user_id}, {"$set" : tags})
+        resolve(returnnew ? await user_find({_id:user_id}) : undefined)
+    })
+}
 
+/**
+ * Sets any parameter of a specific document and resolves with the updated document data.
+ * @param {ObjectId} doc_id the specific document to be updated.
+ * @param {object} tags an object containing the updated fields to write on the document.
+ * @param {boolean=true} returnnew whether to return the updated document data.
+ * @returns {Promise<object>} a promise resolving with the updated document data.
+ */
+function doc_set(doc_id, tags, returnnew=true) {
+    return new Promise(async (resolve, reject)=>{
+        if (!(await doc_exists({_id:doc_id}))) {
+            reject("Document does not exist")
+            return
+        }
+        await model.docs.findOneAndUpdate({_id:doc_id}, {"$set" : tags})
+        resolve(returnnew? await doc_find({_id:doc_id}) : undefined)
+    })
+}
+
+/**
+ * Updates the content of a document and resolves with the updated document data.
+ * @param {ObjectId} doc_id the specific document to be updated.
+ * @param {object} content an object containing the new content data.
+ * @param {boolean=true} returnnew whether to return the updated document data.
+ * @returns {Promise<object>} a promise resolving with the updated document data.
+ */
+function doc_set_content(doc_id, content={}, returnnew=true) {
+    return doc_set(doc_id,{"content" : content}, returnnew)
+}
+
+/**
+ * Adds read/edit permissions to an array of users.
+ * @param {String} doc_id the specific document to be updated.
+ * @param {object} perms an object containing the incremental permission updates.
+ *  The object is structured as follows:
+ *      {
+ *          {String[]} perm_read_add    : array containing all the user ID's to add to the read permission array of the document.
+ *          {String[]} perm_edit_add    : array containing all the user ID's to add to the edit permission array of the document.
+ *      }
+ * @param {boolean=true} returnnew whether to return the updated document data.
+ * @returns {Promise<object>} a promise resolving with the updated document data or with undefined.
+ */
+function doc_add_permissions(doc_id, perms={perm_read_add:[], perm_edit_add:[]}, returnnew=true) {
+    return new Promise(async (resolve, reject)=>{
+        if (!(await doc_exists(ObjectId(doc_id))))
+            reject("Document does not exist")
+
+        model.docs.findOneAndUpdate (
+            {_id : ObjectId(doc_id)},
+            { $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
+                    perm_read: { $each: perms.perm_read_add || []} }})
+        resolve(returnnew ? await doc_find({_id:ObjectId(doc_id)}) : undefined)
+    })
+}
+/**
+ * Removes read/edit permissions to an array of users.
+ * @param {String} doc_id the specific document to be updated.
+ * @param {object} perms an object containing the incremental permission updates.
+ *  The object is structured as follows:
+ *      {
+ *          {String[]} perm_read_remove    : array containing all the user ID's to remove from the read permission array of the document.
+ *          {String[]} perm_edit_remove    : array containing all the user ID's to remove from the edit permission array of the document.
+ *      }
+ * @param {boolean=true} returnnew whether to return the updated document data.
+ * @returns {Promise<object>} a promise resolving with the updated document data or with undefined.
+ */
+function doc_remove_permissions(doc_id, perms={perm_read_remove:[], perm_edit_remove:[]}, returnnew=true) {
+    return new Promise(async (resolve, reject)=>{
+        if (!(await doc_exists(ObjectId(doc_id))))
+            reject("Document does not exist")
+
+        model.docs.findOneAndUpdate (
+            {_id : ObjectId(doc_id)},
+            { $pull: { perm_edit: { $in: perms.perm_edit_add || []},
+                       perm_read: { $in: perms.perm_read_add || []} }})
+        resolve(returnnew ? await doc_find({_id:ObjectId(doc_id)}) : undefined)
+    })
+}
 
 // Get permissions of user over document
 /**
@@ -220,7 +310,7 @@ function docs_available(user_id) {
  */
 function user_get_perms(user_id, doc_id) {
     return new Promise(async (resolve, reject) => {
-        const doc = await doc_get(doc_id);
+        const doc = await doc_find({_id:doc_id});
 
         var ret = []
         if(doc.perm_read.includes(user_id))
@@ -236,13 +326,11 @@ function user_get_perms(user_id, doc_id) {
 
 /**
  * To set into the db that the email has been verified
- * @param {ObjectID} user_id the user id.
+ * @param {ObjectId} user_id the user id.
  * @returns {Promise<[]>} A Promise that resolves with the updated user. Resolves undefined if the user cant be found
  */
 function user_set_email_verification(user_id) { 
-    let filter = {_id : user_id}
-    let update = { $set : { email_verification_status : true } };
-    return model.users.updateOne(filter, update);
+    return user_set(user_id ,{ email_verification_status : true }, false);
 }
 
 
@@ -253,13 +341,21 @@ function user_set_email_verification(user_id) {
 module.exports = {
     run_find,
     user_find,
-    doc_get: doc_get,
+    doc_find,
+
     user_create,
-    doc_create,
-    user_delete,
-    doc_delete,
     user_exists,
+    user_delete,
+    user_set,
+
+    doc_create,
     doc_exists,
+    doc_delete,
+    doc_set,
+    doc_set_content,
+    doc_add_permissions,
+    doc_remove_permissions,
+
     docs_available,
     user_get_perms,
     user_set_email_verification

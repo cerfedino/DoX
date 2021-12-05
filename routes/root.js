@@ -122,7 +122,7 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
         // TODO: AUTH. Check if user is allowed to view/edit document
         if(true) {
             if(req.accepts("text/html")) {
-                res.status(200).render('../views/edit.ejs',{doc: await dbops.doc_get(ObjectId(req.params.id))})
+                res.status(200).render('../views/edit.ejs',{doc: await dbops.doc_find({_id:ObjectId(req.params.id)})})
             } else {
                 res.status(406).send("Accepts: text/html").end()
             }
@@ -168,7 +168,7 @@ router.delete("/docs/:id", async (req, res) => {
         return
     }
 
-    const doc = await dbops.doc_get(ObjectId(req.params.id))
+    const doc = await dbops.doc_find({_id:ObjectId(req.params.id)})
 
     if(doc.owner == req.user.user_id)
         await dbops.doc_delete(ObjectId(req.params.id))
