@@ -7,7 +7,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DoX — Edit — New document</title>
+    <title>DoX — Edit — <%= doc.title %></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="/css/common.css" rel="stylesheet">
@@ -19,7 +19,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     <div id="pageheader" class="py-4 text-white">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <div class="h3 me-auto col-auto">New document</div>
+                <div class="h3 me-auto col-auto"><%= doc.title %></div>
                 <div class="text-end ms-3">
                     <button type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i> Save</button>
                 </div>
@@ -123,6 +123,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
 <input id="dark-mode-toggle" type="checkbox">
 
+<script>
+    // Get document state as a global varaiable
+    const documentState = JSON.parse('<%- JSON.stringify(doc.content)%>');
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>

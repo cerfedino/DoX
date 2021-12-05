@@ -83,7 +83,8 @@ document.getElementById('insert-image-form').addEventListener('submit', insertIm
 
 // Functions
 /**
- * Initializes an editor inside of the element with ID 'editor'
+ * Initializes an editor inside of the element with ID 'editor'.
+ * This function uses documentState global variable to set up the editor state.
  */
 function initEditor() {
     // Base scheme loaded from prosemirror-scheme-basic and prosemirror-scheme-list
@@ -183,15 +184,43 @@ function initEditor() {
         }
     ])
 
-    let state = EditorState.create({
-        schema,
-        plugins: [
-            history(),
-            keymap(buildKeymap(schema)),
-            keymap(baseKeymap),
-            menu
-        ]
-    });
+    let state;
+    if (typeof documentState === "object" && Object.keys(documentState).length !== 0) {
+        // Create state from the global variable
+        try {
+            state = EditorState.fromJSON({
+                schema,
+                plugins: [
+                    history(),
+                    keymap(buildKeymap(schema)),
+                    keymap(baseKeymap),
+                    menu
+                ]
+            }, documentState);
+        } catch {
+            // Can't create a state from current documentState
+            state = EditorState.create({
+                schema,
+                plugins: [
+                    history(),
+                    keymap(buildKeymap(schema)),
+                    keymap(baseKeymap),
+                    menu
+                ]
+            });
+        }
+    } else {
+        // Create an empty state
+        state = EditorState.create({
+            schema,
+            plugins: [
+                history(),
+                keymap(buildKeymap(schema)),
+                keymap(baseKeymap),
+                menu
+            ]
+        });
+    }
     let editorView = new EditorView(document.getElementById("editor"), {state});
 
     editorView.focus();
