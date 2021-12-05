@@ -1,5 +1,6 @@
 const {model} = require('../models')
 const auth = require("./auth.js")
+const {ObjectId} = require("mongodb");
 
 /**
  * Contains all database operations.
@@ -250,6 +251,54 @@ function doc_set_content(doc_id, content={}, returnnew=true) {
     return doc_set(doc_id,{"content" : content}, returnnew)
 }
 
+/**
+ * Adds read/edit permissions to an array of users.
+ * @param {ObjectId} doc_id the specific document to be updated.
+ * @param {object} perms an object containing the incremental permission updates.
+ *  The object is structured as follows:
+ *      {
+ *          {String[]} perm_read_add    : array containing all the user ID's to add to the read permission array of the document.
+ *          {String[]} perm_edit_add    : array containing all the user ID's to add to the edit permission array of the document.
+ *      }
+ * @param {boolean=true} returnnew whether to return the updated document data.
+ * @returns {Promise<object>} a promise resolving with the updated document data or with undefined.
+ */
+function doc_add_permissions(doc_id, perms={perm_read_add:[], perm_edit_add:[]}, returnnew=true) {
+    return new Promise(async (resolve, reject)=>{
+        if (!(await doc_exists(ObjectId(doc_id))))
+            reject("Document does not exist")
+
+        model.docs.findOneAndUpdate (
+            {_id : ObjectId(doc_id)},
+            { $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
+                    perm_read: { $each: perms.perm_read_add || []} }})
+        resolve(returnnew ? await doc_find({_id:ObjectId(doc_id)}) : undefined)
+    })
+}
+/**
+ * Removes read/edit permissions to an array of users.
+ * @param {ObjectId} doc_id the specific document to be updated.
+ * @param {object} perms an object containing the incremental permission updates.
+ *  The object is structured as follows:
+ *      {
+ *          {String[]} perm_read_remove    : array containing all the user ID's to remove from the read permission array of the document.
+ *          {String[]} perm_edit_remove    : array containing all the user ID's to remove from the edit permission array of the document.
+ *      }
+ * @param {boolean=true} returnnew whether to return the updated document data.
+ * @returns {Promise<object>} a promise resolving with the updated document data or with undefined.
+ */
+function doc_remove_permissions(doc_id, perms={perm_read_remove:[], perm_edit_remove:[]}, returnnew=true) {
+    return new Promise(async (resolve, reject)=>{
+        if (!(await doc_exists(ObjectId(doc_id))))
+            reject("Document does not exist")
+
+        model.docs.findOneAndUpdate (
+            {_id : ObjectId(doc_id)},
+            { $pull: { perm_edit: { $in: perms.perm_edit_add || []},
+                       perm_read: { $in: perms.perm_read_add || []} }})
+        resolve(returnnew ? await doc_find({_id:ObjectId(doc_id)}) : undefined)
+    })
+}
 
 // Get permissions of user over document
 /**
@@ -293,14 +342,20 @@ module.exports = {
     run_find,
     user_find,
     doc_find,
+
     user_create,
+    user_exists,
+    user_delete,
+    user_set,
+
     doc_create,
+    doc_exists,
+    doc_delete,
     doc_set,
     doc_set_content,
-    user_delete,
-    doc_delete,
-    user_exists,
-    doc_exists,
+    doc_add_permissions,
+    doc_remove_permissions,
+
     docs_available,
     user_get_perms,
     user_set_email_verification
