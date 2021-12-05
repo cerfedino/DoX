@@ -146,6 +146,15 @@ document.getElementById('rename-form').addEventListener('submit', async (e) => {
     name.placeholder = name.value;
     modal.hide();
 });
+document.getElementById('button-export').addEventListener('click', async () => {
+    const title = document.getElementById('doc-title').innerText;
+    html2pdf(document.querySelector('#editor > .ProseMirror'), {
+        margin: [12, 15],
+        filename: title + '.pdf',
+        pagebreak: {mode: ['avoid-all']},
+        image: {quality: 1}
+    });
+})
 
 // Functions
 /**
