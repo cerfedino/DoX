@@ -2,7 +2,7 @@
   "name": "dox",
   "main": "app.js",
   "scripts": {
-    "build": "browserify public/js/dev/documents.js -o public/js/build-documents.js && minify public/js/build-documents.js > public/js/build-documents.min.js"
+    "build": "browserify public/js/dev/editor.js -o public/js/build-editor.js && minify public/js/build-editor.js > public/js/build-editor.min.js"
   },
   "repository": {
     "type": "git",
