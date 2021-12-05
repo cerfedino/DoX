@@ -63,7 +63,7 @@ router.get('/verify/:id/:token', async function(req, res) {
         if(req.accepts('text/html')) {
             res.status(401).render('../views/error.ejs', {s: 401, m: `Token does not match. Check if there is a typo in: ${req.url}`});
         } else {
-            res.status(404).send(`Token does not match. Check if there is a typo in: ${req.url}`).end();
+            res.status(401).send(`Token does not match. Check if there is a typo in: ${req.url}`).end();
         }
         
     }
@@ -118,7 +118,7 @@ router.post("/register",  function(req, res, next) {
 // ###############
 
 /*
-    DELETE /logout
+    DELETE /auth/logout
     Log-out user
 */
 router.delete("/logout", (req,res) => {
