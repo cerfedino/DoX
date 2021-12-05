@@ -83,7 +83,6 @@ document.getElementById('insert-image-form').addEventListener('submit', insertIm
 document.getElementById('button-save').addEventListener('click', async (e) => {
     document.getElementById('button-save').innerHTML = 'Saving...'
 
-    debugger
     let result = await fetch('/docs/' + documentID, {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
@@ -114,6 +113,39 @@ document.getElementById('button-save').addEventListener('click', async (e) => {
         messageSave.innerText = '';
     }, 5000)
 })
+document.getElementById('renameModal').addEventListener('shown.bs.modal', () => {
+    document.getElementById('new-name').focus();
+});
+document.getElementById('renameModal').addEventListener('hidden.bs.modal', () => {
+    editor.focus();
+})
+document.getElementById('rename-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('renameModal'));
+
+    let name = document.getElementById('new-name');
+    let result = await fetch('/docs/' + documentID, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            tags: {
+                title: name.value
+            }
+        })
+    })
+
+    if (!result.ok) {
+        alert('Error occurred! Please try again');
+        return;
+    }
+
+    document.getElementById('doc-title').innerText = name.value;
+    document.querySelector('title').innerText = 'DoX - Edit - ' + name.value;
+
+    name.value = '';
+    name.placeholder = name.value;
+    modal.hide();
+});
 
 // Functions
 /**
