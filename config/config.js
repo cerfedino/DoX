@@ -10,7 +10,7 @@ const arg = process.argv[2]
 
 ///////////////////
 // Initializes some settings that depend on whether the application is getting deployed locally or remotely
-const PORT = (arg !== "remote") ? 8888 : 80
+const PORT = (arg !== "remote") ? 8888 : process.env.PORT
 const HOST = (arg !== "remote") ? "localhost" : "doxeditor.herokuapp.com"
 const HTTPS_ENABLED = (arg !== "remote") ? false : true
 
@@ -22,6 +22,7 @@ const MONGODB_URI = (arg !== "remote") ? `mongodb://localhost:27017` : `mongodb+
 
 const settings = {
     webserver: {
+        remote: (arg === "remote"),
         https_enabled: HTTPS_ENABLED,
         domain: HOST,
         port: PORT
