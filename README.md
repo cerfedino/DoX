@@ -73,11 +73,11 @@ Hashing of user passwords.
 
 |  |  |
 |---|---|
-|<div style="width:20%"><img style="border-radius: 50%; width:100%;" src="https://avatars.githubusercontent.com/u/39586706?v=4"></div>      | [Albert Cerfeda](https://github.com/AlbertCerfeda)  |
-|<div style="width:20%"><img style="border-radius: 50%; width:100%;" src="https://avatars.githubusercontent.com/u/79453106?v=4"></div>      | [Alessandro Gobbetti](https://github.com/Alessandro-Gobbetti)  |
-|<div style="width:20%"><img style="border-radius: 50%; width:100%;" src="https://avatars.githubusercontent.com/u/31219724?v=4"></div>      | [Denis Karev](https://github.com/actisPRO)  |
-|<div style="width:20%"><img style="border-radius: 50%; width:100%;" src="https://avatars.githubusercontent.com/u/79482346?v=44"></div>      | [Bojan Lazarevski](https://github.com/BojanUSI)  |
-|<div style="width:20%"><img style="border-radius: 50%; width:100%;" src="https://avatars.githubusercontent.com/u/79453782?v=4"></div>      | [Enrico Benedettini](https://github.com/Enrico-Benedettini)  |
+|<img style="border-radius: 50%; width:25vh;" src="https://avatars.githubusercontent.com/u/39586706?v=4">      | [Albert Cerfeda](https://github.com/AlbertCerfeda)  |
+|<img style="border-radius: 50%; width:25vh;" src="https://avatars.githubusercontent.com/u/79453106?v=4">   | [Alessandro Gobbetti](https://github.com/Alessandro-Gobbetti)  |
+|<img style="border-radius: 50%; width:25vh;" src="https://avatars.githubusercontent.com/u/31219724?v=4">   | [Denis Karev](https://github.com/actisPRO)  |
+|<img style="border-radius: 50%; width:25vh;" src="https://avatars.githubusercontent.com/u/79482346?v=44">     | [Bojan Lazarevski](https://github.com/BojanUSI)  |
+|<img style="border-radius: 50%; width:25vh;" src="https://avatars.githubusercontent.com/u/79453782?v=4">     | [Enrico Benedettini](https://github.com/Enrico-Benedettini)  |
 
 
 
