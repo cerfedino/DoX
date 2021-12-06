@@ -101,7 +101,7 @@ npm run build
 ### 3. Run the application
 Finally run the application with
 ```bash
-node app.js
+npm run local
 ```
 \
 You should be good to go now :smiling_imp:
