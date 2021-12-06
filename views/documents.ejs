@@ -50,7 +50,7 @@ function generate_document_card(doc) {
     </style>
 </head>
 <body>
-    <header id="pageheader" class="p-3 mb-4 text-white">
+    <!-- <header id="pageheader" class="p-3 mb-4 text-white">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <div class="h3 me-auto col-auto">
@@ -61,7 +61,10 @@ function generate_document_card(doc) {
                 </form>
             </div>
         </div>
-    </header>
+    </header> -->
+
+    <%- include('includes/header', {'extra' : 'search'}) %>
+
 
     <main class=" ps-3 d-flex flex-wrap">
         <div class="card document document-create">
