@@ -11,7 +11,7 @@ if(process.argv[2] == "remote") {
     // https.createServer({ key, cert }, app).listen(config.webserver.port);
 
     // TODO: Add HTTPS encryption if remote.
-    https.createServer(app).listen(config.webserver.port)
+    app.listen(config.webserver.port)
 } else {
-    https.createServer(app).listen(config.webserver.port)
+    app.listen(config.webserver.port)
 }
