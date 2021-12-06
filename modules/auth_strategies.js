@@ -89,6 +89,7 @@ async function registerUser(req, user, password, done) {
     )
 
     let verification_link = `${config.webserver.https_enabled? 'https:' : 'http:'}//${config.webserver.domain}:${config.webserver.port}/auth/verify/${new_user._id}/${new_user.token}`
+
     // send email with verification link
     mailing.send_mail(user, req.body.email, verification_link)
 
