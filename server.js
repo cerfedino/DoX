@@ -5,7 +5,7 @@ const fs = require('fs-extra')
 
 
 
-if(process.argv[2] == "remote") {
+if(config.webserver.https_enabled) {
     // const key = fs.readFileSync("localhost-key.pem", "utf-8");
     // const cert = fs.readFileSync("localhost.pem", "utf-8");
     // https.createServer({ key, cert }, app).listen(config.webserver.port);
