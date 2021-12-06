@@ -4,7 +4,7 @@ const models = require('../models').model;
 const auth = require('./auth.js');
 const dbops = require('./dbops.js');
 const mailing = require('./mailing.js');
-
+const config = require('../config/config.js');
 
 /**
  * Search the user, password in the DB to authenticate the user
@@ -88,7 +88,7 @@ async function registerUser(req, user, password, done) {
         user_token
     )
 
-    let verification_link = `http://localhost:8888/auth/verify/${new_user._id}/${new_user.token}`
+    let verification_link = `http://${config.webserver.domain}:${config.webserver.port}/auth/verify/${new_user._id}/${new_user.token}`
     // send email with verification link
     mailing.send_mail(user, req.body.email, verification_link)
 
