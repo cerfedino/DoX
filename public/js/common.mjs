@@ -43,3 +43,19 @@ document.querySelector("#dark-mode-toggle")?.addEventListener('change',
         else
             document.body.classList.remove('dark-theme')
     });
+
+
+// document.querySelectorAll("form.logout").forEach(x=>x.addEventListener('submit',function(e) {
+//     e.preventDefault()
+//     // Sends DELETE request for the document
+//     fetch('/auth/logout',
+//         {
+//             method: "POST"
+//         })
+//     }).then( () => {
+//         window.location = "/login";
+//         console.log(window.location)
+//     })
+
+    
+//     );
