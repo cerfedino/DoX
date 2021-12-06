@@ -1,0 +1,85 @@
+<header>
+
+    <div id="logo" onclick="window.location='/docs';"></div>
+
+
+    <% if(extra) { %>
+        <div id="extra">
+
+            <% if (extra == "search") { %>
+                <input id="search" type="text" placeholder="Search...">
+
+
+            <% } else if ( extra == "editor") { %>
+
+                <h1><%= doc.title %></h1>
+
+                <div style="display: flex;">
+                    <button>Share</button>
+
+                    <div class="text-end d-flex flex-wrap ms-3">
+                        <p id="message-save" class="mt-auto mb-auto me-3"></p>
+                        <button id="button-save" type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i>
+                            Save
+                        </button>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+
+
+    <div id="profile_pic">
+        <% if (isUserAuthenticated) { %>
+            <img id="profile_pic" src='./media/profile_pics/img_avatar.png' onerror="if (this.src != './media/profile_pics/img_avatar.png') this.src = '../media/profile_pics/img_avatar.png';"alt="<%= user.username %>">
+
+            <!-- <img id="profile_pic" src="<%= user.profile_pic %>" alt="<%= user.username %>"> -->
+        <% } %>
+    </div>
+    
+    
+    <div class="modal">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <img id="profile_pic" src='./media/profile_pics/img_avatar.png' onerror="if (this.src != './media/profile_pics/img_avatar.png') this.src = '../media/profile_pics/img_avatar.png';"alt="<%= user.username %>">
+                <!-- <img id="profile_pic" src="<%= user.profile_pic %>" alt="<%= user.username %>"> -->
+                
+            </div>
+            <div class="modal-body">
+                <h2><%= user.username %></h2>
+                <p><%= user.email %></p>
+                
+            </div>
+            <div class="modal-footer">
+                <form action="/auth/logout?_method=DELETE" method="post" class="logout">
+                    <input type="submit" class="btn btn-sm btn-danger" value="Log out"></input> 
+                </form>
+            </div>
+        </div>
+    </div>
+    
+</header>
+
+
+
+<script>
+    // Get the modal
+    var modal = document.querySelector(".modal");
+    
+    // Get the button that opens the modal
+    var btn = document.getElementById("profile_pic");
+    
+    // When the user clicks the button, open the modal 
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+    
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+</script>
