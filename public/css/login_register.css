@@ -54,3 +54,11 @@ main.login-form {
 .login-form input[type="submit"] {
     margin-bottom: 10px;
 }
+
+
+div#logo {
+    background-image: var(--logo-notebook);
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100px;
+}

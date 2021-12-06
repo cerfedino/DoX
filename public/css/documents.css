@@ -16,6 +16,28 @@
 ########################
 */
 
+input#search {
+    border: 1px solid var(--bg-contrast);
+    border-radius: 10px;
+    padding: 5px 15px;
+    height: 60px;
+    min-width: 50vw;
+    background-color: var(--bg);
+    color: var(--text);
+
+}
+
+/* input#search:before {
+    background-image: url('./images/search.svg');
+    background-color: gray;
+}
+
+input#search:focus {
+    border: 0px solid gray;
+    box-shadow: 0 5px 5px gray;
+} */
+
+
 
 .form-control-dark:focus {
     border-color: #fff;
