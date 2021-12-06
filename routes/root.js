@@ -123,7 +123,11 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
         
         if((await dbops.user_get_perms(ObjectId(req.user.user_id),ObjectId(req.params.id))).length > 0) {
             if(req.accepts("text/html")) {
-                res.status(200).render('../views/edit.ejs',{doc: await dbops.doc_find({_id:ObjectId(req.params.id)})})
+                res.status(200).render('../views/edit.ejs',
+                    {
+                        doc: await dbops.doc_find({_id:ObjectId(req.params.id)}),
+                        user : await dbops.user_find({_id : ObjectId(req.user.user_id)})
+                    })
             } else {
                 res.status(406).send("Accepts: text/html").end()
             }
@@ -131,7 +135,11 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
     } else { // Render document list
         if(req.accepts("text/html")) {
             console.log(await dbops.docs_available(ObjectId(req.user.user_id)))
-            res.status(200).render('../views/documents.ejs', {docs: await dbops.docs_available(ObjectId(req.user.user_id))})
+            res.status(200).render('../views/documents.ejs', 
+                {
+                    docs: await dbops.docs_available(ObjectId(req.user.user_id)),
+                    user : await dbops.user_find({_id : ObjectId(req.user.user_id)})
+                })
         } else {
             res.status(406).send("Accepts: text/html").end();
         }
