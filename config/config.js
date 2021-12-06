@@ -52,17 +52,17 @@ const deepFreeze = obj => {
 };
 
 
-if(arg === "remote") {
-    fs.writeFileSync(path.resolve(__dirname,"./greenlock.d/config.json"),
-`{ "sites": 
-    [
-        { 
-            "subject": "${settings.webserver.domain}", 
-            "altnames": [ "www.${settings.webserver.domain}" ] 
-        }
-    ] 
-}`)
+// if(arg === "remote") {
+//     fs.writeFileSync(path.resolve(__dirname,"./greenlock.d/config.json"),
+// `{ "sites": 
+//     [
+//         { 
+//             "subject": "${settings.webserver.domain}", 
+//             "altnames": [ "www.${settings.webserver.domain}" ] 
+//         }
+//     ] 
+// }`)
 
-}
+// }
 
 module.exports = deepFreeze(settings)
