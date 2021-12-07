@@ -71,7 +71,6 @@ class MenuView {
 
 // Editor setup
 let editor = initEditor();
-debugger
 // Modals
 
 // Insert image
@@ -140,40 +139,7 @@ document.getElementById('insert-link-form').addEventListener('submit', (e) => {
 })
 
 // Document operations
-document.getElementById('button-save').addEventListener('click', async (e) => {
-    document.getElementById('button-save').innerHTML = 'Saving...'
-
-    let result = await fetch('/docs/' + documentID, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            tags: {
-                content: JSON.stringify(editor.state.toJSON()),
-            }
-        })
-    })
-
-    let messageSave = document.getElementById('message-save');
-    if (!result.ok) {
-        let error = await result.text();
-        messageSave.innerText = 'Error occurred while saving!';
-        messageSave.classList.add('text-danger');
-        messageSave.classList.remove('text-secondary');
-        e.target.innerHTML = '<i class="bi-save me-1"></i> Save';
-        return;
-    }
-
-    messageSave.innerText = 'Saved successfully!';
-    messageSave.classList.remove('text-danger');
-    messageSave.classList.add('text-secondary');
-
-    document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
-    editor.focus();
-
-    setTimeout(() => {
-        messageSave.innerText = '';
-    }, 5000)
-});
+document.getElementById('button-save').addEventListener('click', save);
 document.getElementById('button-export').addEventListener('click', async () => {
     const title = document.getElementById('doc-title').innerText;
     editor.focus();
@@ -353,8 +319,10 @@ function buildKeymap(schema) {
         keys[key] = cmd;
     }
 
+    bind('Mod-s', save);
+
     bind('Mod-z', undo)
-    bind('Shift-Mod-z', redo)
+    bind('Mod-Shift-z', redo)
 
     bind('Mod-b', toggleMark(schema.marks.strong));
     bind('Mod-i', toggleMark(schema.marks.em));
@@ -376,6 +344,44 @@ function menuPlugin(items) {
             return new MenuView(items, editorView);
         }
     })
+}
+
+/**
+ * Saves the document
+ */
+async function save() {
+    document.getElementById('button-save').innerHTML = 'Saving...'
+
+    let result = await fetch('/docs/' + documentID, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            tags: {
+                content: JSON.stringify(editor.state.toJSON()),
+            }
+        })
+    })
+
+    let messageSave = document.getElementById('message-save');
+    if (!result.ok) {
+        let error = await result.text();
+        messageSave.innerText = 'Error occurred while saving!';
+        messageSave.classList.add('text-danger');
+        messageSave.classList.remove('text-secondary');
+        e.target.innerHTML = '<i class="bi-save me-1"></i> Save';
+        return;
+    }
+
+    messageSave.innerText = 'Saved successfully!';
+    messageSave.classList.remove('text-danger');
+    messageSave.classList.add('text-secondary');
+
+    document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
+    editor.focus();
+
+    setTimeout(() => {
+        messageSave.innerText = '';
+    }, 5000)
 }
 
 /**
