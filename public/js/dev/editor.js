@@ -72,14 +72,74 @@ class MenuView {
 // Editor setup
 let editor = initEditor();
 
-// Events
+// Modals
+
+// Insert image
 document.getElementById('insertImageModal').addEventListener('shown.bs.modal', () => {
     document.getElementById('image-src').focus();
 });
 document.getElementById('insertImageModal').addEventListener('hidden.bs.modal', () => {
+    document.getElementById('image-src').value = '';
+    document.getElementById('image-alt').value = '';
+
+    editor.focus();
+});
+document.getElementById('insert-image-form').addEventListener('submit', insertImage);
+// Rename
+document.getElementById('renameModal').addEventListener('shown.bs.modal', () => {
+    document.getElementById('new-name').focus();
+});
+document.getElementById('renameModal').addEventListener('hidden.bs.modal', () => {
+    document.getElementById('new-name').value = '';
+    editor.focus();
+});
+document.getElementById('rename-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('renameModal'));
+
+    let name = document.getElementById('new-name');
+    let result = await fetch('/docs/' + documentID, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            tags: {
+                title: name.value
+            }
+        })
+    })
+
+    if (!result.ok) {
+        alert('Error occurred! Please try again');
+        return;
+    }
+
+    document.getElementById('doc-title').innerText = name.value;
+    document.querySelector('title').innerText = 'DoX - Edit - ' + name.value;
+
+    name.value = '';
+    name.placeholder = name.value;
+    modal.hide();
+});
+// Insert link
+document.getElementById('insertLinkModal').addEventListener('shown.bs.modal', () => {
+    document.getElementById('link-href').focus();
+})
+document.getElementById('insertLinkModal').addEventListener('hidden.bs.modal', () => {
+    document.getElementById('link-href').value = '';
     editor.focus();
 })
-document.getElementById('insert-image-form').addEventListener('submit', insertImage);
+document.getElementById('insert-link-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('insertLinkModal'));
+
+    toggleMark
+    (editor.state.schema.marks.link, {href: document.getElementById('link-href').value})
+    (editor.state, editor.dispatch);
+
+    modal.hide();
+})
+
+// Document operations
 document.getElementById('button-save').addEventListener('click', async (e) => {
     document.getElementById('button-save').innerHTML = 'Saving...'
 
@@ -108,53 +168,22 @@ document.getElementById('button-save').addEventListener('click', async (e) => {
     messageSave.classList.add('text-secondary');
 
     document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
+    editor.focus();
 
     setTimeout(() => {
         messageSave.innerText = '';
     }, 5000)
-})
-document.getElementById('renameModal').addEventListener('shown.bs.modal', () => {
-    document.getElementById('new-name').focus();
-});
-document.getElementById('renameModal').addEventListener('hidden.bs.modal', () => {
-    editor.focus();
-})
-document.getElementById('rename-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('renameModal'));
-
-    let name = document.getElementById('new-name');
-    let result = await fetch('/docs/' + documentID, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            tags: {
-                title: name.value
-            }
-        })
-    })
-
-    if (!result.ok) {
-        alert('Error occurred! Please try again');
-        return;
-    }
-
-    document.getElementById('doc-title').innerText = name.value;
-    document.querySelector('title').innerText = 'DoX - Edit - ' + name.value;
-
-    name.value = '';
-    name.placeholder = name.value;
-    modal.hide();
 });
 document.getElementById('button-export').addEventListener('click', async () => {
     const title = document.getElementById('doc-title').innerText;
+    editor.focus();
     html2pdf(document.querySelector('#editor > .ProseMirror'), {
         margin: [12, 15],
         filename: title + '.pdf',
         pagebreak: {mode: ['avoid-all']},
         image: {quality: 1}
     });
-})
+});
 
 // Functions
 /**
@@ -358,11 +387,7 @@ function insertImage(e) {
             editor.state.schema.nodes.image.createAndFill({src: src.value, alt: alt.value}),
             false
         ));
-    editor.focus();
 
-    // Clear form and hide the modal
-    src.value = '';
-    alt.value = '';
     modal.hide();
 }
 

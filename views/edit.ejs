@@ -36,14 +36,15 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </div>
     <div class="py-2 border-bottom mb-5 bg-light">
         <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
+
             <i id="action-bold" class="bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
                title="Bold (Ctrl-B)"></i>
             <i id="action-italic" class="bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
                title="Italic (Ctrl-I)"></i>
-            <i id="action-underline" class="bi-type-underline me-2" data-bs-toggle="tooltip" data-bs-placement="top"
+            <i id="action-underline" class="bi-type-underline" data-bs-toggle="tooltip" data-bs-placement="top"
                title="Underline (Ctrl-U)"></i>
 
-            <div class="dropdown me-2">
+            <div class="dropdown ms-2 me-2">
                 <button class="btn-sm btn-secondary dropdown-toggle" type="button" id="headingMenu"
                         data-bs-toggle="dropdown" aria-expanded="false">Normal text
                 </button>
@@ -85,6 +86,11 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             <a data-bs-toggle="modal" data-bs-target="#insertImageModal">
                 <i class="bi-image" data-bs-toggle="tooltip" data-bs-placement="top"
                    title="Insert image"></i>
+            </a>
+
+            <a data-bs-toggle="modal" data-bs-target="#insertLinkModal">
+                <i class="bi-link" data-bs-toggle="tooltip" data-bs-placement="top"
+                   title="Insert link"></i>
             </a>
 
             <div class="ms-auto d-flex flex-wrap">
@@ -158,6 +164,31 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         </form>
     </div>
 </div>
+<!-- Insert link modal -->
+<div class="modal fade" id="insertLinkModal" tabindex="-1" aria-labelledby="inserLinkLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="post" action="/" id="insert-link-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renameLabel">Insert link</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <label for="link-href" class="col-3 col-form-label">URL</label>
+                    <div class="col-9">
+                        <input type="url" class="form-control" id="link-href"
+                               placeholder="https://example.com" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary" id="action-insert-link" value="Insert">
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <script>
     // Get document state and ID as a global varaiable
