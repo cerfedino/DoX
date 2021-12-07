@@ -6,33 +6,6 @@ if(!docs) {
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
 
-
-var doc_cards = ""
-docs.forEach(doc=>{
-    doc_cards += generate_document_card(doc)
-})
-
-/**
- * Generates the html code for a document card.
- * @param {object} doc the document to generate the card from.
- * @returns {string} the generated html code.
- */
-function generate_document_card(doc) {
-    return `<div class="card document">
-            <div class="card-body">
-                <h6 class="card-title">${doc.title}</h6>
-                <p class="card-text">${doc.body}</p>
-            </div>
-            <div class="card-footer">
-                <a href="/docs/${doc._id}" class="btn btn-sm btn-primary">Edit</a>
-                <form _method="DELETE" action="/docs/${doc._id}" class="delete-doc"> <input type="submit" href="#" class="btn btn-sm btn-danger" value="Delete"></input> </form>
-            </div>
-        </div>`
-}
-
-
-
-
  %>
 
 <!DOCTYPE html>
@@ -65,13 +38,141 @@ function generate_document_card(doc) {
 
     <%- include('includes/header', {'extra' : 'search'}) %>
 
-
-    <main class=" ps-3 d-flex flex-wrap">
-        <div class="card document document-create">
-            <a href="/docs/new"><i class="far fa-plus-square"></i></a>
+    <section class="tools-bar">
+        <span></span>
+        <!-- Card/Grid view buttons -->
+        <div class="switch-list-grid">
+            <a class="active grid-view" href=""><i class="fa fa-th"></i></a>
+            <a class="list-view" href=""><i class="fa fa-list"></i></a>
         </div>
 
-        <%- doc_cards %>
+        <!-- Sort section -->
+        <div class="dropdown show sort">
+            <a class="btn btn-secondary dropdown-toggle" href="#" data-toggle="dropdown">
+                Sort by
+            </a>
+          
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="#">Date</a>
+              <a class="dropdown-item" href="#">Title</a>
+            </div>
+        </div>
+        <section class="active-sort">
+            <p><!-- TODO - fill this with the actual sort filter --></p>
+        </section>
+
+        <!-- Filter section -->
+        <div class="dropdown show filter">
+            <a class="btn btn-secondary dropdown-toggle" href="#" data-toggle="dropdown">
+                Filter
+            </a>
+            <div class="dropdown-menu">
+                <form id="filters">
+                    <article class="dropdown-item filter">
+                        <label for="filter-owned">Owned by me</label>
+                        <input name="filter-owned" type="checkbox">
+                    </article>
+                    <article class="dropdown-item filter">
+                        <label for="filter-read">Reading Permissions</label>
+                        <input name="filter-read" type="checkbox">
+                    </article>
+                    <article class="dropdown-item filter">
+                        <label for="filter-write">Writing Permissions</label>
+                        <input name="filter-write" type="checkbox">
+                    </article>
+                    <article class="dropdown-item filter">
+                        <label for="filter-shared">Shared Documents</label>
+                        <input name="filter-shared" type="checkbox">
+                    </article>
+                    <input name="filter-submit" type="submit" value="Save">
+                </form>
+            </div>
+        </div>
+        <section class="active-filter">
+            <p><!-- TODO - fill this with the actual filter --></p>
+        </section>
+    </section>
+
+
+    <main class=" ps-3 d-flex flex-wrap">
+        
+        <section class="list">
+            <article class="list-element head">
+                <span class="info"><b><a href="sort/title">Title</a></b></span>
+                <span class="info"><b><a href="sort/creation-date">Creation Date</a></b></span>
+                <span class="info"><b><a href="sort/edit-date">Edit Date</a></b></span>
+                <span class="info"></span>
+                <span class="info"><b><a href="sort/permissions">Permissions</a></b></span>
+                <span class="info"><b><a href="sort/owner">Owner</a></b></span>
+            </article>
+            <% docs.forEach((doc)=>{ %>
+                <article class="list-element">
+                    <span class="info title"><b><%= doc.title %></b></span>
+                    <span class="info creation-date"><%= doc.created_date %></span>
+                    <span class="info edit-date"><%= doc.edit_date %></span>
+                    <span class="info"></span>
+                    <div class="info dropleft perms">
+                        <a class="btn btn-secondary dropdown-toggle" href="#" data-toggle="dropdown">
+                            <% let doc_perms = [] 
+                            doc.perm_edit.forEach(u=>{ 
+                                if (String(doc.owner) != String(u)) {
+                                    doc_perms.push(`<a class="dropdown-item" href="#">${u} edit</a>`)
+                                }
+                            }) 
+                            doc.perm_read.forEach(u=>{
+                                if (String(doc.owner) != String(u)) {
+                                    let contained = false;
+                                    doc_perms.forEach(p=>{
+                                        if (p.includes(String(u))) {
+                                            contained = true;
+                                        }
+                                    });
+                                    if (!contained) {
+                                        doc_perms.push(`<a class="dropdown-item" href="#">${u} read</a>`);
+                                    }
+                                }
+                            })
+                            %>
+                            Shared with <%= doc_perms.length %> users 
+                        </a>
+                        <div class="dropdown-menu">
+                            <% doc_perms.forEach(u=>{ %>
+                                <%- u %>
+                            <% }) 
+                            if (doc_perms.length == 0) { %>
+                                <a class="dropdown-item">Document not shared</a>
+                            <% } %>
+                        </div>
+                        </div>
+                    <span class="info owner"><%= doc.owner %></span>
+                    <section class="actions">
+                        <a href="docs/<%= doc._id %>" rel="del" _method="DELETE"><i class="far fa-trash-alt"></i></a>
+                    </section>
+                </article>
+            <% }); %>
+        </section>
+
+        <section class="grid">
+            <div class="card document document-create">
+                <a href="/docs/new"><i class="far fa-plus-square"></i></a>
+            </div>
+
+            <% docs.forEach((doc)=>{ %>
+                <div class="card document">
+                    <div class="card-body">
+                        <h6 class="card-title"><%= doc.title %></h6>
+                        <p class="card-text"><!-- <%= doc.content %> --></p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="docs/<%= doc._id %>" class="btn btn-sm btn-primary">Edit</a>
+                        <form _method="DELETE" action="docs/<%= doc._id %>" class="delete-doc">
+                            <input type="submit" href="#" class="btn btn-sm btn-danger" value="Delete"></input>
+                        </form>
+                    </div>
+                </div>
+            <% }); %>
+        </section>
+
     </main>
 
 <input id="dark-mode-toggle" type="checkbox">
