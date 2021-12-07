@@ -6,7 +6,7 @@
 
 const nodemailer = require('nodemailer');
 
-const email_credentials = require('../config.js').mailing;
+const email_credentials = require('../config/config.js').mailing;
 
 
 
