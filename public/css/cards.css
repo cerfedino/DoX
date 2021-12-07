@@ -1,0 +1,20 @@
+.card {
+    margin: 1rem;
+    display: inline-block;
+}
+
+.card-body {
+    display: grid;
+}
+
+.optionbuttons {
+    display: inline-grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 3fr 1fr 1fr;
+}
+#end {
+    justify-self: end;
+}
+#start {
+    justify-self: center;
+}
