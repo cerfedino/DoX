@@ -43,6 +43,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </div>
     <div class="py-2 border-bottom mb-5 bg-light">
         <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
+            <i id="action-undo" class="bi-arrow-counterclockwise" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Undo (Ctrl-Z)"></i>
+            <i id="action-redo" class="bi-arrow-clockwise me-2" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Redo (Ctrl-Shift-Z)"></i>
 
             <i id="action-bold" class="bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
                title="Bold (Ctrl-B)"></i>

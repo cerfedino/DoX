@@ -71,7 +71,7 @@ class MenuView {
 
 // Editor setup
 let editor = initEditor();
-
+debugger
 // Modals
 
 // Insert image
@@ -208,6 +208,18 @@ function initEditor() {
 
     // Menu setup
     let menu = menuPlugin([
+        {
+            name: 'undo',
+            type: 'history',
+            command: undo,
+            dom: document.getElementById('action-undo')
+        },
+        {
+            name: 'redo',
+            type: 'history',
+            command: redo,
+            dom: document.getElementById('action-redo')
+        },
         {
             name: 'strong',
             type: 'mark',
