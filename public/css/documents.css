@@ -27,17 +27,6 @@ input#search {
 
 }
 
-/* input#search:before {
-    background-image: url('./images/search.svg');
-    background-color: gray;
-}
-
-input#search:focus {
-    border: 0px solid gray;
-    box-shadow: 0 5px 5px gray;
-} */
-
-
 
 .form-control-dark:focus {
     border-color: #fff;

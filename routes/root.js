@@ -11,6 +11,12 @@ const router = express.Router();
 const dbops = require('../modules/dbops.js')
 const {ObjectId} = require("mongodb");
 
+const auth = require('../modules/auth.js');
+
+const fs = require('fs-extra');
+const path = require('path');
+
+
 
 module.exports = router;
 
@@ -104,9 +110,9 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
     if (req.params.id && !ObjectId.isValid(req.params.id)) {
         
         if(req.accepts("text/html")) {
-            res.status(404).render('../views/error.ejs', {s: 404, m: `Invalid user ID. Check if there is a typo in: ${req.url}`});
+            res.status(404).render('../views/error.ejs', {s: 404, m: `Invalid document ID. Check if there is a typo in: ${req.url}`});
         } else {
-            res.status(404).send(`Invalid user ID. Check if there is a typo in: ${req.url}`).end();
+            res.status(404).send(`Invalid document ID. Check if there is a typo in: ${req.url}`).end();
         }
         return
     }
@@ -276,6 +282,76 @@ function get_editable_doc_fields(obj={}) {
     Object.keys(ret).forEach(key => { if(!ret[key]) delete ret[key]})
     return ret
 }
+
+
+
+/*
+    PUT /user
+    Updates a user data.
+
+    Updates user only if the request is coming from the user himself.
+*/
+router.put('/user', async (req,res)=> {
+    console.log('BBBBBBBBBBBBBBBB')
+    if (!ObjectId.isValid(req.user.user_id)) {
+        res.status(400).send(`Invalid user ID.`);
+        return
+    }
+    console.log('CCCCCCCCCCCCCCCCCCCCC')
+    console.log('user: ' + req.user.user_id)
+
+    if(!(await dbops.user_exists({_id:ObjectId(req.user.user_id)}))) {
+        if(req.accepts("text/html")) {
+            res.status(404).render('../views/error.ejs', {s: 404, m: "User does not exist"});
+        } else {
+            res.status(404).send("User does not exist").end();
+        }
+        return
+    }
+    console.log(req.body)
+    
+    let tags = {}
+    if (req.body.username && !await (dbops.user_exists({username : new ObjectId(req.body.username)}))) {
+        tags.username = req.body.username;
+    }
+    if (req.body.password) {
+        tags.password = auth.encrypt_pwd(req.body.password);
+    }
+
+    console.log('DDDDDDDDDDDDDDDDDDDDD', tags)
+
+
+    if (req.files && Object.keys(req.files).length > 0) {
+        // new profile picture uploaded
+
+        let file = req.files["file"];
+        let ext = path.extname(file.name);
+        if (ext !== ".png" || ext !== '.jpg' || ext !== '.jpeg') {
+            return res.status(400).send("bad file type");
+        }
+        let file_url = "/../public/media/profile_pics/" + req.user.user_id + ext;
+
+        // await file.mv(file_url, function (err) {
+        //     //The uploaded file has been moved
+        // });
+
+        tags.profile_pic = file_url;
+
+    }
+    console.log('FFFFFFFFFFFFFFFFFFFF', tags)
+
+    dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
+
+        console.log("[+] Updated user")
+        req.flash("messageSuccess","User has been updated")
+        res.redirect('/docs')
+    })
+    
+})
+
+
+
+
   
 // ###############
 // DELETE REQUESTS

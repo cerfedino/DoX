@@ -44,3 +44,28 @@ document.querySelector("#dark-mode-toggle")?.addEventListener('change',
             document.body.classList.remove('dark-theme')
     });
 
+
+
+
+
+let form = document.querySelector(".modal-body form")
+  
+// Submission of the User update form
+// form.addEventListener("submit",function(e){
+//     e.preventDefault()
+
+//     // Check for invalid fields
+//     // const mistakes = validateForm(this)
+//     // if(mistakes) {
+//     //     // showAlert(document.querySelector("#alerts"),"warning",mistakes,false)
+//     //     return
+//     // }
+//     // //
+    
+
+//     // console.log(this.method, this.action)
+//     console.log(document.querySelector(".modal-body form #username").value);
+//     let body = new FormData(form);
+//     console.log('body', body);
+//     fetch('/user',{ method : "PUT", body})
+// })

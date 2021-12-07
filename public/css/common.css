@@ -47,11 +47,11 @@ body.dark-theme, body.dark-theme * {
     --bg-contrastt: #cbcbcb;
     --text: #cccccc;
     --contrast-text: #ffffff;
+    
     --logo-minimal: url('../media/svg/logo_minimal_LIGHT.svg');
     --logo-composed: url('../media/svg/logo_composed_LIGHT.svg');
     --logo-notebook: url('../media/svg/notebook_icon.svg');
 
-    
 }
 
 /*
@@ -238,4 +238,53 @@ button.close span {
 
 
 
+.modal .modal-body input {
+    width: 100%;
+    margin-bottom: 10px;
+}
 
+.modal .modal-body input#username, .modal .modal-body input#email{
+    margin-bottom: 10px;
+    border-radius: 10pt;
+    border: 1px solid var(--bg-contrast);
+    width: 100%;
+    margin-bottom: 10px;
+    background-color: var(--bg);
+    color: var(--text);
+    padding: 6px;
+}
+
+.modal .modal-body input#username {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+
+
+input[type=file]::-webkit-file-upload-button {
+    display: none; /*to hide the original one and then replace it*/
+}
+input[type=file] {
+    cursor: pointer;
+    font-size: 10pt;
+    width: 300px;
+    padding: 10px;
+    margin-left: -20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+input[type=file]::before {
+    color: var(--text);
+    content: 'Upload profile picture';
+    background-color: var(--bg-contrast);
+    font-size: 10pt;
+    padding: 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+    width: 200px;
+}
+
+input[type=file]:active::before {
+    background-color: gray;
+}

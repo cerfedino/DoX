@@ -77,7 +77,7 @@ function user_create(username,email,password,token='', returnnew=true) {
             email : email,
             password : await auth.encrypt_pwd(password),
             token: token,
-            email_verification_status : false
+            email_verification_status : false,
         }
         model.users.insertOne(new_user).then(() => {
             console.log("[+] Inserted user:",new_user)
@@ -265,7 +265,7 @@ function docs_available(user_id) {
 function user_set(user_id, tags, returnnew=true) {
     return new Promise(async (resolve, reject) => {
         if (!(await user_exists({_id:user_id}))) {
-            reject("Document does not exist")
+            reject("User does not exist")
             return
         }
         await model.users.findOneAndUpdate({_id:user_id}, {"$set" : tags})
