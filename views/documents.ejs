@@ -20,6 +20,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     <style type="text/css">
         @import url("/css/common.css");
         @import url("/css/documents.css");
+        @import url("/css/cards.css")
     </style>
 </head>
 <body>
@@ -94,7 +95,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </section>
 
 
-    <main class=" ps-3 d-flex flex-wrap">
+    <main class="d-block">
         
         <section class="list">
             <article class="list-element head">
@@ -157,17 +158,28 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <a href="/docs/new"><i class="far fa-plus-square"></i></a>
             </div>
 
+            <!-- Card display - bojan -->
             <% docs.forEach((doc)=>{ %>
-                <div class="card document">
+                <div class="card" style="width: 18rem;">
                     <div class="card-body">
-                        <h6 class="card-title"><%= doc.title %></h6>
-                        <p class="card-text"><!-- <%= doc.content %> --></p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="docs/<%= doc._id %>" class="btn btn-sm btn-primary">Edit</a>
-                        <form _method="DELETE" action="docs/<%= doc._id %>" class="delete-doc">
-                            <input type="submit" href="#" class="btn btn-sm btn-danger" value="Delete"></input>
-                        </form>
+                        <img class="card-img-top" src="/media/svg/notebook_icon_LIGHT.svg" alt="Card image cap">
+                        <h5 class="card-title">Card title</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        <div class="optionbuttons">
+                            <form _method="DELETE" action="/docs/<%= doc._id %>" class="delete-doc">
+                                <input type="image" src="/media/svg/delete.svg" class="svgimgform" name="submit"></input>
+                            </form>
+                            <a id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Shared with" 
+                                data-content="<% for(let i = 0; i < doc.perm_edit.length; i++) { %>
+                                        <%= doc.perm_edit[i] %> <br />
+                                <% } %>
+                                "><img src="/media/svg/share.svg" alt="Options"></a>
+                            <a id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Document Information" 
+                                data-content="Created on: <%= doc.created_date.toDateString() %> <br />
+                                Owner: <%= doc.owner %> <br />
+                                Size: <%= doc.size %> <br />
+                                "><img src="/media/svg/options.svg" alt="Options"></a>
+                        </div>
                     </div>
                 </div>
             <% }); %>
@@ -197,8 +209,13 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-
-
+<script>
+    $(document).ready(function(){
+        $('[data-toggle="popover"]').popover({
+            html:true
+        });   
+    });
+    </script>
 
 </body>
 </html>
