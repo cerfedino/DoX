@@ -19,7 +19,14 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     <div id="pageheader" class="py-4 text-white">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <div id="doc-title" class="h3 me-auto col-auto"><%= doc.title %></div>
+                <div class="h3 me-auto col-auto">
+                    <a class="text-white text-decoration-none" href="../docs/" data-bs-toggle="tooltip"
+                       data-bs-placement="bottom"
+                       title="Return to the documents page">
+                        <i class="bi-house-door-fill"></i>
+                    </a>
+                    <span id="doc-title" class="doc-title text-white"><%= doc.title %></span>
+                </div>
                 <div class="text-end d-flex flex-wrap ms-3">
                     <p id="message-save" class="mt-auto mb-auto me-3"></p>
                     <button id="button-save" type="button" class="btn btn-success me-1">
