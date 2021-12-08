@@ -315,7 +315,7 @@ router.put('/user', async (req,res)=> {
         tags.username = req.body.username;
     }
     if (req.body.password) {
-        tags.password = auth.encrypt_pwd(req.body.password);
+        tags.password =  req.body.password; // await (auth.encrypt_pwd(req.body.password));
     }
 
     console.log('DDDDDDDDDDDDDDDDDDDDD', tags)

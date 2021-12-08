@@ -17,8 +17,8 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 <body class="">
 <%- include('includes/header', {'extra' : "editor"}) %>
 
-<header>
-    <div id="pageheader" class="py-4 text-white">
+<!-- <header class="style"> -->
+    <!-- <div id="pageheader" class="py-4 text-white">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <div id="doc-title" class="h3 me-auto col-auto"><%= doc.title %></div>
@@ -30,7 +30,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
     
     <div class="py-2 border-bottom mb-5 bg-light">
         <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
@@ -89,10 +89,13 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <button type="button" class="btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal">
                     Rename
                 </button>
+                <button id="button-save" type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i>
+                    Save
+                </button>
             </div>
         </div>
     </div>
-</header>
+<!-- </header> -->
 <main class="document-view">
     <div id="editor" class="p-5">
     </div>

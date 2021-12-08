@@ -108,7 +108,8 @@ header div#extra {
     display: flex;
     justify-content: space-between;
     /* align-items: center; */
-    min-width: 50vw;
+    min-width: 60vw;
+    margin-right:140px;
 }
 
 header #profile_pic {
