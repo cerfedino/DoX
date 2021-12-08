@@ -4,6 +4,20 @@
 ########################
 */
 
+body {
+    display: flex;
+    flex-direction: column;
+    --bg-tool-bar: rgb(165, 165, 165);
+    --bg-tool-bar-button: #007bff;
+    --text-tool-bar-button: white;
+    --bg-active-mode: rgb(200, 200, 200);
+}
+
+body.dark-theme, body.dark-theme * {
+    --bg-tool-bar: rgb(44, 44, 44);
+    --bg-active-mode: rgb(165, 165, 165);
+}
+
 .card.document {
     background: var(--bg);
     border: var(--text) 2px solid;
@@ -61,4 +75,193 @@ div.card div.card-footer *{
 
 svg#logo {
     height: 3vmax;
+}
+
+
+.list {
+    margin: 10px;
+    grid-template-rows: repeat(2/* 8 */, 1fr);
+    grid-template-areas: 
+        "document"
+        "document"
+        /* "document"
+        "document"
+        "document"
+        "document"
+        "document"
+        "document" */;
+    display: none;
+}
+
+.list-element {
+    min-height: 40px;
+    max-height: 50px;
+    border-radius: 5px;
+    grid-area: 'document';
+    display: grid;
+    grid-row: 'document-start' / 'document-end';
+    grid-template-columns: repeat(3, 4fr) 10fr 4fr 6fr 1fr;
+    grid-template-areas: 
+        "info info info info info info info info";
+}
+
+.list-element.head > .info {
+    background-color: var(--bg-tool-bar);
+}
+
+.list-element.head a {
+    color: var(--text);
+    text-decoration: none;
+}
+
+.list-element.head a:hover {
+    --text: rgb(80,80,80);
+}
+
+.list-element:hover .actions {
+    display: flex;
+    flex-direction: row;
+}
+
+.list-element > .info {
+    padding-left: 5px;
+    padding-right: 5px;
+    border-bottom: 3px solid var(--text);
+    padding-top: 5px;
+    grid-area: 'info';
+    flex: 1;
+    text-align: center;
+    text-overflow: ellipsis;
+    /* for the overflow text */
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.list-element:hover .info {
+    background-color: var(--bg-contrast);
+}
+
+.list-element.head:hover > .info {
+    background-color: var(--bg-tool-bar);
+}
+
+.list-element > .info:nth-child(5) {
+    text-align: right;
+}
+
+.btn-secondary.dropdown-toggle {
+    border: 0;
+}
+
+.list-element .btn-secondary.dropdown-toggle {
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.list-element:hover .btn-secondary.dropdown-toggle {
+    background-color: var(--bg-contrast);
+}
+
+.list-element .btn-secondary.dropdown-toggle:hover {
+    background-color: var(--bg);
+}
+
+.dropdown-menu {
+    z-index: 100000;
+}
+
+.list-element > .actions {
+    display: none;
+}
+
+.list-element > .actions > * {
+    padding-left: 10px;
+    flex: 1;
+    margin: 2px;
+}
+
+a[rel="edit"] > i {
+    font-size: 1px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.tools-bar {
+    margin-top: 0;
+    background-color: var(--bg-tool-bar);
+    display: grid;
+    grid-template-columns: 1fr 2fr 2fr 2fr 2fr 2fr 30fr;
+    flex-direction: row;
+    height: 40px;
+    align-items: center;
+}
+
+.tools-bar > * {
+    margin-left: 5px;
+    margin-right: 5px;
+    border-radius: 5px;
+}
+
+.switch-list-grid {
+    border: 3px solid var(--text);
+    display: flex;
+    flex-direction: row;
+}
+
+.switch-list-grid > * {
+    padding: 5px;
+}
+
+.list-view{
+    border-left: 3px solid var(--text);
+}
+
+.list-view, .grid-view {
+    flex: 1;
+}
+
+.active {
+    background-color: var(--bg-active-mode);
+}
+
+.tools-bar .btn-secondary.dropdown-toggle {
+    color: var(--text);
+    background-color: var(--bg-tool-bar);
+}
+
+.tools-bar .btn-secondary.dropdown-toggle:hover {
+    background-color: var(--bg);
+}
+#filters {
+    padding: 10px;
+}
+
+#filters > article {
+    display: flex;
+    flex-direction: row;
+}
+
+#filters > article > label {
+    flex: 97%;
+}
+
+#filters > article > input {
+    margin-top: 5px;
+    flex: 3%;
+}
+
+input[name="filter-submit"] {
+    border-radius: 5px;
+    background-color: var(--bg-tool-bar-button);
+    color: var(--text-tool-bar-button);
+    width: 100%;
+    border: 0;
+    opacity: 1;
+}
+
+input[name="filter-submit"]:hover {
+    --bg-tool-bar-button: rgb(45, 84, 212);
 }
