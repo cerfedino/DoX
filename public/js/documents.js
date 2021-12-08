@@ -33,6 +33,21 @@ function init_documents() {
     //         }})
     //     });
     // })
+
+
+    document.querySelectorAll(".svgimgform").forEach(btn => {
+        btn.addEventListener("click", deletecard)
+    })
+
+    function deletecard(e) {
+        let id = e.target.parentNode.id;
+        fetch(id, {
+            method: "DELETE"
+        }).then(res => {
+            console.log(res.status);
+            e.target.parentNode.parentNode.parentNode.parentNode.parentNode.remove();
+        })
+    }
 }
 
 // Set all the listeners for a Document (row in list view)

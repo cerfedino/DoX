@@ -315,14 +315,10 @@ function get_editable_doc_fields(obj={}) {
     Updates user only if the request is coming from the user himself.
 */
 router.put('/user', async (req,res)=> {
-    console.log('BBBBBBBBBBBBBBBB')
     if (!ObjectId.isValid(req.user.user_id)) {
         res.status(400).send(`Invalid user ID.`);
         return
     }
-    console.log('CCCCCCCCCCCCCCCCCCCCC')
-    console.log('user: ' + req.user.user_id)
-
     if(!(await dbops.user_exists({_id:ObjectId(req.user.user_id)}))) {
         if(req.accepts("text/html")) {
             res.status(404).render('../views/error.ejs', {s: 404, m: "User does not exist"});
@@ -331,17 +327,15 @@ router.put('/user', async (req,res)=> {
         }
         return
     }
-    console.log(req.body)
     
     let tags = {}
-    if (req.body.username && !await (dbops.user_exists({username : new ObjectId(req.body.username)}))) {
+    
+    if (req.body.username && (!await (dbops.user_exists({username : req.body.username})))) {
         tags.username = req.body.username;
     }
     if (req.body.password) {
-        tags.password = auth.encrypt_pwd(req.body.password);
+        tags.password = await auth.encrypt_pwd(req.body.password);
     }
-
-    console.log('DDDDDDDDDDDDDDDDDDDDD', tags)
 
 
     if (req.files && Object.keys(req.files).length > 0) {
@@ -361,13 +355,13 @@ router.put('/user', async (req,res)=> {
         tags.profile_pic = file_url;
 
     }
-    console.log('FFFFFFFFFFFFFFFFFFFF', tags)
 
     dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
 
         console.log("[+] Updated user")
         req.flash("messageSuccess","User has been updated")
         res.redirect('/docs')
+
     })
     
 })
