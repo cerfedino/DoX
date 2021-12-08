@@ -160,27 +160,30 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
             <!-- Card display - bojan -->
             <% docs.forEach((doc)=>{ %>
-                <div class="card" style="width: 18rem;">
+                <div class="card" style="width: 14rem;">
                     <div class="card-body">
                         <a href="docs/<%= doc._id %>">
                             <img class="card-img-top" src="/media/svg/notebook_icon_LIGHT.svg" alt="Card image cap">
                         </a>
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                        <div class="optionbuttons">
-                            <form _method="DELETE" action="/docs/<%= doc._id %>" class="delete-doc">
-                                <input type="image" src="/media/svg/delete.svg" class="svgimgform" name="submit"></input>
-                            </form>
-                            <a id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Shared with" 
-                                data-content="<% for(let i = 0; i < doc.perm_edit.length; i++) { %>
-                                        <%= doc.perm_edit[i] %> <br />
-                                <% } %>
-                                "><img src="/media/svg/share.svg" alt="Options"></a>
-                            <a id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Document Information" 
-                                data-content="Created on: <%= doc.created_date.toDateString() %> <br />
-                                Owner: <%= doc.owner %> <br />
-                                Size: <%= doc.size %> <br />
-                                "><img src="/media/svg/options.svg" alt="Options"></a>
+                        <div class="card-inner">
+                            <h5 class="card-title"><%= doc.title %></h5>
+                            <p class="card-date"><%= doc.created_date.toDateString() %></p>
+                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                            <div class="optionbuttons">
+                                <form _method="DELETE" action="/docs/<%= doc._id %>" class="delete-doc">
+                                    <input type="image" src="/media/svg/delete.svg" class="svgimgform" name="submit"></input>
+                                </form>
+                                <a id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Shared with" 
+                                    data-content="<% for(let i = 0; i < doc.perm_edit.length; i++) { %>
+                                            <%= doc.perm_edit[i] %> <br />
+                                    <% } %>
+                                    "><img src="/media/svg/share.svg" alt="Options"></a>
+                                <a id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-title="Document Information" 
+                                    data-content="Created on: <%= doc.created_date.toDateString() %> <br />
+                                    Owner: <%= doc.owner %> <br />
+                                    Size: <%= doc.size %> <br />
+                                    "><img id="threedots" src="/media/svg/options.svg" alt="Options"></a>
+                            </div>
                         </div>
                     </div>
                 </div>
