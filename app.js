@@ -2,7 +2,7 @@
  * Web Atelier 2021  Final Project : DoX
  *
  * Main Server Aplication
- * 
+ *
  */
 
 
@@ -94,6 +94,7 @@ app.use(serve_auth_info_toViews);
 // CONTROLLERS
 //this will automatically load all routers found in the routes folder
 const routers = require('./routes');
+const {Server} = require("socket.io");
 
 app.use('/auth', routers.router_auth);
 app.use('/', routers.root);
@@ -128,11 +129,16 @@ app.use(function(err, req, res, next) {
 // Start server
 app.set('port', webserver.port)
 
-var server = require('http').createServer(app);
+const server = require('http').createServer(app);
+const io = new Server(server);
 
+io.on('connection', (socket) => {
+
+})
 
 server.on('listening', function() {
 	console.log(`Express server listening on ${domain}:${server.address().port}`);
 });
 
-module.exports = app
+
+module.exports = server

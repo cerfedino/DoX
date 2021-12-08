@@ -6,6 +6,8 @@ const {keymap} = require('prosemirror-keymap');
 const {baseKeymap, toggleMark, setBlockType, lift} = require('prosemirror-commands');
 const basicSchema = require('prosemirror-schema-basic')
 const {wrapInList, addListNodes, splitListItem, liftListItem} = require("prosemirror-schema-list");
+const {collab, sendableSteps} = require('prosemirror-collab');
+const io = require('socket.io-client')
 
 /**
  * Menu component
@@ -70,6 +72,8 @@ class MenuView {
 }
 
 // Editor setup
+const socket = io();
+
 let editor = initEditor();
 // Modals
 
@@ -273,6 +277,7 @@ function initEditor() {
             state = EditorState.fromJSON({
                 schema,
                 plugins: [
+                    collab(),
                     history(),
                     keymap(buildKeymap(schema)),
                     keymap(baseKeymap),
@@ -284,6 +289,7 @@ function initEditor() {
             state = EditorState.create({
                 schema,
                 plugins: [
+                    collab(),
                     history(),
                     keymap(buildKeymap(schema)),
                     keymap(baseKeymap),
@@ -296,6 +302,7 @@ function initEditor() {
         state = EditorState.create({
             schema,
             plugins: [
+                collab(),
                 history(),
                 keymap(buildKeymap(schema)),
                 keymap(baseKeymap),
@@ -303,7 +310,19 @@ function initEditor() {
             ]
         });
     }
-    let editorView = new EditorView(document.getElementById("editor"), {state});
+    let editorView = new EditorView(document.getElementById("editor"),
+        {
+            state,
+            dispatchTransaction(transaction) {
+                // This function overwrites default transaction behaviour
+                let newState = editorView.state.apply(transaction);
+                editorView.updateState(newState);
+                let sendable = sendableSteps(newState);
+                if (sendable) {
+                    console.log(sendable);
+                }
+            }
+        });
 
     editorView.focus();
     return editorView;

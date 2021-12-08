@@ -1,5 +1,5 @@
 const config = require('./config/config.js')
-const app = require("./app.js")
+const server = require("./app.js")
 const https = require("https");
 const fs = require('fs-extra')
 
@@ -11,7 +11,7 @@ if(config.webserver.https_enabled) {
     // https.createServer({ key, cert }, app).listen(config.webserver.port);
 
     // TODO: Add HTTPS encryption if remote.
-    app.listen(config.webserver.port)
+    server.listen(config.webserver.port)
 } else {
-    app.listen(config.webserver.port)
+    server.listen(config.webserver.port)
 }
