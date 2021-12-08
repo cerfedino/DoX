@@ -72,7 +72,11 @@ class MenuView {
 }
 
 // Editor setup
-const socket = io();
+const socket = io({
+    query: {
+        documentID,
+    }
+});
 
 let editor = initEditor();
 // Modals

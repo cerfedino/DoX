@@ -11,6 +11,9 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const methodOverride = require('method-override');
+const {Server} = require("socket.io");
+const {doc_find} = require("./modules/dbops");
+const {ObjectId} = require("mongodb");
 
 // Application config import
 const {webserver} = require('./config/config.js')
@@ -50,13 +53,15 @@ app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
 
-
-// INIT session
-app.use(session({
+const sessionMiddleware = session({
+    name: 'dox.auth',
     secret: "secret",
     resave: false,
     saveUninitialized: true,
-}));
+});
+
+// INIT session
+app.use(sessionMiddleware);
 
 // INIT passport on every route call.
 app.use(passport.initialize());
@@ -94,7 +99,6 @@ app.use(serve_auth_info_toViews);
 // CONTROLLERS
 //this will automatically load all routers found in the routes folder
 const routers = require('./routes');
-const {Server} = require("socket.io");
 
 app.use('/auth', routers.router_auth);
 app.use('/', routers.root);
@@ -132,8 +136,30 @@ app.set('port', webserver.port)
 const server = require('http').createServer(app);
 const io = new Server(server);
 
-io.on('connection', (socket) => {
+io.use((socket, next) => {
+    sessionMiddleware(socket.request, {}, next);
+})
 
+io.on('connection', async (socket) => {
+    try {
+        let userID = socket.request.session.passport.user.user_id;
+        let documentID = socket.handshake.query.documentID;
+        let permission = ''; // should be 'OWNER', 'WRITE';
+
+        // Undefined shouldn't be handled, as any exception will disconnect the socket
+        let doc = await doc_find({_id: new ObjectId(documentID)});
+        if (doc.owner.toString() === userID)
+            permission = 'OWNER';
+        else if (doc.perm_edit.includes(userID))
+            permission = 'WRITE';
+        else {
+            socket.disconnect();
+            return;
+        }
+    } catch {
+        // Unauthorized connection
+        socket.disconnect();
+    }
 })
 
 server.on('listening', function() {
