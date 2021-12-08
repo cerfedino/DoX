@@ -147,7 +147,8 @@ io.on('connection', async (socket) => {
         let permission = ''; // should be 'OWNER', 'WRITE';
 
         // Undefined shouldn't be handled, as any exception will disconnect the socket
-        let doc = await doc_find({_id: new ObjectId(documentID)});
+        // Permissions check
+        const doc = await doc_find({_id: new ObjectId(documentID)});
         if (doc.owner.toString() === userID)
             permission = 'OWNER';
         else if (doc.perm_edit.includes(userID))
@@ -157,9 +158,10 @@ io.on('connection', async (socket) => {
             return;
         }
 
+        const state = JSON.parse(doc.content);
+
         // Send document data to the client
         socket.emit("init", {content: doc.content});
-
         // Join current document room
         socket.join(documentID);
 

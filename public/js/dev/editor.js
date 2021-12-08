@@ -8,6 +8,7 @@ const basicSchema = require('prosemirror-schema-basic')
 const {wrapInList, addListNodes, splitListItem, liftListItem} = require("prosemirror-schema-list");
 const {collab, sendableSteps} = require('prosemirror-collab');
 const io = require('socket.io-client')
+const schema = require('../../../modules/schema');
 
 /**
  * Menu component
@@ -71,7 +72,7 @@ class MenuView {
     }
 }
 
-// Editor setup
+//region Editor setup
 let editor;
 
 // Sockets
@@ -171,6 +172,8 @@ document.getElementById('button-export').addEventListener('click', async () => {
     });
 });
 
+//endregion
+
 // Functions
 /**
  * Initializes an editor inside of the element with ID 'editor'.
@@ -178,21 +181,6 @@ document.getElementById('button-export').addEventListener('click', async () => {
  * @param {Object} content Editor state stored as JSON
  */
 function initEditor(content) {
-    // Base scheme loaded from prosemirror-scheme-basic and prosemirror-scheme-list
-    let base = {
-        nodes: addListNodes(basicSchema.schema.spec.nodes, 'paragraph block*', 'block'),
-        marks: basicSchema.schema.spec.marks
-    }
-
-    // Extended features
-    base.marks = base.marks.addToEnd('underline', {
-        toDOM() {
-            return ['u', 0]
-        },
-        parseDOM: [{tag: 'u'}]
-    })
-    let schema = new Schema(base);
-
     // Menu setup
     let menu = menuPlugin([
         {
@@ -288,7 +276,7 @@ function initEditor(content) {
     ])
 
     let state;
-    if (typeof documentState === "object" && Object.keys(documentState).length !== 0) {
+    if (typeof content === "object" && Object.keys(content).length !== 0) {
         // Create state from the global variable
         try {
             state = EditorState.fromJSON({
@@ -303,7 +291,7 @@ function initEditor(content) {
             }, content);
         } catch (e) {
             // TODO: show error instead of an empty file
-            console.log(e);
+            console.error(e);
             // Can't create a state from current documentState
             state = EditorState.create({
                 schema,
