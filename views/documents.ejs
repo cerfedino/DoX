@@ -170,9 +170,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                             <p class="card-date"><%= doc.created_date.toDateString() %></p>
                             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
                             <div class="optionbuttons">
-                                <form _method="DELETE" action="/docs/<%= doc._id %>" class="delete-doc">
-                                    <input type="image" src="/media/svg/delete.svg" class="svgimgform" name="submit"></input>
-                                </form>
+                                <!-- <form _method="DELETE" action="/docs/<%= doc._id %>" class="delete-doc"> -->
+                                <a id="docs/<%= doc._id %>" href="#">
+                                    <img src="/media/svg/delete.svg" class="svgimgform"></img>
+                                </a>
                                 <a id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Shared with" 
                                     data-content="<% for(let i = 0; i < doc.perm_edit.length; i++) { %>
                                             <%= doc.perm_edit[i] %> <br />
