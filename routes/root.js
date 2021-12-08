@@ -15,6 +15,7 @@ const auth = require('../modules/auth.js');
 
 const fs = require('fs-extra');
 const path = require('path');
+const { use } = require('bcrypt/promises');
 
 
 
@@ -154,6 +155,29 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
 })
 
 
+/* 
+    GET /users/:id
+    Returns the username matching the given user ID
+*/
+router.get('/users/:id', async function (req, res){
+    let id;
+    try {
+        id = ObjectId(req.params.id);
+    } catch(err) {
+        res.status(404).end();
+    }
+    let user = await dbops.user_find({_id : id});
+    if (req.accepts("application/json")){
+        if (user == undefined || user == null) {
+            res.status(404).end();
+        } else {
+            res.json({username:user.username});
+        }
+    } else {
+        res.status(406).end();
+    }
+})
+
 // ###############
 // PUT REQUESTS
 // ###############
@@ -256,7 +280,6 @@ router.put('/docs/:id', checkAuthenticated, async (req,res)=> {
     req.flash("messageSuccess","Document has been updated")
     res.status(200).end()
 })
-
 
 
 

@@ -80,16 +80,11 @@ svg#logo {
 
 .list {
     margin: 10px;
-    grid-template-rows: repeat(2/* 8 */, 1fr);
+    /* grid-template-rows: repeat(2, 1fr);
     grid-template-areas: 
         "document"
-        "document"
-        /* "document"
-        "document"
-        "document"
-        "document"
-        "document"
-        "document" */;
+        "document"; */
+    flex-direction: column;
     display: none;
 }
 
@@ -102,7 +97,11 @@ svg#logo {
     grid-row: 'document-start' / 'document-end';
     grid-template-columns: repeat(3, 4fr) 10fr 4fr 6fr 1fr;
     grid-template-areas: 
-        "info info info info info info info info";
+        "info info info info info info info";
+}
+
+.list-element > .actual-creation-date, .actual-edit-date, p.owner {
+    display: none;
 }
 
 .list-element.head > .info {
@@ -193,7 +192,7 @@ a[rel="edit"] > i {
     margin-top: 0;
     background-color: var(--bg-tool-bar);
     display: grid;
-    grid-template-columns: 1fr 2fr 2fr 2fr 2fr 2fr 30fr;
+    grid-template-columns: 1fr 2fr 2fr 2fr 2fr 4fr 28fr;
     flex-direction: row;
     height: 40px;
     align-items: center;
@@ -264,4 +263,22 @@ input[name="filter-submit"] {
 
 input[name="filter-submit"]:hover {
     --bg-tool-bar-button: rgb(45, 84, 212);
+}
+
+.active-filters {
+    display: flex;
+    flex-direction: row;
+}
+
+.active-filters > * {
+    flex: 1;
+    margin-left: 2px;
+    margin-right: 2px;
+    border: 0;
+    background-color: var(--bg-contrast);
+    max-width: 50px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }

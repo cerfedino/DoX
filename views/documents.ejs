@@ -6,7 +6,7 @@ if(!docs) {
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
 
- %>
+%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -53,8 +53,9 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             </a>
           
             <div class="dropdown-menu">
-              <a class="dropdown-item" href="#">Date</a>
-              <a class="dropdown-item" href="#">Title</a>
+                <a class="dropdown-item" href="#">Create Date</a>
+                <a class="dropdown-item" href="#">Edit Date</a>
+                <a class="dropdown-item" href="#">Title</a>
             </div>
         </div>
         <section class="active-sort">
@@ -88,8 +89,8 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 </form>
             </div>
         </div>
-        <section class="active-filter">
-            <p><!-- TODO - fill this with the actual filter --></p>
+        <section class="active-filters">
+            
         </section>
     </section>
 
@@ -98,17 +99,21 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         
         <section class="list">
             <article class="list-element head">
-                <span class="info"><b><a href="sort/title">Title</a></b></span>
-                <span class="info"><b><a href="sort/creation-date">Creation Date</a></b></span>
-                <span class="info"><b><a href="sort/edit-date">Edit Date</a></b></span>
+                <span class="info"><b><a href="#">Title</a></b></span>
+                <span class="info"><b><a href="#">Creation Date</a></b></span>
+                <span class="info"><b><a href="#">Edit Date</a></b></span>
                 <span class="info"></span>
-                <span class="info"><b><a href="sort/permissions">Permissions</a></b></span>
-                <span class="info"><b><a href="sort/owner">Owner</a></b></span>
+                <span class="info"><b>Permissions</b></span>
+                <span class="info"><b><a href="#">Owner</a></b></span>
+                <section class="actions"></section>
             </article>
+            
             <% docs.forEach((doc)=>{ %>
                 <article class="list-element">
                     <span class="info title"><b><%= doc.title %></b></span>
+                    <p class="actual-creation-date"><%= doc.created_date %></p>
                     <span class="info creation-date"><%= doc.created_date %></span>
+                    <p class="actual-edit-date"><%= doc.edit_date %></p>
                     <span class="info edit-date"><%= doc.edit_date %></span>
                     <span class="info"></span>
                     <div class="info dropleft perms">
@@ -144,7 +149,8 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                             <% } %>
                         </div>
                         </div>
-                    <span class="info owner"><%= doc.owner %></span>
+                    <p class="owner"><%= doc.owner %></p>
+                    <span class="info owner"></span>
                     <section class="actions">
                         <a href="docs/<%= doc._id %>" rel="del" _method="DELETE"><i class="far fa-trash-alt"></i></a>
                     </section>
