@@ -110,7 +110,21 @@ function doc_create(owner_id, title="Untitled", returnnew=true) {
 
             title : title,
 
-            content : {},
+            content : JSON.stringify({
+                "doc": {
+                    "type": "doc",
+                    "content": [
+                        {
+                            "type": "paragraph"
+                        }
+                    ]
+                },
+                "selection": {
+                    "type": "text",
+                    "anchor": 1,
+                    "head": 1
+                }
+            }),
             
             perm_read : [owner_id], 
             perm_edit : [owner_id],
