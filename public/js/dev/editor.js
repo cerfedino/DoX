@@ -72,13 +72,25 @@ class MenuView {
 }
 
 // Editor setup
+let editor;
+
+// Sockets
 const socket = io({
     query: {
         documentID,
     }
-});
+})
+socket.on('connect', () => {
+    console.info('Socket connected');
+})
+socket.on('disconnect', () => {
+    console.warn('Socket was disconnected')
+})
+socket.on('init', ({content}) => {
+    console.log(JSON.parse(content));
+    editor = initEditor(JSON.parse(content));
+})
 
-let editor = initEditor();
 // Modals
 
 // Insert image
@@ -162,9 +174,10 @@ document.getElementById('button-export').addEventListener('click', async () => {
 // Functions
 /**
  * Initializes an editor inside of the element with ID 'editor'.
- * This function uses documentState global variable to set up the editor state.
+ *
+ * @param {Object} content Editor state stored as JSON
  */
-function initEditor() {
+function initEditor(content) {
     // Base scheme loaded from prosemirror-scheme-basic and prosemirror-scheme-list
     let base = {
         nodes: addListNodes(basicSchema.schema.spec.nodes, 'paragraph block*', 'block'),
@@ -287,8 +300,10 @@ function initEditor() {
                     keymap(baseKeymap),
                     menu
                 ]
-            }, documentState);
-        } catch {
+            }, content);
+        } catch (e) {
+            // TODO: show error instead of an empty file
+            console.log(e);
             // Can't create a state from current documentState
             state = EditorState.create({
                 schema,
@@ -323,7 +338,7 @@ function initEditor() {
                 editorView.updateState(newState);
                 let sendable = sendableSteps(newState);
                 if (sendable) {
-                    console.log(sendable);
+                    socket.emit('update', sendable);
                 }
             }
         });

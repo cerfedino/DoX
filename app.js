@@ -156,6 +156,16 @@ io.on('connection', async (socket) => {
             socket.disconnect();
             return;
         }
+
+        // Send document data to the client
+        socket.emit("init", {content: doc.content});
+
+        // Join current document room
+        socket.join(documentID);
+
+        socket.on('update', ({ version, steps, clientID }) => {
+            console.log(steps);
+        })
     } catch {
         // Unauthorized connection
         socket.disconnect();
