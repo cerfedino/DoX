@@ -36,12 +36,12 @@ function init_documents() {
     document.querySelectorAll('.list-element').forEach(doc=>{
         if (!doc.classList.contains('head')){
             doc.querySelectorAll('.info').forEach(function(i){
-                debugger
+                
                 i.addEventListener('click',function(event){
                     if (!this.classList.contains('perms')){
                         let parts = doc.querySelector('a[rel="del"]').href.split('/');
                         let id = parts[parts.length - 1];
-                        debugger
+                        
                         window.location = doc.querySelector('a[rel="del"]').href;
                     }
                 })
@@ -78,4 +78,18 @@ function init_documents() {
     //         }})
     //     });
     // })
+
+    document.querySelectorAll(".svgimgform").forEach(btn => {
+        btn.addEventListener("click", deletecard)
+    })
+
+    function deletecard(e) {
+        let id = e.target.parentNode.id;
+        fetch(id, {
+            method: "DELETE"
+        }).then(res => {
+            console.log(res.status);
+            e.target.parentNode.parentNode.parentNode.parentNode.parentNode.remove();
+        })
+    }
 }
