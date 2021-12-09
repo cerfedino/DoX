@@ -58,18 +58,35 @@ function setDocumentListeners() {
 
 // Set switch button between the list and grid view
 function setSwitchButtonListener(){
-    document.querySelector('.switch-list-grid').querySelectorAll('a').forEach(x=>x.addEventListener('click',function(event){
+    document.querySelector('.switch-list-grid a.grid-view').addEventListener('click', (event) => {
         event.preventDefault();
 
-        if (!this.classList.contains('active')){
-            let deactivate = document.querySelector('a.active').classList.contains('list-view') ? ".list" : ".grid";
-            let activate = document.querySelector('a.active').classList.contains('list-view') ? ".grid" : ".list";
-            document.querySelector("section"+deactivate).style.display = 'none';
-            document.querySelector('a.active').classList.remove('active');
-            document.querySelector("section"+activate).style.display = 'flex';
-            this.classList.add('active');
-        }
-    }))
+        document.getElementById("table-of-documents").className = "cards";
+
+    })
+    
+
+    document.querySelector('.switch-list-grid a.list-view').addEventListener('click', (event) => {
+        event.preventDefault();
+
+        document.getElementById("table-of-documents").className = "list";
+
+    })
+    
+    
+    // querySelectorAll('a').forEach(x=>x.addEventListener('click',function(event){
+    //     event.preventDefault();
+
+
+    //     if (!this.classList.contains('active')){
+    //         let deactivate = document.querySelector('a.active').classList.contains('list-view') ? ".list" : ".card";
+    //         let activate = document.querySelector('a.active').classList.contains('list-view') ? ".card" : ".list";
+    //         document.querySelector("section"+deactivate).style.display = 'none';
+    //         document.querySelector('a.active').classList.remove('active');
+    //         document.querySelector("section"+activate).style.display = 'flex';
+    //         this.classList.add('active');
+    //     }
+    // }))
 }
 
 // Set both edit and delete listeners buttons
