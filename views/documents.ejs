@@ -53,9 +53,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             </a>
           
             <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">Create Date</a>
-                <a class="dropdown-item" href="#">Edit Date</a>
-                <a class="dropdown-item" href="#">Title</a>
+                <a class="dropdown-item" href="#" rel="creation-date">Create Date</a>
+                <a class="dropdown-item" href="#" rel="edit-date">Edit Date</a>
+                <a class="dropdown-item" href="#" rel="title">Title</a>
+                <a class="dropdown-item" href="#" rel="owner">Owner</a>
             </div>
         </div>
         <section class="active-sort">
@@ -100,14 +101,22 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         <section class="cards" id="table-of-documents">
             <article class="list-element head">
                 <span class="info"></span>
-                <span class="info"><b><a href="#">Title</a></b></span>
-                <span class="info"><b><a href="#">Owner</a></b></span>
+                <span class="info"><b><a href="#" rel="title">Title</a></b></span>
+                <span class="info"><b><a href="#" rel="owner">Owner</a></b></span>
                 <span class="info"><b>Shared</b></span>
-                <span class="info"><b><a href="#">Last Edit</a></b></span>
-                <span class="info"><b><a href="#">Creation Date</a></b></span>
+                <span class="info"><b><a href="#" rel="edit-date">Last Edit</a></b></span>
+                <span class="info"><b><a href="#" rel="creation-date">Creation Date</a></b></span>
                 <span class="info"><b><a href="#">Delete</a></b></span>
             </article>
-            
+            <!-- <article class="list-element head">
+                <span class="info"></span>
+                <span class="info "><b><a href="#">Title</a></b></span>
+                <span class="info "><b><a href="#">Owner</a></b></span>
+                <span class="info"><b>Shared</b></span>
+                <span class="info "><b><a href="#">Last Edit</a></b></span>
+                <span class="info "><b><a href="#">Creation Date</a></b></span>
+                <span class="info"><b><a href="#">Delete</a></b></span>
+            </article> -->
             <% docs.forEach((doc)=>{ %>
                 <article class="card-element">
                     <a id="icon" href="docs/<%= doc._id %>">

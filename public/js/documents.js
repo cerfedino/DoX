@@ -14,11 +14,15 @@ function init_documents() {
 
     setOwnersUsernames();
 
-    setFilterRowClick();    
+    setFilterRowClick();
 
     setSaveListeners();
 
     setBaseDocuments();
+
+    setToolBarSortListeners();
+
+    setSortListeners();
 
     // document.querySelector("#send_put").addEventListener('submit',function(e){
     //     e.preventDefault();
@@ -129,66 +133,83 @@ function setEditListeners() {
             row.querySelectorAll('.info').forEach(function(i){
                 i.addEventListener('click',function(event){
                     if (!this.classList.contains('perms')){
-                        /* let parts = row.querySelector('a[rel="del"]').href.split('/');
-                        let id = parts[parts.length - 1]; */
                         window.location = row.querySelector('a[rel="del"]').href;
                     }
                 })
             })
-        } else {
-            setSortListeners(row);
         }
     })
 }
 
-function setSortListeners(row) {
+// Sets the tool bar sort listeners so that they act as the headline's buttons of the table
+function setToolBarSortListeners() {
+    let row = document.querySelector('.list-element.head');
+
+    let elements = document.querySelector('.dropdown.sort');
+    elements.querySelectorAll('.dropdown-item').forEach(item=>{
+        item.addEventListener('click',function(event){
+            event.preventDefault();
+            let className = item.getAttribute('rel');
+            row.querySelector(`a[rel="${className}"]`).click();
+        });
+    })
+}
+
+// Set sort on click over buttons in the head line of the list
+function setSortListeners() {
+
+    let row = document.querySelector('.list-element.head');
+
     row.querySelectorAll('a').forEach(a=>a.addEventListener('click',function(event){
         event.preventDefault();
-        // TODO - discuss best implementations to have the array of html elements to then compose the section
+
         let type;
+        let action = a.getAttribute('rel');
         if (a.innerHTML.includes('Date')) {
-            type = ".actual-" + a.innerHTML.split(' ')[0].toLowerCase() + "-date";
+            type = ".actual-" + action;
         } else {
-            type = '.' + a.innerHTML.toLowerCase();
+            type = '.' + action;
         }
 
-            // First, we take all the actual values
-            let values = [];
-            document.querySelectorAll(type).forEach(val=>{
-                if (type.startsWith('.actual') && type.endsWith('-date')) {
-                    values.push(new Date(val.innerHTML));
-                } else {
-                    values.push(val.innerHTML);
-                }
-            });
+        debugger
+        // First, we take all the actual values
+        let values = [];
+        document.querySelectorAll(type).forEach(val=>{
+            if (type.startsWith('.actual') && type.endsWith('-date')) {
+                values.push(new Date(val.innerHTML));
+            } else {
+                values.push(val.innerHTML);
+            }
+        });
 
-            // Then we get all the document rows and empty the section
-            let documents_rows = [];
-            let list = document.querySelector('section.list');
-            document.querySelectorAll('.card-element').forEach(doc=>{
-                if (!doc.classList.contains('head')) {
-                    documents_rows.push(doc);
-                    list.removeChild(doc);
+        // Then we get all the document rows and empty the section
+        let documents_rows = [];
+        let list = document.querySelector('section#table-of-documents');
+        document.querySelectorAll('.card-element').forEach(doc=>{
+            if (!doc.classList.contains('head')) {
+                documents_rows.push(doc);
+                list.removeChild(doc);
+            }
+        })
+        
+        // TODO - merge new version
+        /* let main = document.querySelector('main'); */
+
+        // Finally we sort the values and for each of them place in the section the first node matching the value
+        values.sort();
+        values.forEach(val=>{
+            let done = false;
+            documents_rows.forEach(doc=>{
+                if (!done && doc != undefined && doc.querySelector(type).innerHTML == String(val)){
+                    list.innerHTML += doc.outerHTML;
+                    documents_rows = documents_rows.filter(x=>(x != doc));
+                    done = true;
                 }
             })
-            
-            // TODO - merge new version
-            /* let main = document.querySelector('main'); */
-
-            // Finally we sort the values and for each of them place in the section the first node matching the value
-            values.sort();
-            values.forEach(val=>{
-                let done = false;
-                documents_rows.forEach(doc=>{
-                    if (!done && doc != undefined && doc.querySelector(type).innerHTML == String(val)){
-                        list.innerHTML += doc.outerHTML;
-                        documents_rows = documents_rows.filter(x=>(x != doc));
-                        done = true;
-                    }
-                })
-            });
+        });
         
         setEditListeners();
+        setSortListeners();
         // setDocumentListeners();
     }))
 }
@@ -305,6 +326,7 @@ function setSaveListeners() {
         })
 
         setDocumentListeners();
+        setSortListeners();
 
         document.getElementById('filters').querySelectorAll('input[type="checkbox"]').forEach(checkbox=>{
             let active = document.querySelector('.active-filters');
@@ -367,7 +389,6 @@ function setActiveFilter(checkbox){
         })
     } else {
         rows.forEach(row=>{
-            debugger
             let a = row.querySelector('a[data-title="Shared with"]');
             let n = parseInt(a.childNodes[0].nodeValue);
             if (n == 0) {
