@@ -89,8 +89,6 @@ function formatTime(date) {
     let nowmonth = checkLess(now.getUTCMonth() + 1); //months from 1-12
     let nowday = checkLess(now.getUTCDate());
     let nowyear = now.getUTCFullYear();
-    let nowhour = checkLess(now.getHours());
-    let nowminutes = checkLess(now.getMinutes());
 
     let month = checkLess(date.getUTCMonth() + 1); //months from 1-12
     let day = checkLess(date.getUTCDate());
@@ -99,11 +97,11 @@ function formatTime(date) {
     let minutes = checkLess(date.getMinutes());
     
 
-    if (day === nowday && year === nowyear) {
+    if (day === nowday && month === nowmonth && year === nowyear) {
         return "Today at " + hour + ":" + minutes;
     }
 
-    if (((nowday - day) === 1) && year === nowyear) {
+    if (((nowday - day) === 1) && year === nowyear && month === nowmonth) {
         return "Yesterday at " + hour + ":" + minutes;
     }
     
