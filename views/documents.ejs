@@ -20,7 +20,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     <style type="text/css">
         @import url("/css/common.css");
         @import url("/css/documents.css");
-        @import url("/css/cards.css")
+        @import url("/css/cards.css");
     </style>
 </head>
 <body>
@@ -43,7 +43,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         <span></span>
         <!-- Card/Grid view buttons -->
         <div class="switch-list-grid">
-            <a class="active grid-view" href=""><i class="fa fa-th"></i></a>
+            <a class="grid-view" href=""><i class="fa fa-th"></i></a>
             <a class="list-view" href=""><i class="fa fa-list"></i></a>
         </div>
 
@@ -96,75 +96,89 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </section>
 
 
-    <main class="d-block">
+    <main >
         
-        <section class="list">
+        <section class="cards" id="table-of-documents">
             <article class="list-element head">
-                <span class="info"><b><a href="#">Title</a></b></span>
-                <span class="info"><b><a href="#">Creation Date</a></b></span>
-                <span class="info"><b><a href="#">Edit Date</a></b></span>
                 <span class="info"></span>
-                <span class="info"><b>Permissions</b></span>
+                <span class="info"><b><a href="#">Title</a></b></span>
                 <span class="info"><b><a href="#">Owner</a></b></span>
-                <section class="actions"></section>
+                <span class="info"><b>Shared</b></span>
+                <span class="info"><b><a href="#">Last Edit</a></b></span>
+                <span class="info"><b><a href="#">Creation Date</a></b></span>
+                <span class="info"><b><a href="#">Delete</a></b></span>
             </article>
             
             <% docs.forEach((doc)=>{ %>
-                <article class="list-element">
-                    <span class="info title"><b><%= doc.title %></b></span>
+                <article class="card-element">
+                    <a id="icon" href="docs/<%= doc._id %>">
+                        <img src="/media/svg/notebook_icon_LIGHT.svg" alt="Card image cap">
+                    </a>
+                    <span class="title"><%= doc.title %></span>
                     <p class="actual-creation-date"><%= doc.created_date %></p>
-                    <span class="info creation-date"><%= doc.created_date %></span>
+                    <span class="info creation-date"><%= doc.created_date.toDateString() %></span>
                     <p class="actual-edit-date"><%= doc.edit_date %></p>
-                    <span class="info edit-date"><%= doc.edit_date %></span>
+                    <span class="info edit-date"><%= doc.edit_date.toDateString() %></span>
                     <span class="info"></span>
-                    <div class="info dropleft perms">
-                        <a class="btn btn-secondary dropdown-toggle" href="#" data-toggle="dropdown">
-                            <% let doc_perms = [] 
-                            doc.perm_edit.forEach(u=>{ 
-                                if (String(doc.owner) != String(u)) {
-                                    doc_perms.push(`<a class="dropdown-item" href="#">${u} edit</a>`)
-                                }
-                            }) 
-                            doc.perm_read.forEach(u=>{
-                                if (String(doc.owner) != String(u)) {
-                                    let contained = false;
-                                    doc_perms.forEach(p=>{
-                                        if (p.includes(String(u))) {
-                                            contained = true;
-                                        }
-                                    });
-                                    if (!contained) {
-                                        doc_perms.push(`<a class="dropdown-item" href="#">${u} read</a>`);
-                                    }
-                                }
-                            })
-                            %>
-                            Shared with <%= doc_perms.length %> users 
-                        </a>
-                        <div class="dropdown-menu">
-                            <% doc_perms.forEach(u=>{ %>
-                                <%- u %>
-                            <% }) 
-                            if (doc_perms.length == 0) { %>
-                                <a class="dropdown-item">Document not shared</a>
-                            <% } %>
-                        </div>
-                        </div>
+                    
                     <p class="owner"><%= doc.owner %></p>
                     <span class="info owner"></span>
-                    <section class="actions">
-                        <a href="docs/<%= doc._id %>" rel="del" _method="DELETE"><i class="far fa-trash-alt"></i></a>
-                    </section>
+                    <a class="delete" id="docs/<%= doc._id %>" href="#">
+                        <img src="/media/svg/delete.svg" class="svgimgform"></img>
+                    </a>
+
+                    <p id="content">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ducimus, inventore. In, quaerat facere earum repellendus cum maxime tenetur nemo. Nemo assumenda voluptas eveniet ab consectetur excepturi expedita. Ex, nulla iure?</p>
+
+                    <% let doc_perms = [] 
+                        doc.perm_edit.forEach(u=>{ 
+                            if (String(doc.owner) != String(u)) {
+                                doc_perms.push(`<a class="dropdown-item" href="#">${u} edit</a>`)
+                            }
+                        })
+                    %>
+                    <a id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Shared with" 
+                        data-content='
+                        <% doc.perm_read.forEach(u=>{
+                            if (String(doc.owner) != String(u)) {
+                                let contained = false;
+                                doc_perms.forEach(p=>{
+                                    if (p.includes(String(u))) {
+                                        contained = true;
+                                    }
+                                });
+                                if (!contained) {
+                                    doc_perms.push(`<a class="dropdown-item" href="#">${u} read</a>`);
+                                }
+                            }
+                        })
+                        %>
+                        <% doc_perms.forEach(u=>{ %>
+                            <%- u %>
+                        <% }) 
+                        if (doc_perms.length == 0) { %>
+                            <a class="dropdown-item">Document not shared</a>
+                        <% } %>
+
+                        '><%= doc_perms.length %> <img src="/media/svg/share.svg" alt="Options">
+                        </a>
+
+                    <a id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-title="Document Information" 
+                        data-content="Created on: <%= doc.created_date.toDateString() %> <br />
+                        Owner: <%= doc.owner %> <br />
+                        Size: <%= doc.size %> <br />
+                        "><img id="threedots" src="/media/svg/options.svg" alt="Options"></a>
+
                 </article>
             <% }); %>
         </section>
 
+        <!--
         <section class="grid">
             <div class="card document document-create">
                 <a href="/docs/new"><i class="far fa-plus-square"></i></a>
             </div>
 
-            <!-- Card display - bojan -->
+            
             <% docs.forEach((doc)=>{ %>
                 <div class="card" style="width: 14rem;">
                     <div class="card-body">
@@ -176,7 +190,6 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                             <p class="card-date"><%= doc.created_date.toDateString() %></p>
                             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
                             <div class="optionbuttons">
-                                <!-- <form _method="DELETE" action="/docs/<%= doc._id %>" class="delete-doc"> -->
                                 <a id="docs/<%= doc._id %>" href="#">
                                     <img src="/media/svg/delete.svg" class="svgimgform"></img>
                                 </a>
@@ -196,6 +209,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 </div>
             <% }); %>
         </section>
+        -->
 
     </main>
 
