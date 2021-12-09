@@ -2,6 +2,8 @@ let base_documents = []; // Array containing all the documents of the page (with
 
 function init_documents() {
 
+    setSearchListener();
+
     setDeleteListeners();
 
     setSwitchButtonListener();
@@ -48,6 +50,12 @@ function init_documents() {
             e.target.parentNode.parentNode.parentNode.parentNode.parentNode.remove();
         })
     }
+}
+
+// Set search listener on any input to search between all the titles and owners
+function setSearchListener() {
+    let search = document.getElementById('search');
+
 }
 
 // Set all the listeners for a Document (row in list view)
@@ -116,7 +124,7 @@ function setDeleteListeners() {
 
 // Set list edit links for each document and sort links for the header buttons
 function setEditListeners() {
-    document.querySelectorAll('.list-element').forEach(row=>{
+    document.querySelectorAll('.card-element').forEach(row=>{
         if (!row.classList.contains('head')){
             row.querySelectorAll('.info').forEach(function(i){
                 i.addEventListener('click',function(event){
@@ -157,7 +165,7 @@ function setSortListeners(row) {
             // Then we get all the document rows and empty the section
             let documents_rows = [];
             let list = document.querySelector('section.list');
-            document.querySelectorAll('.list-element').forEach(doc=>{
+            document.querySelectorAll('.card-element').forEach(doc=>{
                 if (!doc.classList.contains('head')) {
                     documents_rows.push(doc);
                     list.removeChild(doc);
@@ -185,46 +193,67 @@ function setSortListeners(row) {
     }))
 }
 
-// Sets the username matching the given User's Id in the given DOM element
-function setUsernameById(dom, id){
+// Returns the username matching the given User's Id
+function getUsernameById(id){
     return new Promise((resolve,reject)=>{
         let filter = {_id: id};
-        fetch('users/'+filter._id)
+        fetch('/users/'+filter._id)
         .then(res=>res.json())
         .then(user=>{
             if (user.username == document.querySelector('#info > h2').innerHTML) {
-                dom.innerHTML = "me";
+                resolve("me");
             } else {
-                dom.innerHTML = user.username;
+                resolve(user.username);
             }
-            resolve();
         })
         .catch(err=>{
-            if (dom.innerHTML == ""){
-                dom.innerHTML = "invalid user";
-            }
-            reject();
+            reject("invalid user");
         });
         
     })
 }
 
+// Sets the username matching the given User's Id in the given DOM element
+function setUsernameById(dom, id){
+    return new Promise((resolve,reject)=>{
+        getUsernameById(id)
+        .then(username=>{
+            dom.innerHTML = username;
+            resolve(dom);
+        })
+        .catch(username=>{
+            dom.innerHTML = username;
+            resolve(dom);
+        })
+    })
+}
+
 // Set usernames instead of Ids in the permissions section of the document
 function setEditReadUsernames() {
-    document.querySelectorAll('.perms').forEach(el=>{
-        el.querySelectorAll('.dropdown-item').forEach(item=>{
-            debugger
+    document.querySelectorAll('a[data-title="Shared with"]').forEach(el=>{
+        let articles = document.createElement('SECTION');
+        articles.innerHTML = el.getAttribute('data-content');
+        let promises = [];
+        articles.querySelectorAll('.dropdown-item').forEach(item=>{
             let parts = item.innerHTML.split(' ');
             let i = 0;
             while(parts[i] != 'edit' && parts[i] != 'read' && parts[i] != 'Document') {
                 i++;
             }
             if (parts[i+1] != 'not' && parts[i+2] != 'shared') {
-                setUsernameById(item,parts[i-1])
-                .then(()=>{
-                    item.innerHTML += ' ' + parts[i];
-                })
+                promises.push(new Promise((resolve,reject)=>{
+                    setUsernameById(item,parts[i-1])
+                    .then((dom)=>{
+                        item = dom;
+                        item.innerHTML += ' ' + parts[i];
+                        resolve();
+                    })
+                }))
             }
+        })
+        Promise.all(promises)
+        .then(()=>{  
+            el.setAttribute('data-content',articles.innerHTML);
         })
     })
 }
@@ -258,10 +287,9 @@ function setSaveListeners() {
     document.querySelector('input[name="filter-submit"]').addEventListener('click',function(event){
         event.preventDefault();
 
-        debugger
         // First reset the whole page so that the filters are all reapplied
         let toBeReseted = [];
-        let list = document.querySelector('.list');
+        let list = document.getElementById('table-of-documents');
         list.childNodes.forEach(child=>{
             if (child.classList != undefined && !child.classList.contains('head')) {
                 toBeReseted.push(child);
@@ -310,12 +338,11 @@ function setActiveFilter(checkbox){
     }
 
     let rows = [];
-    document.querySelectorAll('.list-element').forEach(el=>{
+    document.querySelectorAll('.card-element').forEach(el=>{
         if (!el.classList.contains('head')){
             rows.push(el);
         }
     })
-    debugger
     let type = checkbox.name.split('-')[1];
     if (type == 'owned'){
         rows.forEach(row=>{
@@ -325,7 +352,9 @@ function setActiveFilter(checkbox){
         })
     } else if (type == 'read' || type == 'edit'){
         rows.forEach(row=>{
-            row.querySelectorAll('.perms > .dropdown-menu > .dropdown-item').forEach(item=>{
+            let articles = document.createElement('SECTION');
+            articles.innerHTML = row.querySelector('a[data-title="Shared with"]').getAttribute('data-content');
+            articles.querySelectorAll('.dropdown-item').forEach(item=>{
                 let parts = item.innerHTML.split(' ');
                 let i = 0;
                 while (parts[i] != 'read' && parts[i] != 'edit' && parts[i] != 'Document') {
@@ -338,13 +367,9 @@ function setActiveFilter(checkbox){
         })
     } else {
         rows.forEach(row=>{
-            let parts = row.querySelector('.dropdown-toggle').innerHTML.split(' ');
-            let i = 0;
-            while (parts[i] != 'with') {
-                i++;
-            }
-            i++;
-            let n = parts[i];
+            debugger
+            let a = row.querySelector('a[data-title="Shared with"]');
+            let n = parseInt(a.childNodes[0].nodeValue);
             if (n == 0) {
                 row.parentNode.removeChild(row);
             }
@@ -355,7 +380,7 @@ function setActiveFilter(checkbox){
 // Set base documents variable
 function setBaseDocuments() {
     base_documents = [];
-    document.querySelectorAll('.list-element').forEach(el=>{
+    document.querySelectorAll('.card-element').forEach(el=>{
         if (!el.classList.contains('head')) {
             base_documents.push(el);
         }
