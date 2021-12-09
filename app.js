@@ -11,6 +11,7 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const methodOverride = require('method-override');
+const fileUpload = require('express-fileupload');
 
 // Application config import
 const {webserver} = require('./config/config.js')
@@ -47,6 +48,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: false }));    // parse application/x-www-form-urlencoded
 app.use(express.json());    // parse application/json
 app.use(methodOverride('_method'));
+app.use(fileUpload());
 
 app.set('view engine', 'ejs');
 
