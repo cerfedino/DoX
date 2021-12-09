@@ -12,7 +12,7 @@ const path = require('path');
 const logger = require('morgan');
 const methodOverride = require('method-override');
 const {Server} = require("socket.io");
-const {doc_find} = require("./modules/dbops");
+const {doc_find, doc_set_content} = require("./modules/dbops");
 const {ObjectId} = require("mongodb");
 const schema = require('./modules/schema');
 
@@ -162,7 +162,7 @@ io.on('connection', async (socket) => {
         if (!memoryDocs[documentID]) {
             // Load the document from the db
             memoryDocs[documentID] = {
-                doc: schema.nodeFromJSON((JSON.parse(doc.content)).doc),
+                doc: schema.nodeFromJSON(doc.content),
                 steps: [],
                 stepClientIDs: []
             }
@@ -177,7 +177,7 @@ io.on('connection', async (socket) => {
         socket.join(documentID);
 
         if (permission !== 'READ') {
-            socket.on('update', ({version, steps, clientID}) => {
+            socket.on('update', async ({version, steps, clientID}) => {
                 if (version !== memoryDocs[documentID].steps.length) return;
 
                 // This updates the server version of the document.
@@ -189,13 +189,31 @@ io.on('connection', async (socket) => {
                     memoryDocs[documentID].stepClientIDs.push(clientID);
                 })
 
+                // Save the document every 75 changes
+                if (memoryDocs[documentID].steps.length % 75 === 0) {
+                    try {
+                        await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
+                        io.to(documentID).emit('save-success');
+                    } catch (e) {
+                        io.to(documentID).emit('save-fail', {error: e})
+                    }
+                }
+
                 // Send changes
-                //socket.to(documentID).emit
                 io.to(documentID).emit('update', {
                     version: memoryDocs[documentID].steps.length,
                     steps: memoryDocs[documentID].steps,
                     stepClientIDs: memoryDocs[documentID].stepClientIDs
                 });
+            })
+
+            socket.on('save', async () => {
+                try {
+                    await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
+                    io.to(documentID).emit('save-success');
+                } catch (e) {
+                    io.to(documentID).emit('save-fail', {error: e})
+                }
             })
         }
     } catch (e) {

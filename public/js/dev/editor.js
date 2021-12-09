@@ -101,6 +101,28 @@ socket.on('update', ({version, steps, stepClientIDs}) => {
         collab.receiveTransaction(editor.state, newSteps, newClientIDs)
     )
 })
+socket.on('save-success', () => {
+    console.info('Received SAVE-SUCCESS event');
+    document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
+    let messageSave = document.getElementById('message-save');
+
+    messageSave.innerText = 'Saved successfully!';
+    messageSave.classList.remove('text-danger');
+    messageSave.classList.add('text-secondary');
+
+    setTimeout(() => {
+        messageSave.innerText = '';
+    }, 5000)
+})
+socket.on('save-fail', ({error}) => {
+    console.error('Received SAVE-FAIL event with data: ', error);
+    document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
+    let messageSave = document.getElementById('message-save');
+
+    messageSave.classList.add('text-danger');
+    messageSave.classList.remove('text-secondary');
+    messageSave.innerText = 'Error occurred while saving!';
+})
 
 // Modals
 
@@ -286,16 +308,6 @@ function initEditor(doc, version) {
         }
     ])
 
-    /*let state = EditorState.fromJSON({
-        schema,
-        plugins: [
-            collab({version}),
-            history(),
-            keymap(buildKeymap(schema)),
-            keymap(baseKeymap),
-            menu
-        ]
-    }, content);*/
     let state = EditorState.create({
         schema,
         doc,
@@ -368,37 +380,7 @@ function menuPlugin(items) {
  */
 async function save() {
     document.getElementById('button-save').innerHTML = 'Saving...'
-
-    let result = await fetch('/docs/' + documentID, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            tags: {
-                content: JSON.stringify(editor.state.toJSON()),
-            }
-        })
-    })
-
-    let messageSave = document.getElementById('message-save');
-    if (!result.ok) {
-        let error = await result.text();
-        messageSave.innerText = 'Error occurred while saving!';
-        messageSave.classList.add('text-danger');
-        messageSave.classList.remove('text-secondary');
-        e.target.innerHTML = '<i class="bi-save me-1"></i> Save';
-        return;
-    }
-
-    messageSave.innerText = 'Saved successfully!';
-    messageSave.classList.remove('text-danger');
-    messageSave.classList.add('text-secondary');
-
-    document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
-    editor.focus();
-
-    setTimeout(() => {
-        messageSave.innerText = '';
-    }, 5000)
+    socket.emit('save');
 }
 
 /**
