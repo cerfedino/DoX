@@ -35,7 +35,7 @@
     <div id="profile_pic">
         <% if (isUserAuthenticated) { %>
             <!-- <img id="profile_pic" src='<%= user.profile_pic %>' onerror="if (this.src != './media/profile_pics/img_avatar.png') this.src = '../media/profile_pics/img_avatar.png';"alt="<%= user.username %>"> -->
-            <img id="profile_pic" src='./media/profile_pics/img_avatar.png' onerror="if (this.src != './media/profile_pics/img_avatar.png') this.src = '../media/profile_pics/img_avatar.png';"alt="<%= user.username %>">
+            <img id="profile_pic" src='./media/profile_pics/<%= user._id %>.png' onerror="if (this.src != './media/profile_pics/img_avatar.png') this.src = '../media/profile_pics/img_avatar.png';"alt="<%= user.username %>">
 
             <!-- <img id="profile_pic" src="<%= user.profile_pic %>" alt="<%= user.username %>"> -->
         <% } %>
@@ -55,7 +55,7 @@
                     <h2><%= user.username %></h2>
                     <p><%= user.email %></p>
                 </div>
-                <form style="display:none" method="post" action="/user?_method=PUT">
+                <form style="display:none" method="post" action="/user?_method=PUT" encType="multipart/form-data">
                     <div>
                         <input type="text" id="username" name='username' value="<%= user.username %>">
                     </div>
@@ -64,11 +64,11 @@
                     </div>
                     
                     <div class="form-floating">
-                        <input type="file" id="img" name="image" accept="image/*">
+                        <input type="file" id="img" name="file">
                     </div>
         
                     <div>
-                        <input type="submit" class="btn btn-sm btn-warning">
+                        <input type="submit" id="profilemodal" class="btn btn-sm btn-warning">
                     </div>
                 </form>
                 
