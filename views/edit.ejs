@@ -32,8 +32,8 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         </div>
     </div> -->
     
-    <div class="py-2 border-bottom mb-5 bg-light">
-        <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
+    <div class="editor-tools">
+        <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center" style="width:60vw">
             <i id="action-bold" class="bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
                title="Bold (Ctrl-B)"></i>
             <i id="action-italic" class="bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -86,12 +86,18 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             </a>
 
             <div class="ms-auto d-flex flex-wrap">
-                <button type="button" class="btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal">
-                    Rename
-                </button>
-                <button id="button-save" type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i>
-                    Save
-                </button>
+                
+
+                <div style="display: flex;">
+
+                    <button type="button-share" class="btn btn-warning px-3"><i class="bi bi-share"></i></button>
+
+                    <div class="text-end d-flex flex-wrap ms-3">
+
+                        <button id="button-save" type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i></button>
+                        <p style="position:absolute; margin-left: 100px;" id="message-save" class="mt-auto mb-auto me-3"></p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
