@@ -349,7 +349,7 @@ router.put('/user', async (req,res)=> {
             return res.status(400).send("bad file type");
         }
 
-        let file_url = "./public/media/profile_pics/" + req.user.user_id + ext;
+        let file_url = "./public/media/profile_pics/" + req.user.user_id + ".png";
 
         await file.mv(file_url, function(err) { 
             if(err) throw err;
