@@ -338,19 +338,23 @@ router.put('/user', async (req,res)=> {
     }
 
 
+
     if (req.files && Object.keys(req.files).length > 0) {
         // new profile picture uploaded
 
         let file = req.files["file"];
         let ext = path.extname(file.name);
-        if (ext !== ".png" || ext !== '.jpg' || ext !== '.jpeg') {
+
+        if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
             return res.status(400).send("bad file type");
         }
-        let file_url = "/../public/media/profile_pics/" + req.user.user_id + ext;
 
-        // await file.mv(file_url, function (err) {
-        //     //The uploaded file has been moved
-        // });
+        let file_url = "./public/media/profile_pics/" + req.user.user_id + ext;
+
+        await file.mv(file_url, function(err) { 
+            if(err) throw err;
+            console.log("[+] File moved to folder")
+        })
 
         tags.profile_pic = file_url;
 
