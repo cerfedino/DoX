@@ -12,9 +12,9 @@
 
             <% } else if ( extra == "editor") { %>
 
-                <h1><%= doc.title %></h1>
+                <h1 data-bs-toggle="modal" data-bs-target="#renameModal"><%= doc.title %></h1>
 
-                <div style="display: flex;">
+                <!-- <div style="display: flex;">
                     <button>Share</button>
 
                     <div class="text-end d-flex flex-wrap ms-3">
@@ -23,7 +23,10 @@
                             Save
                         </button>
                     </div>
-                </div>
+                </div> -->
+
+                <button type="button-share" class="btn btn-warning px-3"><i class="bi bi-people"></i></button>
+
             <% } %>
         </div>
     <% } %>
@@ -39,7 +42,7 @@
     </div>
     
     
-    <div class="modal">
+    <div class="modal-user">
         <div class="modal-content">
             
             <div class="modal-header">
@@ -89,7 +92,7 @@
 
 <script>
     // Get the modal
-    var modal = document.querySelector(".modal");
+    var modal = document.querySelector(".modal-user");
     
     // Get the button that opens the modal
     var btn = document.getElementById("profile_pic");
