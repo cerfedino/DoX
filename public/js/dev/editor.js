@@ -1,14 +1,13 @@
-const {Schema} = require('prosemirror-model');
 const {Plugin, EditorState} = require('prosemirror-state');
 const {EditorView} = require('prosemirror-view');
 const {undo, redo, history} = require('prosemirror-history');
 const {keymap} = require('prosemirror-keymap');
 const {baseKeymap, toggleMark, setBlockType, lift} = require('prosemirror-commands');
-const basicSchema = require('prosemirror-schema-basic')
 const {wrapInList, addListNodes, splitListItem, liftListItem} = require("prosemirror-schema-list");
-const {collab, sendableSteps} = require('prosemirror-collab');
+const collab = require('prosemirror-collab');
 const io = require('socket.io-client')
 const schema = require('../../../modules/schema');
+const {Step} = require("prosemirror-transform");
 
 /**
  * Menu component
@@ -87,9 +86,20 @@ socket.on('connect', () => {
 socket.on('disconnect', () => {
     console.warn('Socket was disconnected')
 })
-socket.on('init', ({content}) => {
-    console.log(JSON.parse(content));
-    editor = initEditor(JSON.parse(content));
+socket.on('init', ({document, version}) => {
+    console.info('Received INIT event. Version: ' + version);
+    console.info(document);
+    editor = initEditor(schema.nodeFromJSON(document), version);
+})
+socket.on('update', ({version, steps, stepClientIDs}) => {
+    console.info(`Received UPDATE event. Version: ${version}. With data: `, steps, stepClientIDs);
+    let currentVersion = collab.getVersion(editor.state);
+    let newSteps = steps.slice(currentVersion).map(step => Step.fromJSON(schema, step));
+    let newClientIDs = stepClientIDs.slice(currentVersion);
+
+    editor.dispatch(
+        collab.receiveTransaction(editor.state, newSteps, newClientIDs)
+    )
 })
 
 // Modals
@@ -178,9 +188,10 @@ document.getElementById('button-export').addEventListener('click', async () => {
 /**
  * Initializes an editor inside of the element with ID 'editor'.
  *
- * @param {Object} content Editor state stored as JSON
+ * @param {Object} doc Document node
+ * @param version
  */
-function initEditor(content) {
+function initEditor(doc, version) {
     // Menu setup
     let menu = menuPlugin([
         {
@@ -275,48 +286,27 @@ function initEditor(content) {
         }
     ])
 
-    let state;
-    if (typeof content === "object" && Object.keys(content).length !== 0) {
-        // Create state from the global variable
-        try {
-            state = EditorState.fromJSON({
-                schema,
-                plugins: [
-                    collab(),
-                    history(),
-                    keymap(buildKeymap(schema)),
-                    keymap(baseKeymap),
-                    menu
-                ]
-            }, content);
-        } catch (e) {
-            // TODO: show error instead of an empty file
-            console.error(e);
-            // Can't create a state from current documentState
-            state = EditorState.create({
-                schema,
-                plugins: [
-                    collab(),
-                    history(),
-                    keymap(buildKeymap(schema)),
-                    keymap(baseKeymap),
-                    menu
-                ]
-            });
-        }
-    } else {
-        // Create an empty state
-        state = EditorState.create({
-            schema,
-            plugins: [
-                collab(),
-                history(),
-                keymap(buildKeymap(schema)),
-                keymap(baseKeymap),
-                menu
-            ]
-        });
-    }
+    /*let state = EditorState.fromJSON({
+        schema,
+        plugins: [
+            collab({version}),
+            history(),
+            keymap(buildKeymap(schema)),
+            keymap(baseKeymap),
+            menu
+        ]
+    }, content);*/
+    let state = EditorState.create({
+        schema,
+        doc,
+        plugins: [
+            collab.collab({version}),
+            history(),
+            keymap(buildKeymap(schema)),
+            keymap(baseKeymap),
+            menu
+        ]
+    })
     let editorView = new EditorView(document.getElementById("editor"),
         {
             state,
@@ -324,8 +314,9 @@ function initEditor(content) {
                 // This function overwrites default transaction behaviour
                 let newState = editorView.state.apply(transaction);
                 editorView.updateState(newState);
-                let sendable = sendableSteps(newState);
+                let sendable = collab.sendableSteps(newState);
                 if (sendable) {
+                    console.info('Emitting UPDATE event with data: ', sendable);
                     socket.emit('update', sendable);
                 }
             }

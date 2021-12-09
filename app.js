@@ -14,6 +14,7 @@ const methodOverride = require('method-override');
 const {Server} = require("socket.io");
 const {doc_find} = require("./modules/dbops");
 const {ObjectId} = require("mongodb");
+const schema = require('./modules/schema');
 
 // Application config import
 const {webserver} = require('./config/config.js')
@@ -35,7 +36,6 @@ const flash = require('connect-flash');
 const serve_auth_info_toViews = require('./modules/auth_middleware/auth_info_views_middleware.js')
 
 
-
 /////////////////////////////////////////////////////////////////////////////////////
 // INIT framework
 const app = express();
@@ -47,7 +47,7 @@ const domain = webserver.domain
 
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: false }));    // parse application/x-www-form-urlencoded
+app.use(express.urlencoded({extended: false}));    // parse application/x-www-form-urlencoded
 app.use(express.json());    // parse application/json
 app.use(methodOverride('_method'));
 
@@ -72,19 +72,19 @@ app.use(passport.session());
 passport.use('local-login', new LocalStrategy(passportStrategies.authUser))
 
 // register
-passport.use('local-signup', 
+passport.use('local-signup',
     new LocalStrategy(
         {passReqToCallback: true}, // we pass the re to the callback to be able to read the email (req.body.email)
         passportStrategies.registerUser)
 );
 
 // attach the {authenticate_user} to req.session.passport.user.{authenticated_user}
-passport.serializeUser( (userObj, done) => {
+passport.serializeUser((userObj, done) => {
     done(null, userObj)
 })
 // get the {authenticated_user} for the session from "req.session.passport.user.{authenticated_user}, and attach it to req.user.{authenticated_user}
 passport.deserializeUser((userObj, done) => {
-    done (null, userObj )
+    done(null, userObj)
 })
 
 // flash messages
@@ -93,12 +93,11 @@ app.use(flash());
 app.use(serve_auth_info_toViews);
 
 
-
-
 /////////////////////////////////////////////////////////////////////////////////////
 // CONTROLLERS
 //this will automatically load all routers found in the routes folder
 const routers = require('./routes');
+const {Step} = require("prosemirror-transform");
 
 app.use('/auth', routers.router_auth);
 app.use('/', routers.root);
@@ -108,7 +107,7 @@ app.use('/', express.static('public'));
 
 //default fallback handlers
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     const err = new Error('Not Found');
     err.status = 404;
     next(err);
@@ -118,7 +117,7 @@ app.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.json({
         message: err.message,
@@ -127,14 +126,13 @@ app.use(function(err, req, res, next) {
 });
 
 
-
-
 /////////////////////////////////////////////////////////////////////////////////////
 // Start server
 app.set('port', webserver.port)
 
 const server = require('http').createServer(app);
 const io = new Server(server);
+let memoryDocs = {}
 
 io.use((socket, next) => {
     sessionMiddleware(socket.request, {}, next);
@@ -158,24 +156,52 @@ io.on('connection', async (socket) => {
             return;
         }
 
-        const state = JSON.parse(doc.content);
+        // Check if the document is already in memory
+        if (!memoryDocs[documentID]) {
+            // Load the document from the db
+            memoryDocs[documentID] = {
+                doc: schema.nodeFromJSON((JSON.parse(doc.content)).doc),
+                steps: [],
+                stepClientIDs: []
+            }
+        }
 
         // Send document data to the client
-        socket.emit("init", {content: doc.content});
+        socket.emit("init", {
+            document: memoryDocs[documentID].doc.toJSON(),
+            version: memoryDocs[documentID].steps.length
+        });
         // Join current document room
         socket.join(documentID);
 
-        socket.on('update', ({ version, steps, clientID }) => {
-            console.log(steps);
+        socket.on('update', ({version, steps, clientID}) => {
+            if (version !== memoryDocs[documentID].steps.length) return;
+
+            // This updates the server version of the document.
+            steps.forEach(stepJSON => {
+                let step = Step.fromJSON(schema, stepJSON);
+
+                memoryDocs[documentID].doc = (step.apply(memoryDocs[documentID].doc)).doc;
+                memoryDocs[documentID].steps.push(step);
+                memoryDocs[documentID].stepClientIDs.push(clientID);
+            })
+
+            // Send changes
+            //socket.to(documentID).emit
+            io.to(documentID).emit('update', {
+                version: memoryDocs[documentID].steps.length,
+                steps: memoryDocs[documentID].steps,
+                stepClientIDs: memoryDocs[documentID].stepClientIDs
+            });
         })
-    } catch {
+    } catch (e) {
         // Unauthorized connection
         socket.disconnect();
     }
 })
 
-server.on('listening', function() {
-	console.log(`Express server listening on ${domain}:${server.address().port}`);
+server.on('listening', function () {
+    console.log(`Express server listening on ${domain}:${server.address().port}`);
 });
 
 
