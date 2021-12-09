@@ -78,115 +78,12 @@ svg#logo {
 }
 
 
-.list {
-    margin: 10px;
-    /* grid-template-rows: repeat(2, 1fr);
-    grid-template-areas: 
-        "document"
-        "document"; */
-    flex-direction: column;
-    display: none;
-}
 
-.list-element {
-    min-height: 40px;
-    max-height: 50px;
-    border-radius: 5px;
-    grid-area: 'document';
-    display: grid;
-    grid-row: 'document-start' / 'document-end';
-    grid-template-columns: repeat(3, 4fr) 10fr 4fr 6fr 1fr;
-    grid-template-areas: 
-        "info info info info info info info";
-}
+/* ############################
 
-.list-element > .actual-creation-date, .actual-edit-date, p.owner {
-    display: none;
-}
+    TOOLBAR
 
-.list-element.head > .info {
-    background-color: var(--bg-tool-bar);
-}
-
-.list-element.head a {
-    color: var(--text);
-    text-decoration: none;
-}
-
-.list-element.head a:hover {
-    --text: rgb(80,80,80);
-}
-
-.list-element:hover .actions {
-    display: flex;
-    flex-direction: row;
-}
-
-.list-element > .info {
-    padding-left: 5px;
-    padding-right: 5px;
-    border-bottom: 3px solid var(--text);
-    padding-top: 5px;
-    grid-area: 'info';
-    flex: 1;
-    text-align: center;
-    text-overflow: ellipsis;
-    /* for the overflow text */
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-.list-element:hover .info {
-    background-color: var(--bg-contrast);
-}
-
-.list-element.head:hover > .info {
-    background-color: var(--bg-tool-bar);
-}
-
-.list-element > .info:nth-child(5) {
-    text-align: right;
-}
-
-.btn-secondary.dropdown-toggle {
-    border: 0;
-}
-
-.list-element .btn-secondary.dropdown-toggle {
-    background-color: var(--bg);
-    color: var(--text);
-}
-
-.list-element:hover .btn-secondary.dropdown-toggle {
-    background-color: var(--bg-contrast);
-}
-
-.list-element .btn-secondary.dropdown-toggle:hover {
-    background-color: var(--bg);
-}
-
-.dropdown-menu {
-    z-index: 100000;
-}
-
-.list-element > .actions {
-    display: none;
-}
-
-.list-element > .actions > * {
-    padding-left: 10px;
-    flex: 1;
-    margin: 2px;
-}
-
-a[rel="edit"] > i {
-    font-size: 1px;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-}
+##############################*/
 
 .tools-bar {
     margin-top: 0;
@@ -281,4 +178,239 @@ input[name="filter-submit"]:hover {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+}
+
+
+
+
+
+
+/* ############################
+
+    GRID VIEW
+
+##############################*/
+
+.cards {
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+    /* display: none; */
+    flex-wrap: wrap;
+}
+
+.cards .list-element.head {
+    display: none;
+}
+
+.cards .card-element {
+    width: 250px !important;
+    max-height: 350px !important;
+    margin: 10px;
+    border-radius: 10px;
+    padding:10px;
+
+    display: grid;
+
+    grid-template-columns: 1fr 3fr 1fr;
+    grid-template-rows: 2fr 1fr 0.5fr auto;
+    box-shadow: -5px 5px 10px 5px var(--bg-contrast);
+
+    grid-template-areas:
+        "icon icon icon"
+        "title title title"
+        "date date date"
+        "delete perms info";
+}
+
+.cards .card-element:hover {
+    background-color: var(--bg-hover);
+    transition: background-color 0.4s;
+}
+
+
+.cards .card-element > .actual-creation-date, .actual-edit-date, p.owner, span[class='info creation-date'] {
+    display: none;
+}
+
+
+.cards .card-element  span.title {
+
+    grid-area: title;
+    font-size:  x-large;
+    font-weight: bold;
+}
+
+.cards .card-element > #icon {
+    grid-area: icon;
+    border-bottom: 1px solid black;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cards .card-element #icon img {
+    height: 180px;
+    padding: 10px;
+}
+
+
+
+.cards .card-element > span[class="info edit-date"] {
+    grid-area: date;
+    font-size: small;
+    font-style: italic;
+}
+
+.cards .card-element a.delete {
+    grid-area: delete;
+}
+
+
+.cards .card-element > a#end {
+    grid-area: perms;
+    text-align: right;
+}
+
+.cards .card-element > a#start {
+    grid-area: info;
+    text-align: right;
+}
+
+
+.cards .card-element > #content {
+    display: none;
+    margin: 10px;
+    grid-area: content;
+    font-family: monospace;
+    font-size: small;
+    
+}
+
+.cards .card-element > span[class="info owner"] {
+    display: none;
+}
+
+
+
+.card-element a { 
+    text-decoration: none;
+    color: var(--text);
+}
+
+a:hover {
+    text-decoration: none;
+    color: var(--text);
+}
+
+
+/* ############################
+
+    LIST VIEW
+
+##############################*/
+
+.list {
+    margin: 10px;
+
+    flex-direction: column;
+}
+
+.list .list-element.head {
+    display: grid;
+    margin: 10px -10px;
+    padding: 20px;
+    box-shadow: -5px 5px 10px 5px var(--bg-contrast);
+
+    grid-template-columns: 50px 3fr 1fr 0.5fr 1fr 1fr 0.1fr;
+    grid-template-areas: "icon title owner perms last-edit created delete";
+    align-items: center;
+}
+
+.list .card-element {
+    
+    max-height: 350px !important;
+    margin: 10px;
+    border-radius: 10px;
+    padding:10px;
+
+    display: grid;
+
+    grid-template-columns: 50px  3fr  1fr  0.5fr    1fr      1fr   0.1fr;
+    grid-template-areas: "icon title owner perms last-edit created delete";
+    
+    box-shadow: -5px 5px 10px 5px var(--bg-contrast);
+    align-items: center;
+}
+
+.list .card-element:hover {
+    background-color: var(--bg-hover);
+    transition: background-color 0.4s;
+}
+
+
+.list .card-element > .actual-creation-date, .actual-edit-date, p.owner {
+    display: none;
+}
+
+
+.list .card-element > span.title {
+    grid-area: title;
+    font-size:  x-large;
+    font-weight: bold;
+}
+
+.list .card-element #icon {
+    grid-area: icon;
+    margin-top: auto;
+    margin-bottom: auto;
+    
+}
+
+.list .card-element #icon img {
+    padding: 6px;   
+}
+
+
+.list .card-element > span[class="info edit-date"] {
+    grid-area: last-edit;
+    font-size: small;
+    font-style: italic;
+}
+
+
+.list .card-element .info.creation-date {
+    display: block;
+    grid-area: created;
+    font-size: small;
+    font-style: italic;
+}
+
+
+.list .card-element a.delete {
+    grid-area: delete;
+    text-align: right;
+    padding-right: 20px;
+}
+
+
+.list .card-element > a#end {
+    grid-area: perms;
+}
+
+.list .card-element > a#start {
+    display: none;
+}
+
+
+.list .card-element > #content {
+    display: none;
+    margin: 10px;
+    grid-area: content;
+    font-family: monospace;
+    font-size: small;
+    
+}
+
+.list .card-element .info.owner {
+    grid-area: owner;
 }

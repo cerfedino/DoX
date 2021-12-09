@@ -27,6 +27,7 @@ body,body * {
     --accent: #E63946;
     --accent-darker: #ad2933;
     --bg: #ffffff;
+    --bg-hover: #eeeeee;
     --bg-contrast: #c9c9c9;
     --bg-contrastt: #383838;
     --text: #333333;
@@ -43,6 +44,7 @@ body.dark-theme, body.dark-theme * {
     --accent: #E63946;
     --accent-darker: #ad2933;
     --bg: #1e1e1e;
+    --bg-hover: #333333;
     --bg-contrast: #565656;
     --bg-contrastt: #cbcbcb;
     --text: #cccccc;
@@ -91,7 +93,7 @@ header div#extra {
     justify-content: space-between;
     /* align-items: center; */
     min-width: 60vw;
-    margin-right:140px;
+    margin-left:-140px;
 }
 
 header #profile_pic {
