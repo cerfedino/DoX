@@ -62,33 +62,3 @@ div#logo {
     background-position: center;
     height: 100px;
 }
-
-
-
-input[type=file]::-webkit-file-upload-button {
-    display: none; /*to hide the original one and then replace it*/
-}
-input[type=file] {
-    cursor: pointer;
-    font-size: 10pt;
-    width: 300px;
-    padding: 10px;
-    margin-left: -20px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-input[type=file]::before {
-    color: var(--text);
-    content: 'Upload profile picture';
-    background-color: var(--accent);
-    font-size: 10pt;
-    padding: 10px;
-    border-radius: 5px;
-    margin-right: 10px;
-    width: 200px;
-}
-
-input[type=file]:active::before {
-    background-color: var(--accent-darker);
-}

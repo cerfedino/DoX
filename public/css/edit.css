@@ -55,3 +55,22 @@
     margin-right: auto;
     display: block;
 }
+
+
+.editor-tools {
+    position: -webkit-sticky;
+    position: sticky;
+    margin-top:-20px;
+    top: 80px;
+    /* width:100vw; */
+    justify-content:center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 0  0 20px 20px;
+    /* margin-left: auto;
+    margin-right: auto; */
+    background-color: var(--bg);
+    /* box-shadow: 0 10px 30px 15px var(--bg-contrast); */
+    box-shadow: 0 20px 20px 0 var(--bg-contrast);
+    margin-bottom: 20px;
+}
