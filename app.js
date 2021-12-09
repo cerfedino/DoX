@@ -142,7 +142,7 @@ io.on('connection', async (socket) => {
     try {
         let userID = socket.request.session.passport.user.user_id;
         let documentID = socket.handshake.query.documentID;
-        let permission = ''; // should be 'OWNER', 'WRITE';
+        let permission = ''; // should be 'OWNER', 'WRITE' or 'READ';
 
         // Undefined shouldn't be handled, as any exception will disconnect the socket
         // Permissions check
@@ -151,7 +151,9 @@ io.on('connection', async (socket) => {
             permission = 'OWNER';
         else if (doc.perm_edit.includes(userID))
             permission = 'WRITE';
-        else {
+        else if (doc.perm_read.includes(userID)) {
+            permission = 'READ';
+        } else {
             socket.disconnect();
             return;
         }
@@ -174,26 +176,28 @@ io.on('connection', async (socket) => {
         // Join current document room
         socket.join(documentID);
 
-        socket.on('update', ({version, steps, clientID}) => {
-            if (version !== memoryDocs[documentID].steps.length) return;
+        if (permission !== 'READ') {
+            socket.on('update', ({version, steps, clientID}) => {
+                if (version !== memoryDocs[documentID].steps.length) return;
 
-            // This updates the server version of the document.
-            steps.forEach(stepJSON => {
-                let step = Step.fromJSON(schema, stepJSON);
+                // This updates the server version of the document.
+                steps.forEach(stepJSON => {
+                    let step = Step.fromJSON(schema, stepJSON);
 
-                memoryDocs[documentID].doc = (step.apply(memoryDocs[documentID].doc)).doc;
-                memoryDocs[documentID].steps.push(step);
-                memoryDocs[documentID].stepClientIDs.push(clientID);
+                    memoryDocs[documentID].doc = (step.apply(memoryDocs[documentID].doc)).doc;
+                    memoryDocs[documentID].steps.push(step);
+                    memoryDocs[documentID].stepClientIDs.push(clientID);
+                })
+
+                // Send changes
+                //socket.to(documentID).emit
+                io.to(documentID).emit('update', {
+                    version: memoryDocs[documentID].steps.length,
+                    steps: memoryDocs[documentID].steps,
+                    stepClientIDs: memoryDocs[documentID].stepClientIDs
+                });
             })
-
-            // Send changes
-            //socket.to(documentID).emit
-            io.to(documentID).emit('update', {
-                version: memoryDocs[documentID].steps.length,
-                steps: memoryDocs[documentID].steps,
-                stepClientIDs: memoryDocs[documentID].stepClientIDs
-            });
-        })
+        }
     } catch (e) {
         // Unauthorized connection
         socket.disconnect();
