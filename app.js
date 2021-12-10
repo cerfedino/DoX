@@ -52,11 +52,12 @@ app.set('view engine', 'ejs');
 
 
 // INIT session
-app.use(session({
+app.sessionMid = session({
     secret: "secret",
     resave: false,
     saveUninitialized: true,
-}));
+})
+app.use(app.sessionMid);
 
 // INIT passport on every route call.
 app.use(passport.initialize());

@@ -12,12 +12,22 @@ module.exports.init = function (server) {
 
     io.attach(server)
 
-    io.on("connection", function (socket) {
+    io.use(function (socket, next) {
+        app.sessionMid(socket.request, {}, next);
+    }).on("connection", async function (socket) {
 
-        console.log("[+] User connected")
+        try {
+            socket.request.session.passport.user.user_id
+            ObjectId(socket.request.session.passport.user.user_id)
+        } catch(err) {
+            // User is not authenticated yet
+            return
+        }
+
+        const userId = socket.request.session.passport.user.user_id;
 
         socket.on('disconnect',function(socket) {
-            console.log("[-] User disconnected")
+            console.log("[-] User ", userId, " disconnected")
         })
     });
 
