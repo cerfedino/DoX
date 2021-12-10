@@ -411,7 +411,17 @@ function user_set_email_verification(user_id) {
 }
 
 
-
+/**
+ * Generates a db-event that notifies the server of a change in the stored data in the database.
+ * @param {String} name the name of the event ( e.g 'notify-update' ).
+ * @param {String="add"|"change"|"remove"} type the nature of the operation conducted on the database resource.
+ * @param {Object{type,_id}} subject the database element that is undergoing change.
+ *      subject : {
+ *          {String="user"|"document"} type  : The type of the element, either "user" or "document".
+ *          {String} _id    : The ID of the element.
+ *      }
+ * @param {object={}} data contains the fields of the database element that have changed or additional data in general.
+ */
 function generate_event(name,type,subject,data={}) {
     if (!name || !type || !subject || !subject.type || !subject._id) {
         console.log("[X] Invalid event: not sending it")

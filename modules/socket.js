@@ -12,6 +12,7 @@ module.exports.init = function (server) {
 
     io.attach(server)
 
+    // Maps every user to its list of connected sockets to server
     var connected_users = {}
 
     console.log("Connected users: ",connected_users)
@@ -28,7 +29,6 @@ module.exports.init = function (server) {
             // User is not authenticated yet
             return
         }
-
 
         // USER IS AUTHENTICATED
 
@@ -58,7 +58,8 @@ module.exports.init = function (server) {
             socket.join("document:"+doc._id.toHexString())
         })
 
-
+        // Received when a socket wants to be kept updates on any events on a specific documents.
+        //  Satisfies the socket's request only if the user is allowed to access the document in the first place.
         socket.on('subscribe_to_doc_events',async function (msg) {
             if(await dbops.isValidDocument(msg._id) && await dbops.isValidUser(userId) && (await dbops.user_get_perms(ObjectId(userId), ObjectId(msg._id))).length > 0) {
                 console.log("Adding user to room ","doc:"+msg._id)
@@ -83,7 +84,7 @@ module.exports.init = function (server) {
         // })
     });
 
-    //// Relays the database change to every connected socket.
+    //// Relays the database change to every related socket.
     events.on("db-event", async ev => {
         console.log(ev)
         if(ev.subject.type == "document") {

@@ -13,8 +13,9 @@ function init_socket(doc_id) {
             // server.emit("doc-join-request",{doc_id:doc_id})
         } else {
             server.on("notify-update",(msg) => {
-                if(msg.type == "add" && msg.subject.type == "document") { // If a new document concerning this user has been added
-                    // Ask the server to keep updating this socket on any changes on the newly created document, if allowed
+                // If a new document concerning this user has been added
+                if(msg.type == "add" && msg.subject.type == "document") {
+                    // Ask the server to keep updating this socket on any changes on the newly created document.
                     server.emit("subscribe_to_doc_events",{_id : msg.subject._id})
                 }
             })
