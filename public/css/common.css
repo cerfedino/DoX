@@ -67,14 +67,14 @@ body {
 header {
     position: -webkit-sticky;
     position: sticky;
+    z-index: 9999999;
     top: 0px;
     width: 100%;
     display: flex;
     justify-content: space-between;
     padding: 10px;
     background-color: var(--bg);
-    /* border-bottom: 1px solid var(--bg-contrast); */
-    box-shadow: 0 10px 30px 15px var(--bg-contrast);
+    /* box-shadow: 0 10px 30px 15px var(--bg-contrast); */
     margin-bottom: 20px;
 }
 
