@@ -49,6 +49,9 @@ module.exports.init = function (server) {
         socket.on('disconnect', function(socket) {
             console.log("[-] User ", userId, " disconnected")
             connected_users[userId].splice(connected_users[userId].indexOf(socket.id),1)
+            if(connected_users[userId].length == 0) {
+                delete connected_users[userId]
+            }
             console.log("Connected users: ",connected_users)
         })
 
@@ -62,7 +65,7 @@ module.exports.init = function (server) {
         //  Satisfies the socket's request only if the user is allowed to access the document in the first place.
         socket.on('subscribe_to_doc_events',async function (msg) {
             if(await dbops.isValidDocument(msg._id) && await dbops.isValidUser(userId) && (await dbops.user_get_perms(ObjectId(userId), ObjectId(msg._id))).length > 0) {
-                console.log("Adding user to room ","doc:"+msg._id)
+                console.log("Adding user to room ","document:"+msg._id)
                 socket.join("document:"+msg._id)
             }
         })
@@ -91,7 +94,7 @@ module.exports.init = function (server) {
             if(ev.type == "add") {  // If a new document has been added, manually notifies every involved user.
                 await manually_relay_to_involved_users(ev.subject._id, ev)
             } else { // Otherwise updates every socket in the document's room.
-                console.log("Sending back to room ","doc:"+ev.subject._id)
+                console.log("Sending back to room ","document:"+ev.subject._id)
                 io.to("document:"+ev.subject._id).emit(ev.event, ev)
             }
         } else if(ev.subject.type == "user") {
