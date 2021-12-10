@@ -19,6 +19,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </style>
 </head>
 <body class="text-center">
+<script src="/socket.io/socket.io.js"></script>
+<script  onload="init_socket()" src="/js/socket.js"></script>
+
+
 <main class="login-form">
     <svg id="logo" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595.06 133.62"><defs><style>.cls-1{font-size:175px;font-family:jumper_XBdIt, Jumper;font-weight:700;font-style:italic;}.cls-2{letter-spacing:-0.01em;}</style></defs><text class="cls-1" transform="translate(0 126.81)"><tspan class="cls-2"></tspan><tspan x="102.9" y="0">DoX</tspan></text></svg>
     <p>ERROR <b><%= s %></b></p> 

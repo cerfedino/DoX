@@ -1,8 +1,8 @@
 const config = require('./config/config.js')
 const app = require("./app.js")
-const https = require("https");
-const fs = require('fs-extra')
+// const fs = require('fs-extra')
 
+const websocket = require("./modules/socket.js")
 
 
 if(config.webserver.https_enabled) {
@@ -11,7 +11,11 @@ if(config.webserver.https_enabled) {
     // https.createServer({ key, cert }, app).listen(config.webserver.port);
 
     // TODO: Add HTTPS encryption if remote.
-    app.listen(config.webserver.port)
+    var server = require('http').createServer(app);
+    websocket.init(server)
+    server.listen(config.webserver.port);
 } else {
-    app.listen(config.webserver.port)
+    var server = require('http').createServer(app);
+    websocket.init(server)
+    server.listen(config.webserver.port);
 }

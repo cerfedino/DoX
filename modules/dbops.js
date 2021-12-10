@@ -2,6 +2,9 @@ const {model} = require('../models')
 const auth = require("./auth.js")
 const {ObjectId} = require("mongodb");
 
+const EventEmitter = require('events')
+const events = new EventEmitter()
+
 /**
  * Contains all database operations.
  */
@@ -42,7 +45,7 @@ function user_find(filter={}) {
  * @param {object} filter the filter of the user to look for.
  * @returns {Promise<[]>} A Promise that resolves with the fetched document. Resolves undefined if the document cant be found
  */
- function doc_find(filter={}) {
+function doc_find(filter={}) {
     return model.docs.findOne(filter)
 }
 
@@ -66,12 +69,12 @@ function user_find(filter={}) {
  */
 function user_create(username,email,password,token='', returnnew=true) {
     // Pwd hashing
-    return new Promise(async (resolve, reject)=>{
+    return new Promise(async (resolve, reject)=> {
         if(await user_exists({username:username})) {
             reject("Username already taken")
             return
         }
-            
+
         const new_user = {
             username : username,
             email : email,
@@ -81,10 +84,10 @@ function user_create(username,email,password,token='', returnnew=true) {
         }
         model.users.insertOne(new_user).then(() => {
             console.log("[+] Inserted user:",new_user)
-
+            generate_event("notify-update","add",{type:"user",_id:new_user._id.toHexString()})
             resolve(returnnew? new_user : undefined)
         });
-        
+
     })
 }
 
@@ -102,7 +105,7 @@ function doc_create(owner_id, title="Untitled", returnnew=true) {
             reject("User not found")
             return
         }
-            
+
         // Re-hashing the client-side hash
         const date = new Date()
 
@@ -111,25 +114,26 @@ function doc_create(owner_id, title="Untitled", returnnew=true) {
             title : title,
 
             content : {},
-            
-            perm_read : [owner_id], 
+
+            perm_read : [owner_id],
             perm_edit : [owner_id],
-        
-            owner : owner_id, 
-        
-            read_link : undefined, 
-            edit_link : undefined, 
-        
-            edit_date : date, 
+
+            owner : owner_id,
+
+            read_link : undefined,
+            edit_link : undefined,
+
+            edit_date : date,
             created_date : date,
         }
 
         model.docs.insertOne(new_doc).then( (res) => {
             console.log("[+] Inserted doc:",new_doc)
-            
+
+            generate_event("notify-update","add",{type:"document",_id:new_doc._id.toHexString()})
             resolve(returnnew? new_doc: undefined)
         });
-        
+
     })
 }
 
@@ -139,7 +143,14 @@ function doc_create(owner_id, title="Untitled", returnnew=true) {
  * @returns { Promise<DeleteResult>} resolves when the action has been performed.
  */
 function user_delete(user_id) {
-    return model.docs.deleteOne({_id:user_id})
+    return new Promise(async (resolve,reject) => {
+        await model.docs.deleteOne({_id:user_id})
+
+        generate_event("notify-update","remove",{type:"user",_id:user_id.toHexString()})
+
+        resolve()
+    })
+    return
 }
 
 /**
@@ -148,7 +159,11 @@ function user_delete(user_id) {
  * @returns { Promise<DeleteResult>} resolves when the action has been performed.
  */
 function doc_delete(doc_id) {
-    return model.docs.deleteOne({_id:doc_id})
+    return new Promise(async (resolve,reject)=>{
+        await model.docs.deleteOne({_id:doc_id})
+        generate_event("notify-update","remove",{type:"document",_id:doc_id.toHexString()})
+        resolve()
+    })
 }
 
 // ######################
@@ -187,7 +202,7 @@ function doc_exists(filter={}) {
 }
 
 /**
- * Takes an array of hexadecimal strings and returns an array containing every ObjectId representation, if the HEX string is valid.  
+ * Takes an array of hexadecimal strings and returns an array containing every ObjectId representation, if the HEX string is valid.
  * @param {String[]} hex_arr the array of hexadecimal strings representing the ObjectId's
  * @param {Promise<boolean>} filtering_promise the promise that takes the HEX string and returns whether its valid or not.
  *  Expected to be a reference to either:
@@ -202,12 +217,12 @@ function getValidObjectIds(hex_arr=[], filtering_promise) {
         for(idx in hex_arr) {
             if (await (filtering_promise(hex_arr[idx]))) {
                 ret.push(ObjectId(hex_arr[idx]))
-            } 
+            }
         }
 
         resolve(ret)
     })
-    
+
 }
 
 /**
@@ -218,7 +233,7 @@ function getValidObjectIds(hex_arr=[], filtering_promise) {
 function isValidUser(user_id) {
     return new Promise(async (resolve, reject) => {
         resolve(ObjectId.isValid(user_id) && await user_exists({_id : ObjectId(user_id)}))
-    })  
+    })
 }
 /**
  * Takes a HEX string and checks whether its a valid DOCUMENT ID.
@@ -228,7 +243,7 @@ function isValidUser(user_id) {
 function isValidDocument(doc_id) {
     return new Promise(async (resolve, reject) => {
         resolve(ObjectId.isValid(doc_id) && await doc_exists({_id : ObjectId(doc_id)}))
-    })  
+    })
 }
 
 
@@ -269,6 +284,7 @@ function user_set(user_id, tags, returnnew=true) {
             return
         }
         await model.users.findOneAndUpdate({_id:user_id}, {"$set" : tags})
+        generate_event("notify-update","change",{type:"user",_id:user_id.toHexString()},tags)
         resolve(returnnew ? await user_find({_id:user_id}) : undefined)
     })
 }
@@ -287,6 +303,7 @@ function doc_set(doc_id, tags, returnnew=true) {
             return
         }
         await model.docs.findOneAndUpdate({_id:doc_id}, {"$set" : tags})
+        generate_event("notify-update","change",{type:"doc",_id:doc_id.toHexString()},tags)
         resolve(returnnew? await doc_find({_id:doc_id}) : undefined)
     })
 }
@@ -323,6 +340,8 @@ function doc_add_permissions(doc_id, perms={perm_read_add:[], perm_edit_add:[]},
             {_id :doc_id},
             { $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
                     perm_read: { $each: perms.perm_read_add || []} }})
+
+        generate_event("notify-update","change",{type:"doc",_id:doc_id.toHexString()},perms)
         resolve(returnnew ? await doc_find({_id:doc_id}) : undefined)
     })
 }
@@ -342,14 +361,14 @@ function doc_remove_permissions(doc_id, perms={perm_read_remove:[], perm_edit_re
     return new Promise(async (resolve, reject)=>{
         if (!(await doc_exists({_id : doc_id})))
             reject("Document does not exist")
-        
+
         console.log(await model.docs.findOne({_id : doc_id}))
         model.docs.findOneAndUpdate (
             {_id : doc_id},
             {  "$pullAll": { perm_edit: perms.perm_edit_remove || [],
-                             perm_read: perms.perm_read_remove || [] }})
-        
-        
+                    perm_read: perms.perm_read_remove || [] }})
+
+        generate_event("notify-update","change",{type:"doc",_id:doc_id.toHexString()},perms)
         console.log(await model.docs.findOne({_id : doc_id}))
 
         resolve(returnnew ? await doc_find({_id: doc_id}) : undefined)
@@ -387,13 +406,29 @@ function user_get_perms(user_id, doc_id) {
  * @param {ObjectId} user_id the user id.
  * @returns {Promise<[]>} A Promise that resolves with the updated user. Resolves undefined if the user cant be found
  */
-function user_set_email_verification(user_id) { 
+function user_set_email_verification(user_id) {
     return user_set(user_id ,{ email_verification_status : true }, false);
 }
 
 
 
+function generate_event(name,type,subject,data={}) {
+    if (!name || !type || !subject || !subject.type || !subject._id) {
+        console.log("[X] Invalid event: not sending it")
+        return
+    }
+
+    events.emit("db-event", {
+        "event" : name,
+        "type" : type,
+        "subject" : subject,
+        "data": data
+    })
+}
+
 module.exports = {
+    events,
+
     run_find,
     user_find,
     doc_find,
