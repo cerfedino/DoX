@@ -62,6 +62,8 @@ function setSwitchButtonListener(){
         event.preventDefault();
 
         document.getElementById("table-of-documents").className = "cards";
+        document.querySelector('.switch-list-grid a.grid-view').style = "background-color: var(--bg-contrast); color: var(--accent)";
+        document.querySelector(".switch-list-grid a.list-view").style = "background-color: var(--bg); color: var(--text)";
 
     })
     
@@ -70,6 +72,8 @@ function setSwitchButtonListener(){
         event.preventDefault();
 
         document.getElementById("table-of-documents").className = "list";
+        document.querySelector('.switch-list-grid a.list-view').style = "background-color: var(--bg-contrast); color: var(--accent)";
+        document.querySelector(".switch-list-grid a.grid-view").style = "background-color: var(--bg); color: var(--text)";
 
     })
     

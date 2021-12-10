@@ -86,37 +86,49 @@ svg#logo {
 ##############################*/
 
 .tools-bar {
-    margin-top: 0;
-    background-color: var(--bg-tool-bar);
+
+    position: -webkit-sticky;
+    position: sticky;
+    margin-top:-20px;
+    top: 80px;
+    padding: 10px;
+    border-radius: 0  0 20px 20px;
+    background-color: var(--bg);
+    box-shadow: 0 20px 20px 0 var(--bg-contrast);
+    margin-bottom: 20px;
+
     display: grid;
     grid-template-columns: 1fr 2fr 2fr 2fr 2fr 4fr 28fr;
     flex-direction: row;
-    height: 40px;
     align-items: center;
 }
 
 .tools-bar > * {
-    margin-left: 5px;
-    margin-right: 5px;
-    border-radius: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+
 }
 
 .switch-list-grid {
-    border: 3px solid var(--text);
+    /* border: 2px solid var(--bg-contrast); */
+    border-radius: 10px;
+    min-width: 80px;
     display: flex;
     flex-direction: row;
 }
 
-.switch-list-grid > * {
-    padding: 5px;
-}
-
-.list-view{
-    border-left: 3px solid var(--text);
-}
-
 .list-view, .grid-view {
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px;
     flex: 1;
+    transition: color 0.5s;
+    transition: background-color 0.5s;
+}
+
+.grid-view {
+    color: var(--accent);
+    background-color: var(--bg-contrast);
 }
 
 .active {
