@@ -129,15 +129,13 @@ function setDeleteListeners() {
 // Set list edit links for each document and sort links for the header buttons
 function setEditListeners() {
     document.querySelectorAll('.card-element').forEach(row=>{
-        if (!row.classList.contains('head')){
-            row.querySelectorAll('.info').forEach(function(i){
-                i.addEventListener('click',function(event){
-                    if (!this.classList.contains('perms')){
-                        window.location = row.querySelector('a[rel="del"]').href;
-                    }
+        row.childNodes.forEach(el=>{
+            if (el.classList != undefined && !el.classList.contains('delete')){
+                el.addEventListener('click',function(event){
+                    window.location = row.querySelector('a#icon').href;
                 })
-            })
-        }
+            }
+        })
     })
 }
 
@@ -165,7 +163,7 @@ function setSortListeners() {
 
         let type;
         let action = a.getAttribute('rel');
-        if (a.innerHTML.includes('Date')) {
+        if (action.endsWith('-date')) {
             type = ".actual-" + action;
         } else {
             type = '.' + action;
