@@ -44,6 +44,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <a class="dropdown-item" href="#" rel="edit-date">Edit Date</a>
                 <a class="dropdown-item" href="#" rel="title">Title</a>
                 <a class="dropdown-item" href="#" rel="owner">Owner</a>
+                <a class="dropdown-item" href="#" rel="shared"># of shares</a>
             </div>
         </div>
         <section class="active-sort">
@@ -92,7 +93,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <span class="info"></span>
                 <span class="info"><b><a href="#" rel="title">Title</a></b></span>
                 <span class="info"><b><a href="#" rel="owner">Owner</a></b></span>
-                <span class="info"><b>Shared</b></span>
+                <span class="info"><b><a href="#" rel="shared">Shared</a></b></span>
                 <span class="info"><b><a href="#" rel="edit-date">Last Edit</a></b></span>
                 <span class="info"><b><a href="#" rel="creation-date">Creation Date</a></b></span>
                 <span class="info"><b><a href="#">Delete</a></b></span>
@@ -137,6 +138,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                                 }
                             }
                         }) %>
+                    <p class="shared"><%= doc_perms.length %></p>
                     <a id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Shared with" 
                         data-content='
                         

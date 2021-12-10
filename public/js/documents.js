@@ -1,6 +1,4 @@
 let base_documents = []; // Array containing all the documents of the page (without filter)
-// let filteredDocuments = [];
-// let searchDocuments = [];
 let call = false;
 
 function init_documents() {
@@ -77,8 +75,6 @@ function setSearchListener() {
             list.innerHTML += row.outerHTML;
         })
 
-        // searchDocuments = [];
-
         let text = search.value;
         document.querySelectorAll('.card-element').forEach((row)=>{
             debugger
@@ -86,9 +82,7 @@ function setSearchListener() {
             let title = row.querySelector('.title').innerHTML;
             if (!title.toLowerCase().includes(text.toLowerCase()) && !owner.toLowerCase().includes(text.toLowerCase())) {
                 row.remove();
-            }/*  else {
-                searchDocuments.push(row);
-            } */
+            }
         });
 
         document.querySelector('input[name="filter-submit"]').click();
@@ -206,19 +200,24 @@ function setSortListeners() {
         } else {
             type = '.' + action;
         }
-
         debugger
+
         // First, we take all the actual values
         let values = [];
         let nonCaseSensitiveValues = [];
         document.querySelectorAll(type).forEach(val=>{
             if (type.startsWith('.actual') && type.endsWith('-date')) {
                 values.push(new Date(val.innerHTML));
+            } else if (type == '.shared') {
+                let n = parseInt(val.childNodes[0].nodeValue);
+                values.push(n);
             } else {
                 values.push(val.innerHTML);
                 nonCaseSensitiveValues.push(val.innerHTML.toLowerCase());
             }
         });
+
+        debugger
 
         // Then we get all the document rows and empty the section
         let documents_rows = [];
@@ -227,11 +226,8 @@ function setSortListeners() {
             documents_rows.push(doc);
             list.removeChild(doc);
         })
-        
-        // TODO - merge new version
-        /* let main = document.querySelector('main'); */
 
-        // Finally we sort the values and for each of them place in the section the first node matching the value
+        // Finally we sort the array of values and for each of them place in the section the first node matching the value
         nonCaseSensitiveValues.sort();
         let sortedValues = [];
         nonCaseSensitiveValues.forEach(val=>{
@@ -242,10 +238,23 @@ function setSortListeners() {
                 }
             })
         })
+        if (type.endsWith('-date')) {
+            values.sort(function(d1,d2){
+                return new Date(d1) - new Date(d2);
+            });
+            sortedValues = values;
+        } else if (type == '.shared') {
+            insertionSort(values);
+            sortedValues = values;
+        }
+
+        debugger
 
         sortedValues.forEach(val=>{
             let done = false;
+            debugger
             documents_rows.forEach(doc=>{
+                debugger
                 if (!done && doc != undefined && doc.querySelector(type).innerHTML == String(val)){
                     list.innerHTML += doc.outerHTML;
                     documents_rows = documents_rows.filter(x=>(x != doc));
@@ -448,8 +457,7 @@ function setActiveFilter(checkbox){
         })
     } else {
         rows.forEach(row=>{
-            let a = row.querySelector('a[data-title="Shared with"]');
-            let n = parseInt(a.childNodes[0].nodeValue);
+            let n = parseInt(row.querySelector('p.shared').innerHTML);
             if (n == 0) {
                 row.parentNode.removeChild(row);
             }
@@ -484,13 +492,9 @@ function setBaseDocuments() {
 function formatDates() {
     document.querySelectorAll('.card-element').forEach((doc) => {
         let date = doc.querySelector(".creation-date")
-        let actualcreatedate = doc.querySelector(".actual-creation-date");
-        let actualeditdate = doc.querySelector(".actual-edit-date")
         let editdate = doc.querySelector(".edit-date");
         editdate.innerHTML = formatTime(editdate.innerHTML)
         date.innerHTML = formatTime(date.innerHTML)
-        actualeditdate.innerHTML = formatTime(actualeditdate.innerHTML)
-        actualcreatedate.innerHTML = formatTime(actualcreatedate.innerHTML)
     })
 }
 
@@ -535,4 +539,20 @@ function checkLess(n) {
         n = "0" + n 
     }
     return n;
+}
+
+/**
+ * insertionSort takes an array of integers and sorts it in numerical order
+ * @param {Array[Integer]} a the array of integers to be sorted 
+ */
+function insertionSort(a){
+    for(let i = 1; i < a.length; i++){
+        let value = a[i];
+        let j = i - 1;
+        while (j >= 0 && a[j] > value){
+            a[j + 1] = a[j];
+            j--;
+        }
+        a[j + 1] = value;
+    }
 }

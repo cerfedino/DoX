@@ -380,7 +380,7 @@ a:hover {
 }
 
 
-.list .card-element > .actual-creation-date, .actual-edit-date, p.owner {
+.list .card-element > .actual-creation-date, .actual-edit-date, p.shared, p.owner {
     display: none;
 }
 
