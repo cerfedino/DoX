@@ -177,7 +177,6 @@ socket.on('selection-changed', connected => {
         }
     }
 
-    debugger
     editor.dispatch(
         editor.state.tr.setMeta('update-selections', true)
     )
@@ -193,8 +192,8 @@ function SelectionUpdater() {
                 // Check if the selection has changed after the transaction
                 if (tr.selection.from !== old.tr.selection.from || tr.selection.to !== old.tr.selection.to) {
                     socket.emit('selection-changed', {
-                        from: tr.selection.from,
-                        to: tr.selection.to
+                        from: tr.selection.anchor,
+                        to: tr.selection.head
                     })
                     return;
                 }
@@ -203,9 +202,15 @@ function SelectionUpdater() {
                     let decos = [];
                     for (let clientData of Object.entries(connectedClients)) {
                         if (clientData[0] === socket.id) continue;
+
+                        // As we send anchor and head instead of from and to, we should perform an additional check
+                        let from = clientData[1].selection.from < clientData[1].selection.to ?
+                            clientData[1].selection.from : clientData[1].selection.to;
+                        let to = clientData[1].selection.from > clientData[1].selection.to ?
+                            clientData[1].selection.from : clientData[1].selection.to;
                         decos.push(Decoration.inline(
-                            clientData[1].selection.from,
-                            clientData[1].selection.to,
+                            from,
+                            to,
                             {style: `background-color: ${clientData[1].colors[0]}; color: ${clientData[1].colors[1]}`}
                         ))
                     }
