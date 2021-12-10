@@ -86,10 +86,33 @@ socket.on('connect', () => {
 socket.on('disconnect', () => {
     console.warn('Socket was disconnected')
 })
-socket.on('init', ({document, version}) => {
-    console.info('Received INIT event. Version: ' + version);
-    console.info(document);
-    editor = initEditor(schema.nodeFromJSON(document), version);
+socket.on('init', (data) => {
+    console.info('Received INIT event. Version: ' + data.version);
+    console.info(data.document);
+    editor = initEditor(schema.nodeFromJSON(data.document), data.version);
+
+    let active = document.getElementById('active-users');
+    active.innerHTML = '';
+    for (let client of Object.values(data.connected)) {
+        active.innerHTML +=
+            `<li><span class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
+    }
+})
+socket.on('client-connect', (connected) => {
+    let active = document.getElementById('active-users');
+    active.innerHTML = '';
+    for (let client of Object.values(connected)) {
+        active.innerHTML +=
+            `<li><span class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
+    }
+})
+socket.on('client-disconnect', (connected) => {
+    let active = document.getElementById('active-users');
+    active.innerHTML = '';
+    for (let client of Object.values(connected)) {
+        active.innerHTML +=
+            `<li><span class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
+    }
 })
 socket.on('update', ({version, steps, stepClientIDs}) => {
     console.info(`Received UPDATE event. Version: ${version}. With data: `, steps, stepClientIDs);

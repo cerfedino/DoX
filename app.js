@@ -167,16 +167,23 @@ io.on('connection', async (socket) => {
                 doc: schema.nodeFromJSON(doc.content),
                 steps: [],
                 stepClientIDs: [],
-                selections: {}
+                connected: {}
             }
             console.info(`SOCKETS Document ${documentID} was loaded to memory`);
         }
 
+        memoryDocs[documentID].connected[socket.id] = {
+            userID,
+            permission
+        };
         // Send document data to the client
         socket.emit("init", {
             document: memoryDocs[documentID].doc.toJSON(),
-            version: memoryDocs[documentID].steps.length
+            version: memoryDocs[documentID].steps.length,
+            connected: memoryDocs[documentID].connected,
         });
+        // Inform clients about new connection
+        socket.broadcast.to(documentID).emit('client-connect',  memoryDocs[documentID].connected);
         // Join current document room
         socket.join(documentID);
 
@@ -248,6 +255,9 @@ io.on('connection', async (socket) => {
         }
 
         socket.on('disconnect', async () => {
+            delete memoryDocs[documentID].connected[socket.id]
+            io.to(documentID).emit('client-disconnect', memoryDocs[documentID].connected);
+
             // Every room is a document in the memory
             // If there is a document in the memory, but no room with the same ID, that means
             // the document is not opened by anyone, memory can be freed.

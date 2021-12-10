@@ -105,6 +105,13 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             </a>
 
             <div class="ms-auto d-flex flex-wrap">
+                <div class="dropdown dropdown-menu-end me-1">
+                    <button class="btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false" id="active-users-button">Active</button>
+                    <ul class="dropdown-menu" aria-labelledby="active-users-button" id="active-users" style="width: 320px">
+                    </ul>
+                </div>
+
                 <button type="button" class="btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal">
                     Rename
                 </button>
