@@ -138,6 +138,7 @@ svg#logo {
 .tools-bar .btn-secondary.dropdown-toggle {
     color: var(--text);
     background-color: var(--bg-tool-bar);
+    border: 0;
 }
 
 .tools-bar .btn-secondary.dropdown-toggle:hover {

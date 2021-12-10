@@ -20,7 +20,6 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     <style type="text/css">
         @import url("/css/common.css");
         @import url("/css/documents.css");
-        @import url("/css/cards.css");
     </style>
 </head>
 <body>
@@ -53,9 +52,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             </a>
           
             <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">Create Date</a>
-                <a class="dropdown-item" href="#">Edit Date</a>
-                <a class="dropdown-item" href="#">Title</a>
+                <a class="dropdown-item" href="#" rel="creation-date">Create Date</a>
+                <a class="dropdown-item" href="#" rel="edit-date">Edit Date</a>
+                <a class="dropdown-item" href="#" rel="title">Title</a>
+                <a class="dropdown-item" href="#" rel="owner">Owner</a>
             </div>
         </div>
         <section class="active-sort">
@@ -100,14 +100,22 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         <section class="cards" id="table-of-documents">
             <article class="list-element head">
                 <span class="info"></span>
-                <span class="info"><b><a href="#">Title</a></b></span>
-                <span class="info"><b><a href="#">Owner</a></b></span>
+                <span class="info"><b><a href="#" rel="title">Title</a></b></span>
+                <span class="info"><b><a href="#" rel="owner">Owner</a></b></span>
                 <span class="info"><b>Shared</b></span>
-                <span class="info"><b><a href="#">Last Edit</a></b></span>
-                <span class="info"><b><a href="#">Creation Date</a></b></span>
+                <span class="info"><b><a href="#" rel="edit-date">Last Edit</a></b></span>
+                <span class="info"><b><a href="#" rel="creation-date">Creation Date</a></b></span>
                 <span class="info"><b><a href="#">Delete</a></b></span>
             </article>
-            
+            <!-- <article class="list-element head">
+                <span class="info"></span>
+                <span class="info "><b><a href="#">Title</a></b></span>
+                <span class="info "><b><a href="#">Owner</a></b></span>
+                <span class="info"><b>Shared</b></span>
+                <span class="info "><b><a href="#">Last Edit</a></b></span>
+                <span class="info "><b><a href="#">Creation Date</a></b></span>
+                <span class="info"><b><a href="#">Delete</a></b></span>
+            </article> -->
             <% docs.forEach((doc)=>{ %>
                 <article class="card-element">
                     <a id="icon" href="docs/<%= doc._id %>">
@@ -229,6 +237,30 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 <%- messagefailure %>
 
 
+<script>
+
+    // Returns the username matching the given User's Id
+    function getUsernameById(id){
+        return new Promise((resolve,reject)=>{
+            let filter = {_id: id};
+            fetch('users/'+filter._id)
+            .then(res=>res.json())
+            .then(user=>{
+                if (user.username == document.querySelector('#info > h2').innerHTML) {
+                    resolve("me");
+                } else {
+                    resolve(user.username);
+                }
+            })
+            .catch(err=>{
+                if (dom.innerHTML == ""){
+                    reject("invalid user");
+                }
+            });
+            
+        })
+    }
+</script>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>

@@ -1,6 +1,11 @@
 let base_documents = []; // Array containing all the documents of the page (without filter)
+// let filteredDocuments = [];
+// let searchDocuments = [];
+let call = false;
 
 function init_documents() {
+
+    setSearchListener();
 
     setDeleteListeners();
 
@@ -12,11 +17,15 @@ function init_documents() {
 
     setOwnersUsernames();
 
-    setFilterRowClick();    
+    setFilterRowClick();
 
     setSaveListeners();
 
     setBaseDocuments();
+
+    setToolBarSortListeners();
+
+    setSortListeners();
 
     // document.querySelector("#send_put").addEventListener('submit',function(e){
     //     e.preventDefault();
@@ -48,6 +57,41 @@ function init_documents() {
             e.target.parentNode.parentNode.parentNode.parentNode.parentNode.remove();
         })
     }
+}
+
+// Set search listener on any input to search between all the titles and owners
+function setSearchListener() {
+    let search = document.getElementById('search');
+    search.oninput = function(){
+        
+        // First we clean the section
+        let list = document.querySelector('section#table-of-documents');
+        document.querySelectorAll('.card-element').forEach(doc=>{
+            list.removeChild(doc);
+        })
+
+        // Then we add back every actual row
+        /* filteredDocuments */base_documents.forEach(row=>{
+            list.innerHTML += row.outerHTML;
+        })
+
+        // searchDocuments = [];
+
+        let text = search.value;
+        document.querySelectorAll('.card-element').forEach((row)=>{
+            debugger
+            let owner = row.querySelector('.info.owner').innerHTML;
+            let title = row.querySelector('.title').innerHTML;
+            if (!title.includes(text) && !owner.includes(text)) {
+                row.remove();
+            }/*  else {
+                searchDocuments.push(row);
+            } */
+        });
+
+        document.querySelector('input[name="filter-submit"]').click();
+    };
+
 }
 
 // Set all the listeners for a Document (row in list view)
@@ -120,115 +164,149 @@ function setDeleteListeners() {
 
 // Set list edit links for each document and sort links for the header buttons
 function setEditListeners() {
-    document.querySelectorAll('.list-element').forEach(row=>{
-        if (!row.classList.contains('head')){
-            row.querySelectorAll('.info').forEach(function(i){
-                i.addEventListener('click',function(event){
-                    if (!this.classList.contains('perms')){
-                        /* let parts = row.querySelector('a[rel="del"]').href.split('/');
-                        let id = parts[parts.length - 1]; */
-                        window.location = row.querySelector('a[rel="del"]').href;
-                    }
+    document.querySelectorAll('.card-element').forEach(row=>{
+        row.childNodes.forEach(el=>{
+            if (el.classList != undefined && !el.classList.contains('delete')){
+                el.addEventListener('click',function(event){
+                    window.location = row.querySelector('a#icon').href;
                 })
-            })
-        } else {
-            setSortListeners(row);
-        }
+            }
+        })
     })
 }
 
-function setSortListeners(row) {
+// Sets the tool bar sort listeners so that they act as the headline's buttons of the table
+function setToolBarSortListeners() {
+    let row = document.querySelector('.list-element.head');
+
+    let elements = document.querySelector('.dropdown.sort');
+    elements.querySelectorAll('.dropdown-item').forEach(item=>{
+        item.addEventListener('click',function(event){
+            event.preventDefault();
+            let className = item.getAttribute('rel');
+            row.querySelector(`a[rel="${className}"]`).click();
+        });
+    })
+}
+
+// Set sort on click over buttons in the head line of the list
+function setSortListeners() {
+
+    let row = document.querySelector('.list-element.head');
+
     row.querySelectorAll('a').forEach(a=>a.addEventListener('click',function(event){
         event.preventDefault();
-        // TODO - discuss best implementations to have the array of html elements to then compose the section
+
         let type;
-        if (a.innerHTML.includes('Date')) {
-            type = ".actual-" + a.innerHTML.split(' ')[0].toLowerCase() + "-date";
+        let action = a.getAttribute('rel');
+        if (action.endsWith('-date')) {
+            type = ".actual-" + action;
         } else {
-            type = '.' + a.innerHTML.toLowerCase();
+            type = '.' + action;
         }
 
-            // First, we take all the actual values
-            let values = [];
-            document.querySelectorAll(type).forEach(val=>{
-                if (type.startsWith('.actual') && type.endsWith('-date')) {
-                    values.push(new Date(val.innerHTML));
-                } else {
-                    values.push(val.innerHTML);
-                }
-            });
+        debugger
+        // First, we take all the actual values
+        let values = [];
+        document.querySelectorAll(type).forEach(val=>{
+            if (type.startsWith('.actual') && type.endsWith('-date')) {
+                values.push(new Date(val.innerHTML));
+            } else {
+                values.push(val.innerHTML);
+            }
+        });
 
-            // Then we get all the document rows and empty the section
-            let documents_rows = [];
-            let list = document.querySelector('section.list');
-            document.querySelectorAll('.list-element').forEach(doc=>{
-                if (!doc.classList.contains('head')) {
-                    documents_rows.push(doc);
-                    list.removeChild(doc);
+        // Then we get all the document rows and empty the section
+        let documents_rows = [];
+        let list = document.querySelector('section#table-of-documents');
+        document.querySelectorAll('.card-element').forEach(doc=>{
+            documents_rows.push(doc);
+            list.removeChild(doc);
+        })
+        
+        // TODO - merge new version
+        /* let main = document.querySelector('main'); */
+
+        // Finally we sort the values and for each of them place in the section the first node matching the value
+        values.sort();
+        values.forEach(val=>{
+            let done = false;
+            documents_rows.forEach(doc=>{
+                if (!done && doc != undefined && doc.querySelector(type).innerHTML == String(val)){
+                    list.innerHTML += doc.outerHTML;
+                    documents_rows = documents_rows.filter(x=>(x != doc));
+                    done = true;
                 }
             })
-            
-            // TODO - merge new version
-            /* let main = document.querySelector('main'); */
-
-            // Finally we sort the values and for each of them place in the section the first node matching the value
-            values.sort();
-            values.forEach(val=>{
-                let done = false;
-                documents_rows.forEach(doc=>{
-                    if (!done && doc != undefined && doc.querySelector(type).innerHTML == String(val)){
-                        list.innerHTML += doc.outerHTML;
-                        documents_rows = documents_rows.filter(x=>(x != doc));
-                        done = true;
-                    }
-                })
-            });
+        });
         
         setEditListeners();
+        setSortListeners();
         // setDocumentListeners();
     }))
 }
 
-// Sets the username matching the given User's Id in the given DOM element
-function setUsernameById(dom, id){
+// Returns the username matching the given User's Id
+function getUsernameById(id){
     return new Promise((resolve,reject)=>{
         let filter = {_id: id};
-        fetch('users/'+filter._id)
+        fetch('/users/'+filter._id)
         .then(res=>res.json())
         .then(user=>{
             if (user.username == document.querySelector('#info > h2').innerHTML) {
-                dom.innerHTML = "me";
+                resolve("me");
             } else {
-                dom.innerHTML = user.username;
+                resolve(user.username);
             }
-            resolve();
         })
         .catch(err=>{
-            if (dom.innerHTML == ""){
-                dom.innerHTML = "invalid user";
-            }
-            reject();
+            reject("invalid user");
         });
         
     })
 }
 
+// Sets the username matching the given User's Id in the given DOM element
+function setUsernameById(dom, id){
+    return new Promise((resolve,reject)=>{
+        getUsernameById(id)
+        .then(username=>{
+            dom.innerHTML = username;
+            resolve(dom);
+        })
+        .catch(username=>{
+            dom.innerHTML = username;
+            resolve(dom);
+        })
+    })
+}
+
 // Set usernames instead of Ids in the permissions section of the document
 function setEditReadUsernames() {
-    document.querySelectorAll('.perms').forEach(el=>{
-        el.querySelectorAll('.dropdown-item').forEach(item=>{
-            debugger
+    document.querySelectorAll('a[data-title="Shared with"]').forEach(el=>{
+        let articles = document.createElement('SECTION');
+        articles.innerHTML = el.getAttribute('data-content');
+        let promises = [];
+        articles.querySelectorAll('.dropdown-item').forEach(item=>{
             let parts = item.innerHTML.split(' ');
             let i = 0;
             while(parts[i] != 'edit' && parts[i] != 'read' && parts[i] != 'Document') {
                 i++;
             }
             if (parts[i+1] != 'not' && parts[i+2] != 'shared') {
-                setUsernameById(item,parts[i-1])
-                .then(()=>{
-                    item.innerHTML += ' ' + parts[i];
-                })
+                promises.push(new Promise((resolve,reject)=>{
+                    setUsernameById(item,parts[i-1])
+                    .then((dom)=>{
+                        item = dom;
+                        item.innerHTML += ' ' + parts[i];
+                        resolve();
+                    })
+                }))
             }
+        })
+        Promise.all(promises)
+        .then(()=>{  
+            el.setAttribute('data-content',articles.innerHTML);
         })
     })
 }
@@ -261,26 +339,34 @@ function setSaveListeners() {
     // Save filters sets all the selected filters
     document.querySelector('input[name="filter-submit"]').addEventListener('click',function(event){
         event.preventDefault();
-
+        
         debugger
+        if (call == false){
+            call = true;
+            document.getElementById('search').oninput();
+            call = false;
+        }
+
         // First reset the whole page so that the filters are all reapplied
         let toBeReseted = [];
-        let list = document.querySelector('.list');
+        let list = document.getElementById('table-of-documents');
         list.childNodes.forEach(child=>{
             if (child.classList != undefined && !child.classList.contains('head')) {
                 toBeReseted.push(child);
             }
         })
+        let actualList = document.querySelectorAll('.card-element');
 
         toBeReseted.forEach(doc=>{
             list.removeChild(doc);
         })
 
-        base_documents.forEach(doc=>{
+        actualList.forEach(doc=>{
             list.innerHTML += doc.outerHTML;
         })
 
         setDocumentListeners();
+        setSortListeners();
 
         document.getElementById('filters').querySelectorAll('input[type="checkbox"]').forEach(checkbox=>{
             let active = document.querySelector('.active-filters');
@@ -301,6 +387,11 @@ function setSaveListeners() {
                 }
             }
         })
+
+        /* filteredDocuments = [];
+        document.querySelectorAll('.card-element').forEach(row=>{
+            filteredDocuments.push(row);
+        }) */
     })
 }
 
@@ -314,12 +405,11 @@ function setActiveFilter(checkbox){
     }
 
     let rows = [];
-    document.querySelectorAll('.list-element').forEach(el=>{
+    document.querySelectorAll('.card-element').forEach(el=>{
         if (!el.classList.contains('head')){
             rows.push(el);
         }
     })
-    debugger
     let type = checkbox.name.split('-')[1];
     if (type == 'owned'){
         rows.forEach(row=>{
@@ -329,7 +419,9 @@ function setActiveFilter(checkbox){
         })
     } else if (type == 'read' || type == 'edit'){
         rows.forEach(row=>{
-            row.querySelectorAll('.perms > .dropdown-menu > .dropdown-item').forEach(item=>{
+            let articles = document.createElement('SECTION');
+            articles.innerHTML = row.querySelector('a[data-title="Shared with"]').getAttribute('data-content');
+            articles.querySelectorAll('.dropdown-item').forEach(item=>{
                 let parts = item.innerHTML.split(' ');
                 let i = 0;
                 while (parts[i] != 'read' && parts[i] != 'edit' && parts[i] != 'Document') {
@@ -342,13 +434,8 @@ function setActiveFilter(checkbox){
         })
     } else {
         rows.forEach(row=>{
-            let parts = row.querySelector('.dropdown-toggle').innerHTML.split(' ');
-            let i = 0;
-            while (parts[i] != 'with') {
-                i++;
-            }
-            i++;
-            let n = parts[i];
+            let a = row.querySelector('a[data-title="Shared with"]');
+            let n = parseInt(a.childNodes[0].nodeValue);
             if (n == 0) {
                 row.parentNode.removeChild(row);
             }
@@ -359,9 +446,9 @@ function setActiveFilter(checkbox){
 // Set base documents variable
 function setBaseDocuments() {
     base_documents = [];
-    document.querySelectorAll('.list-element').forEach(el=>{
-        if (!el.classList.contains('head')) {
-            base_documents.push(el);
-        }
+    document.querySelectorAll('.card-element').forEach(el=>{
+        base_documents.push(el);
+        // filteredDocuments.push(el);
+        // searchDocuments.push(el);
     })
 }

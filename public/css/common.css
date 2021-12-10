@@ -267,4 +267,14 @@ input[type=file]::before {
 
 input[type=file]:active::before {
     background-color: gray;
-} 
+}
+
+/* Added */
+a {
+    color: var(--text);
+    text-decoration: none;
+}
+
+a:hover {
+    opacity: 70%;
+}
