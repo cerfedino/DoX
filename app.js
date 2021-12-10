@@ -139,6 +139,26 @@ io.use((socket, next) => {
 })
 
 io.on('connection', async (socket) => {
+    socket.on('disconnect', async () => {
+        // Every room is a document in the memory
+        // If there is a document in the memory, but no room with the same ID, that means
+        // the document is not opened by anyone, memory can be freed.
+
+        let docIDs = Object.keys(memoryDocs);
+        for (let i = 0; i < docIDs.length; ++i) {
+            if (!io.sockets.adapter.rooms.get(docIDs[i])) {
+                console.info(`SOCKETS Document with ID ${docIDs[i]} is not opened by anyone anymore, it will be removed from the memory`);
+                try {
+                    await doc_set_content(new ObjectId(docIDs[i]), memoryDocs[docIDs[i]].doc.toJSON(), false);
+                    console.info(`SOCKETS Document ${docIDs[i]} was successfully saved`);
+                } catch (e) {
+                    console.warn(`SOCKETS Document ${docIDs[i]} can't be saved: ` + e);
+                }
+                delete memoryDocs[docIDs[i]];
+            }
+        }
+    })
+
     try {
         let userID = socket.request.session.passport.user.user_id;
         let documentID = socket.handshake.query.documentID;
@@ -157,6 +177,7 @@ io.on('connection', async (socket) => {
             socket.disconnect();
             return;
         }
+        console.info(`SOCKETS User with ID ${userID} opened the document ${documentID} with permission ${permission}`);
 
         // Check if the document is already in memory
         if (!memoryDocs[documentID]) {
@@ -166,6 +187,7 @@ io.on('connection', async (socket) => {
                 steps: [],
                 stepClientIDs: []
             }
+            console.info(`SOCKETS Document ${documentID} was loaded to memory`);
         }
 
         // Send document data to the client
@@ -193,8 +215,10 @@ io.on('connection', async (socket) => {
                 if (memoryDocs[documentID].steps.length % 75 === 0) {
                     try {
                         await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
+                        console.info(`SOCKETS Document ${documentID} was successfully saved`);
                         io.to(documentID).emit('save-success');
                     } catch (e) {
+                        console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
                         io.to(documentID).emit('save-fail', {error: e})
                     }
                 }
@@ -210,8 +234,10 @@ io.on('connection', async (socket) => {
             socket.on('save', async () => {
                 try {
                     await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
+                    console.info(`SOCKETS Document ${documentID} was successfully saved`);
                     io.to(documentID).emit('save-success');
                 } catch (e) {
+                    console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
                     io.to(documentID).emit('save-fail', {error: e})
                 }
             })
