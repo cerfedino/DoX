@@ -162,10 +162,12 @@ io.on('connection', async (socket) => {
         // Check if the document is already in memory
         if (!memoryDocs[documentID]) {
             // Load the document from the db
+
             memoryDocs[documentID] = {
                 doc: schema.nodeFromJSON(doc.content),
                 steps: [],
-                stepClientIDs: []
+                stepClientIDs: [],
+                selections: {}
             }
             console.info(`SOCKETS Document ${documentID} was loaded to memory`);
         }
@@ -238,6 +240,10 @@ io.on('connection', async (socket) => {
                 } catch (e) {
                     socket.emit('rename-fail', {error: 'Unknown error: ' + e});
                 }
+            })
+
+            socket.on('selection-changed', ({from, to}) => {
+                console.log(`Selection from ${from} to ${to}`);
             })
         }
 
