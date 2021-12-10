@@ -23,18 +23,6 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </style>
 </head>
 <body>
-    <!-- <header id="pageheader" class="p-3 mb-4 text-white">
-        <div class="container">
-            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <div class="h3 me-auto col-auto">
-                    <svg id="logo" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595.06 133.62"><defs><style>.cls-1{font-size:175px;font-family:jumper_XBdIt, Jumper;font-weight:700;font-style:italic;}.cls-2{letter-spacing:-0.01em;}</style></defs><text class="cls-1" transform="translate(0 126.81)"><tspan class="cls-2"></tspan><tspan x="102.9" y="0">DoX</tspan></text></svg>
-                </div>
-                <form class="col-auto">
-                    <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
-                </form>
-            </div>
-        </div>
-    </header> -->
 
     <%- include('includes/header', {'extra' : 'search'}) %>
 
@@ -92,6 +80,8 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         <section class="active-filters">
             
         </section>
+        
+        <a class="new-doc" href="/docs/new">New document</a>
     </section>
 
 
@@ -107,15 +97,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <span class="info"><b><a href="#" rel="creation-date">Creation Date</a></b></span>
                 <span class="info"><b><a href="#">Delete</a></b></span>
             </article>
-            <!-- <article class="list-element head">
-                <span class="info"></span>
-                <span class="info "><b><a href="#">Title</a></b></span>
-                <span class="info "><b><a href="#">Owner</a></b></span>
-                <span class="info"><b>Shared</b></span>
-                <span class="info "><b><a href="#">Last Edit</a></b></span>
-                <span class="info "><b><a href="#">Creation Date</a></b></span>
-                <span class="info"><b><a href="#">Delete</a></b></span>
-            </article> -->
+
             <% docs.forEach((doc)=>{ %>
                 <article class="card-element">
                     <a id="icon" href="docs/<%= doc._id %>">
@@ -142,10 +124,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                                 doc_perms.push(`<a class="dropdown-item" href="#">${u} edit</a>`)
                             }
                         })
-                    %>
-                    <a id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Shared with" 
-                        data-content='
-                        <% doc.perm_read.forEach(u=>{
+                        doc.perm_read.forEach(u=>{
                             if (String(doc.owner) != String(u)) {
                                 let contained = false;
                                 doc_perms.forEach(p=>{
@@ -157,8 +136,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                                     doc_perms.push(`<a class="dropdown-item" href="#">${u} read</a>`);
                                 }
                             }
-                        })
-                        %>
+                        }) %>
+                    <a id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Shared with" 
+                        data-content='
+                        
                         <% doc_perms.forEach(u=>{ %>
                             <%- u %>
                         <% }) 
