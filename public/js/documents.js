@@ -27,6 +27,8 @@ function init_documents() {
 
     setSortListeners();
 
+    formatDates();
+
     // document.querySelector("#send_put").addEventListener('submit',function(e){
     //     e.preventDefault();
         
@@ -451,4 +453,60 @@ function setBaseDocuments() {
         // filteredDocuments.push(el);
         // searchDocuments.push(el);
     })
+}
+
+function formatDates() {
+    document.querySelectorAll('.card-element').forEach((doc) => {
+        let date = doc.querySelector(".creation-date")
+        let actualcreatedate = doc.querySelector(".actual-creation-date");
+        let actualeditdate = doc.querySelector(".actual-edit-date")
+        let editdate = doc.querySelector(".edit-date");
+        editdate.innerHTML = formatTime(editdate.innerHTML)
+        date.innerHTML = formatTime(date.innerHTML)
+        actualeditdate.innerHTML = formatTime(actualeditdate.innerHTML)
+        actualcreatedate.innerHTML = formatTime(actualcreatedate.innerHTML)
+    })
+}
+
+function formatTime(date) {
+
+    date = new Date(date);
+
+    const now = new Date();
+    let nowmonth = checkLess(now.getUTCMonth() + 1); //months from 1-12
+    let nowday = checkLess(now.getUTCDate());
+    let nowyear = now.getUTCFullYear();
+
+    let month = checkLess(date.getUTCMonth() + 1); //months from 1-12
+    let day = checkLess(date.getUTCDate());
+    let year = date.getUTCFullYear();
+    let hour = checkLess(date.getHours());
+    let minutes = checkLess(date.getMinutes());
+    
+
+    if (day === nowday && month === nowmonth && year === nowyear) {
+        return "Today at " + hour + ":" + minutes;
+    }
+
+    if (((nowday - day) === 1) && year === nowyear && month === nowmonth) {
+        return "Yesterday at " + hour + ":" + minutes;
+    }
+    
+    if ((((now.getTime() - date.getTime()) / 86400000) <= 7) && ((now.getTime() - date.getTime()) / 86400000) >= 2){
+        return Math.floor(((now.getTime() - date.getTime()) / 86400000)) + " days ago"
+    }
+
+    if ((((now.getTime() - date.getTime()) / (86400000 * 7)) <= 4) && ((now.getTime() - date.getTime()) / (86400000 * 7) >= 1)){
+        return Math.floor(((now.getTime() - date.getTime()) / (86400000 * 7))) + " weeks ago"
+    }
+
+    return "On " + day + "/" + month + "/" + year
+    
+}
+
+function checkLess(n) {
+    if (n < 10) {
+        n = "0" + n 
+    }
+    return n;
 }

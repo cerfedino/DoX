@@ -99,15 +99,15 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             </article>
 
             <% docs.forEach((doc)=>{ %>
-                <article class="card-element">
+                <article id="<%= doc._id %>" class="card-element">
                     <a id="icon" href="docs/<%= doc._id %>">
                         <img src="/media/svg/notebook_icon_LIGHT.svg" alt="Card image cap">
                     </a>
                     <span class="title"><%= doc.title %></span>
                     <p class="actual-creation-date"><%= doc.created_date %></p>
-                    <span class="info creation-date"><%= doc.created_date.toDateString() %></span>
+                    <span class="info creation-date"><%= doc.created_date %></span>
                     <p class="actual-edit-date"><%= doc.edit_date %></p>
-                    <span class="info edit-date"><%= doc.edit_date.toDateString() %></span>
+                    <span class="info edit-date"><%= doc.edit_date %></span>
                     <span class="info"></span>
                     
                     <p class="owner"><%= doc.owner %></p>
