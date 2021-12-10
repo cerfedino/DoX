@@ -100,19 +100,21 @@ socket.on('init', (data) => {
 })
 socket.on('client-connect', (connected) => {
     let active = document.getElementById('active-users');
-    active.innerHTML = '';
+    let newHTML = '';
     for (let client of Object.values(connected)) {
-        active.innerHTML +=
+        newHTML +=
             `<li><span class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
     }
+    active.innerHTML = newHTML;
 })
 socket.on('client-disconnect', (connected) => {
     let active = document.getElementById('active-users');
-    active.innerHTML = '';
+    let newHTML = '';
     for (let client of Object.values(connected)) {
-        active.innerHTML +=
+        newHTML +=
             `<li><span class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
     }
+    active.innerHTML = newHTML;
 })
 socket.on('update', ({version, steps, stepClientIDs}) => {
     console.info(`Received UPDATE event. Version: ${version}. With data: `, steps, stepClientIDs);
