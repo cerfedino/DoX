@@ -84,7 +84,7 @@ function setSearchListener() {
             debugger
             let owner = row.querySelector('.info.owner').innerHTML;
             let title = row.querySelector('.title').innerHTML;
-            if (!title.includes(text) && !owner.includes(text)) {
+            if (!title.toLowerCase().includes(text.toLowerCase()) && !owner.toLowerCase().includes(text.toLowerCase())) {
                 row.remove();
             }/*  else {
                 searchDocuments.push(row);
@@ -210,11 +210,13 @@ function setSortListeners() {
         debugger
         // First, we take all the actual values
         let values = [];
+        let nonCaseSensitiveValues = [];
         document.querySelectorAll(type).forEach(val=>{
             if (type.startsWith('.actual') && type.endsWith('-date')) {
                 values.push(new Date(val.innerHTML));
             } else {
                 values.push(val.innerHTML);
+                nonCaseSensitiveValues.push(val.innerHTML.toLowerCase());
             }
         });
 
@@ -230,8 +232,18 @@ function setSortListeners() {
         /* let main = document.querySelector('main'); */
 
         // Finally we sort the values and for each of them place in the section the first node matching the value
-        values.sort();
-        values.forEach(val=>{
+        nonCaseSensitiveValues.sort();
+        let sortedValues = [];
+        nonCaseSensitiveValues.forEach(val=>{
+            values.forEach(el=>{
+                if (el.toLowerCase() == val) {
+                    sortedValues.push(el);
+                    delete el;
+                }
+            })
+        })
+
+        sortedValues.forEach(val=>{
             let done = false;
             documents_rows.forEach(doc=>{
                 if (!done && doc != undefined && doc.querySelector(type).innerHTML == String(val)){
