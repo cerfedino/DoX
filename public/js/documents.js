@@ -1,4 +1,7 @@
 let base_documents = []; // Array containing all the documents of the page (without filter)
+// let filteredDocuments = [];
+// let searchDocuments = [];
+let call = false;
 
 function init_documents() {
 
@@ -59,6 +62,35 @@ function init_documents() {
 // Set search listener on any input to search between all the titles and owners
 function setSearchListener() {
     let search = document.getElementById('search');
+    search.oninput = function(){
+        
+        // First we clean the section
+        let list = document.querySelector('section#table-of-documents');
+        document.querySelectorAll('.card-element').forEach(doc=>{
+            list.removeChild(doc);
+        })
+
+        // Then we add back every actual row
+        /* filteredDocuments */base_documents.forEach(row=>{
+            list.innerHTML += row.outerHTML;
+        })
+
+        // searchDocuments = [];
+
+        let text = search.value;
+        document.querySelectorAll('.card-element').forEach((row)=>{
+            debugger
+            let owner = row.querySelector('.info.owner').innerHTML;
+            let title = row.querySelector('.title').innerHTML;
+            if (!title.includes(text) && !owner.includes(text)) {
+                row.remove();
+            }/*  else {
+                searchDocuments.push(row);
+            } */
+        });
+
+        document.querySelector('input[name="filter-submit"]').click();
+    };
 
 }
 
@@ -184,10 +216,8 @@ function setSortListeners() {
         let documents_rows = [];
         let list = document.querySelector('section#table-of-documents');
         document.querySelectorAll('.card-element').forEach(doc=>{
-            if (!doc.classList.contains('head')) {
-                documents_rows.push(doc);
-                list.removeChild(doc);
-            }
+            documents_rows.push(doc);
+            list.removeChild(doc);
         })
         
         // TODO - merge new version
@@ -305,6 +335,13 @@ function setSaveListeners() {
     // Save filters sets all the selected filters
     document.querySelector('input[name="filter-submit"]').addEventListener('click',function(event){
         event.preventDefault();
+        
+        debugger
+        if (call == false){
+            call = true;
+            document.getElementById('search').oninput();
+            call = false;
+        }
 
         // First reset the whole page so that the filters are all reapplied
         let toBeReseted = [];
@@ -314,12 +351,13 @@ function setSaveListeners() {
                 toBeReseted.push(child);
             }
         })
+        let actualList = document.querySelectorAll('.card-element');
 
         toBeReseted.forEach(doc=>{
             list.removeChild(doc);
         })
 
-        base_documents.forEach(doc=>{
+        actualList.forEach(doc=>{
             list.innerHTML += doc.outerHTML;
         })
 
@@ -345,6 +383,11 @@ function setSaveListeners() {
                 }
             }
         })
+
+        /* filteredDocuments = [];
+        document.querySelectorAll('.card-element').forEach(row=>{
+            filteredDocuments.push(row);
+        }) */
     })
 }
 
@@ -400,8 +443,8 @@ function setActiveFilter(checkbox){
 function setBaseDocuments() {
     base_documents = [];
     document.querySelectorAll('.card-element').forEach(el=>{
-        if (!el.classList.contains('head')) {
-            base_documents.push(el);
-        }
+        base_documents.push(el);
+        // filteredDocuments.push(el);
+        // searchDocuments.push(el);
     })
 }
