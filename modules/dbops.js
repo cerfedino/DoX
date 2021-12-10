@@ -303,7 +303,7 @@ function doc_set(doc_id, tags, returnnew=true) {
             return
         }
         await model.docs.findOneAndUpdate({_id:doc_id}, {"$set" : tags})
-        generate_event("notify-update","change",{type:"doc",_id:doc_id.toHexString()},tags)
+        generate_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},tags)
         resolve(returnnew? await doc_find({_id:doc_id}) : undefined)
     })
 }
@@ -341,7 +341,7 @@ function doc_add_permissions(doc_id, perms={perm_read_add:[], perm_edit_add:[]},
             { $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
                     perm_read: { $each: perms.perm_read_add || []} }})
 
-        generate_event("notify-update","change",{type:"doc",_id:doc_id.toHexString()},perms)
+        generate_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
         resolve(returnnew ? await doc_find({_id:doc_id}) : undefined)
     })
 }
@@ -368,7 +368,7 @@ function doc_remove_permissions(doc_id, perms={perm_read_remove:[], perm_edit_re
             {  "$pullAll": { perm_edit: perms.perm_edit_remove || [],
                     perm_read: perms.perm_read_remove || [] }})
 
-        generate_event("notify-update","change",{type:"doc",_id:doc_id.toHexString()},perms)
+        generate_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
         console.log(await model.docs.findOne({_id : doc_id}))
 
         resolve(returnnew ? await doc_find({_id: doc_id}) : undefined)
@@ -417,7 +417,6 @@ function generate_event(name,type,subject,data={}) {
         console.log("[X] Invalid event: not sending it")
         return
     }
-
     events.emit("db-event", {
         "event" : name,
         "type" : type,
