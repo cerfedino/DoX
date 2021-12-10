@@ -178,6 +178,29 @@ router.get('/users/:id', async function (req, res){
     }
 })
 
+// Gets user profile picture based on ID
+
+router.get("/pic/users/:id", async function (req, res){
+    let id;
+    try {
+        id = ObjectId(req.params.id);
+    } catch(err) {
+        res.status(404).end();
+    }
+    let user = await dbops.user_fine({_id : id});
+    if (user) { 
+        if (req.accepts("image/png")) {
+            res.sendFile(user.profile_pic);
+        } else {
+            console.log("err")
+        } 
+    } else {
+        res.status(404).end();
+    }
+    
+
+})
+
 // ###############
 // PUT REQUESTS
 // ###############
