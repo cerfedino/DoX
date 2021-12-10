@@ -96,7 +96,7 @@ socket.on('init', (data) => {
         connectedClients[client[0]] = {
             userID: client[1].userID,
             permission: client[1].permission,
-            selection: data.connected.selection ? data.connected.selection : {
+            selection: client[1].selection ? client[1].selection : {
                 from: 1,
                 to: 1
             },
@@ -104,6 +104,10 @@ socket.on('init', (data) => {
         }
     }
     renderConnections();
+
+    editor.dispatch(
+        editor.state.tr.setMeta('update-selections', true)
+    )
 })
 socket.on('client-connect', data => {
     connectedClients[data.id] = {
