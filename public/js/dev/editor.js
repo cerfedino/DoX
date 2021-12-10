@@ -1,5 +1,5 @@
 const {Plugin, EditorState} = require('prosemirror-state');
-const {EditorView} = require('prosemirror-view');
+const {EditorView, Decoration, DecorationSet} = require('prosemirror-view');
 const {undo, redo, history} = require('prosemirror-history');
 const {keymap} = require('prosemirror-keymap');
 const {baseKeymap, toggleMark, setBlockType} = require('prosemirror-commands');
@@ -73,6 +73,7 @@ class MenuView {
 
 //region Editor setup
 let editor;
+let connectedClients = {};
 
 // Sockets
 const socket = io({
@@ -91,30 +92,30 @@ socket.on('init', (data) => {
     console.info(data.document);
     editor = initEditor(schema.nodeFromJSON(data.document), data.version);
 
-    let active = document.getElementById('active-users');
-    active.innerHTML = '';
-    for (let client of Object.values(data.connected)) {
-        active.innerHTML +=
-            `<li><span class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
+    for (let client of Object.entries(data.connected)) {
+        connectedClients[client[0]] = {
+            userID: client[1].userID,
+            permission: client[1].permission,
+            selection: data.connected.selection ? data.connected.selection : {
+                from: 1,
+                to: 1
+            },
+            colors: pickColor()
+        }
     }
+    renderConnections();
 })
-socket.on('client-connect', (connected) => {
-    let active = document.getElementById('active-users');
-    let newHTML = '';
-    for (let client of Object.values(connected)) {
-        newHTML +=
-            `<li><span class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
+socket.on('client-connect', data => {
+    connectedClients[data.id] = {
+        userID: data.userID,
+        permission: data.permission,
+        colors: pickColor()
     }
-    active.innerHTML = newHTML;
+    renderConnections();
 })
-socket.on('client-disconnect', (connected) => {
-    let active = document.getElementById('active-users');
-    let newHTML = '';
-    for (let client of Object.values(connected)) {
-        newHTML +=
-            `<li><span class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
-    }
-    active.innerHTML = newHTML;
+socket.on('client-disconnect', id => {
+    delete connectedClients[id];
+    renderConnections();
 })
 socket.on('update', ({version, steps, stepClientIDs}) => {
     console.info(`Received UPDATE event. Version: ${version}. With data: `, steps, stepClientIDs);
@@ -162,6 +163,86 @@ socket.on('rename-fail', ({error}) => {
     console.error('Received RENAME-FAIL event. ' + error);
     alert(error);
 })
+socket.on('selection-changed', connected => {
+    let entries = Object.entries(connected);
+    for (let entry of entries) {
+        if (!connectedClients[entry[0]]) {
+            console.warn('Received data about unknown client ' + entry[0]);
+            continue;
+        }
+
+        connectedClients[entry[0]].selection = entry[1].selection ? entry[1].selection : {
+            from: 1,
+            to: 1
+        }
+    }
+
+    debugger
+    editor.dispatch(
+        editor.state.tr.setMeta('update-selections', true)
+    )
+})
+
+function SelectionUpdater() {
+    return new Plugin({
+        state: {
+            init() {
+
+            },
+            apply(tr, _, old) {
+                // Check if the selection has changed after the transaction
+                if (tr.selection.from !== old.tr.selection.from || tr.selection.to !== old.tr.selection.to) {
+                    socket.emit('selection-changed', {
+                        from: tr.selection.from,
+                        to: tr.selection.to
+                    })
+                    return;
+                }
+
+                if (tr.getMeta('update-selections')) {
+                    let decos = [];
+                    for (let clientData of Object.entries(connectedClients)) {
+                        if (clientData[0] === socket.id) continue;
+                        decos.push(Decoration.inline(
+                            clientData[1].selection.from,
+                            clientData[1].selection.to,
+                            {style: `background-color: ${clientData[1].colors[0]}; color: ${clientData[1].colors[1]}`}
+                        ))
+                    }
+
+                    return DecorationSet.create(tr.doc, decos);
+                }
+            }
+        },
+        props: {
+            decorations(state) {
+                return this.getState(state);
+            }
+        }
+    });
+}
+
+let colorIndex = -1;
+function pickColor() {
+    let palette = [
+        ['#ff7070', '#6b0000'],
+        ['#70ff70', '#006b00'],
+        ['#7070ff', '#00006b']
+    ]
+    colorIndex += 1;
+    if (colorIndex >= palette.length || colorIndex < 0) colorIndex = 0;
+    return palette[colorIndex];
+}
+
+function renderConnections() {
+    let active = document.getElementById('active-users');
+    let newHTML = '';
+    for (let client of Object.values(connectedClients)) {
+        newHTML +=
+            `<li><span style="color: ${client.colors[1]}" class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
+    }
+    active.innerHTML = newHTML;
+}
 
 // Modals
 
@@ -333,6 +414,7 @@ function initEditor(doc, version) {
             history(),
             keymap(buildKeymap(schema)),
             keymap(baseKeymap),
+            SelectionUpdater(),
             menu
         ]
     })

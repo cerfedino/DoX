@@ -183,7 +183,7 @@ io.on('connection', async (socket) => {
             connected: memoryDocs[documentID].connected,
         });
         // Inform clients about new connection
-        socket.broadcast.to(documentID).emit('client-connect',  memoryDocs[documentID].connected);
+        socket.broadcast.to(documentID).emit('client-connect',  {id: socket.id, userID, permission});
         // Join current document room
         socket.join(documentID);
 
@@ -250,13 +250,17 @@ io.on('connection', async (socket) => {
             })
 
             socket.on('selection-changed', ({from, to}) => {
-                console.log(`Selection from ${from} to ${to}`);
+                memoryDocs[documentID].connected[socket.id].selection = {
+                    from,
+                    to
+                }
+                io.to(documentID).emit('selection-changed', memoryDocs[documentID].connected);
             })
         }
 
         socket.on('disconnect', async () => {
             delete memoryDocs[documentID].connected[socket.id]
-            io.to(documentID).emit('client-disconnect', memoryDocs[documentID].connected);
+            io.to(documentID).emit('client-disconnect', socket.id);
 
             // Every room is a document in the memory
             // If there is a document in the memory, but no room with the same ID, that means
