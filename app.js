@@ -12,7 +12,7 @@ const path = require('path');
 const logger = require('morgan');
 const methodOverride = require('method-override');
 const {Server} = require("socket.io");
-const {doc_find, doc_set_content} = require("./modules/dbops");
+const {doc_find, doc_set_content, doc_set} = require("./modules/dbops");
 const {ObjectId} = require("mongodb");
 const schema = require('./modules/schema');
 
@@ -219,6 +219,24 @@ io.on('connection', async (socket) => {
                 } catch (e) {
                     console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
                     io.to(documentID).emit('save-fail', {error: e})
+                }
+            })
+
+            socket.on('rename', async (newName) => {
+                try {
+                    if (typeof newName !== 'string') {
+                        socket.emit('rename-fail', {error: 'Title should be a string'});
+                        return;
+                    }
+                    if (newName.length > 100 || newName.length < 1) {
+                        socket.emit('rename-fail', {error: 'Length of the title must be between 1 and 100'})
+                        return;
+                    }
+
+                    await doc_set(new ObjectId(documentID), {title: newName}, false);
+                    io.to(documentID).emit('rename-success', {newName});
+                } catch (e) {
+                    socket.emit('rename-fail', {error: 'Unknown error: ' + e});
                 }
             })
         }

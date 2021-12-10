@@ -164,7 +164,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                     <label for="new-name" class="col-3 col-form-label">New name</label>
                     <div class="col-9">
                         <input type="text" class="form-control" id="new-name"
-                               placeholder="<%= doc.title %>" required>
+                               placeholder="<%= doc.title %>" required minlength="1" maxlength="100">
                     </div>
                 </div>
             </div>

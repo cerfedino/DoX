@@ -123,6 +123,20 @@ socket.on('save-fail', ({error}) => {
     messageSave.classList.remove('text-secondary');
     messageSave.innerText = 'Error occurred while saving!';
 })
+socket.on('rename-success', ({newName}) => {
+    console.info('Received RENAME-SUCCESS event with new title ' + newName);
+
+    document.getElementById('doc-title').innerText = newName;
+    document.querySelector('title').innerText = 'DoX - Edit - ' + newName;
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('renameModal')).hide();
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-name').placeholder = newName;
+})
+socket.on('rename-fail', ({error}) => {
+    console.error('Received RENAME-FAIL event. ' + error);
+    alert(error);
+})
 
 // Modals
 
@@ -147,30 +161,8 @@ document.getElementById('renameModal').addEventListener('hidden.bs.modal', () =>
 });
 document.getElementById('rename-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('renameModal'));
-
     let name = document.getElementById('new-name');
-    let result = await fetch('/docs/' + documentID, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            tags: {
-                title: name.value
-            }
-        })
-    })
-
-    if (!result.ok) {
-        alert('Error occurred! Please try again');
-        return;
-    }
-
-    document.getElementById('doc-title').innerText = name.value;
-    document.querySelector('title').innerText = 'DoX - Edit - ' + name.value;
-
-    name.value = '';
-    name.placeholder = name.value;
-    modal.hide();
+    socket.emit('rename', name.value);
 });
 // Insert link
 document.getElementById('insertLinkModal').addEventListener('shown.bs.modal', () => {
