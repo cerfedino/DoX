@@ -12,6 +12,10 @@ module.exports.init = function (server) {
 
     io.attach(server)
 
+    var connected_users = {}
+
+    console.log("Connected users: ",connected_users)
+
     io.use(function (socket, next) {
         app.sessionMid(socket.request, {}, next);
     }).on("connection", async function (socket) {
@@ -26,8 +30,16 @@ module.exports.init = function (server) {
 
         const userId = socket.request.session.passport.user.user_id;
 
+        if(!connected_users[userId]) {
+            connected_users[userId] = []
+        }
+        connected_users[userId].unshift(socket.id)
+        console.log("Connected users: ",connected_users)
+
         socket.on('disconnect',function(socket) {
             console.log("[-] User ", userId, " disconnected")
+            connected_users[userId].splice(connected_users[userId].indexOf(socket.id),1)
+            console.log("Connected users: ",connected_users)
         })
     });
 
