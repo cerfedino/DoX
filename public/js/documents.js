@@ -455,6 +455,20 @@ function setBaseDocuments() {
     })
 }
 
+// Time Formatting Functions
+
+// Takes a Date object and returns a date string considering:
+// - If the document was created the same day it specifies the time:
+// eg: Today at 12:17
+// - If the document was created yesterday it specifies the time:
+// eg: Yesterday at 12:17
+// - If the document was created at most 7 days ago it specifies how many days ago:
+//  eg: 5 days ago
+// - If the document was created at most 1 month ago it specifies how many weeks ago
+// eg: 2 weeks ago 
+// - If the document was created more than one month ago it specifies the full date
+// eg: On 07/12/2021
+
 function formatDates() {
     document.querySelectorAll('.card-element').forEach((doc) => {
         let date = doc.querySelector(".creation-date")
