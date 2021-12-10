@@ -97,8 +97,8 @@ svg#logo {
     box-shadow: 0 20px 20px 0 var(--bg-contrast);
     margin-bottom: 20px;
 
-    display: grid;
-    grid-template-columns: 1fr 2fr 2fr 2fr 2fr 4fr 28fr;
+    display: flex;
+    /* grid-template-columns: 1fr 2fr 2fr 2fr 2fr 4fr 28fr; */
     flex-direction: row;
     align-items: center;
 }
@@ -115,6 +115,24 @@ svg#logo {
     min-width: 80px;
     display: flex;
     flex-direction: row;
+}
+
+.tools-bar a.new-doc {
+    background-color: var(--accent);
+    width: 160px;
+    height: 40px;
+    margin-left: auto;
+    border-radius: 10px;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    color: black;
+}
+
+.tools-bar .new-doc i {
+    width: 30px;
+    height: 30px;
+
 }
 
 .list-view, .grid-view {
@@ -186,7 +204,7 @@ input[name="filter-submit"]:hover {
     margin-right: 2px;
     border: 0;
     background-color: var(--bg-contrast);
-    max-width: 50px;
+    /* max-width: 50px; */
     text-align: left;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -331,9 +349,10 @@ a:hover {
 .list .list-element.head {
     display: grid;
     margin: 10px -10px;
+    margin-top: -20px;
     padding: 20px;
-    box-shadow: -5px 5px 10px 5px var(--bg-contrast);
-
+    padding-bottom: 10px;
+    margin-right: 10px;
     grid-template-columns: 50px 3fr 1fr 0.5fr 1fr 1fr 0.1fr;
     grid-template-areas: "icon title owner perms last-edit created delete";
     align-items: center;
