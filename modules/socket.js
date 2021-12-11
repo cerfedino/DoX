@@ -4,6 +4,9 @@ const app = require('../app')
 const dbops = require('./dbops.js')
 const {ObjectId} = require("mongodb");
 const {generate_event} = require("./dbops");
+const schema = require("../modules/schema");
+const {Step} = require("prosemirror-transform");
+const {doc_find, doc_set_content, doc_set} = require("../modules/dbops");
 
 let memoryDocs = {}
 
@@ -34,31 +37,31 @@ module.exports.init = function (server) {
 
         // USER IS AUTHENTICATED
 
-        const userId = socket.request.session.passport.user.user_id;
+        const userID = socket.request.session.passport.user.user_id;
 
         // Maps and keeps track of this socket relative to its authenticated users
-        if (!connected_users[userId]) {
-            connected_users[userId] = []
+        if (!connected_users[userID]) {
+            connected_users[userID] = []
         }
-        connected_users[userId].unshift(socket.id)
+        connected_users[userID].unshift(socket.id)
         //
 
         console.log("Connected users: ", connected_users)
 
         // Adds the user to his own personal user room, this way we can relay messages to every socket associated to a specific user
-        socket.join("user:" + userId)
+        socket.join("user:" + userID)
 
         socket.on('disconnect', function (socket) {
-            console.log("[-] User ", userId, " disconnected")
-            connected_users[userId].splice(connected_users[userId].indexOf(socket.id), 1)
-            if (connected_users[userId].length === 0) {
-                delete connected_users[userId]
+            console.log("[-] User ", userID, " disconnected")
+            connected_users[userID].splice(connected_users[userID].indexOf(socket.id), 1)
+            if (connected_users[userID].length === 0) {
+                delete connected_users[userID]
             }
             console.log("Connected users: ", connected_users)
         })
 
         // Makes the socket monitor all of the documents associated with the user
-        const docs = await dbops.docs_available(ObjectId(userId))
+        const docs = await dbops.docs_available(ObjectId(userID))
         docs.forEach(doc => {
             socket.join("document:" + doc._id.toHexString())
         })
@@ -66,7 +69,7 @@ module.exports.init = function (server) {
         // Received when a socket wants to be kept updates on any events on a specific documents.
         //  Satisfies the socket's request only if the user is allowed to access the document in the first place.
         socket.on('subscribe_to_doc_events', async function (msg) {
-            if (await dbops.isValidDocument(msg._id) && await dbops.isValidUser(userId) && (await dbops.user_get_perms(ObjectId(userId), ObjectId(msg._id))).length > 0) {
+            if (await dbops.isValidDocument(msg._id) && await dbops.isValidUser(userID) && (await dbops.user_get_perms(ObjectId(userID), ObjectId(msg._id))).length > 0) {
                 console.log("Adding user to room ", "document:" + msg._id)
                 socket.join("document:" + msg._id)
             }
@@ -76,8 +79,9 @@ module.exports.init = function (server) {
         //////////
 
         socket.on("doc-join-request", async function (msg) {
-            if (await dbops.isValidUser(userId) && await dbops.isValidDocument(msg._id)) {
-                const perms = await dbops.user_get_perms(ObjectId(userId), ObjectId(msg._id))
+            if (await dbops.isValidUser(userID) && await dbops.isValidDocument(msg._id)) {
+                const doc = await dbops.doc_find({_id: ObjectId(msg._id)});
+                const perms = await dbops.user_get_perms(ObjectId(userID), ObjectId(msg._id))
                 if (perms.length === 0) {
                     return
                 }
@@ -88,13 +92,79 @@ module.exports.init = function (server) {
                         socket.leave(room)
                     }
                 })
-                //
+
+                let documentID = msg._id;
+                let permission = perms.includes("owner") ? "OWNER" :
+                    perms.includes("edit") ? "EDIT" : "READ";
 
                 // Makes the socket monitor just the state of the document in the editor.
                 socket.join("document:" + msg._id)
-                if (perms.includes("edit") || perms.includes("owner")) {
+                console.info(`SOCKETS User with ID ${userID} opened the document ${documentID} with permission ${permission}`);
+
+                // Check if the document is already in memory
+                if (!memoryDocs[documentID]) {
+                    // Load the document from the db
+                    memoryDocs[documentID] = {
+                        doc: schema.nodeFromJSON(doc.content),
+                        steps: [],
+                        stepClientIDs: [],
+                        connected: {}
+                    }
+                    console.info(`SOCKETS Document ${documentID} was loaded to memory`);
+                }
+                memoryDocs[documentID].connected[socket.id] = {
+                    userID,
+                    permission
+                };
+
+                // Send document data to the client
+                socket.emit("init", {
+                    document: memoryDocs[documentID].doc.toJSON(),
+                    version: memoryDocs[documentID].steps.length,
+                    connected: memoryDocs[documentID].connected,
+                });
+                // Inform clients about new connection
+                socket.broadcast.to(`document:${msg._id}/editor`).emit('client-connect', {
+                    id: socket.id,
+                    userID,
+                    permission
+                });
+
+                if (permission === "OWNER" || permission === "EDIT") {
                     // If the user has edit access, it gets added to the reserved room for users with write access
                     socket.join(`document:${msg._id}/editor/write`)
+
+                    socket.on('update', async ({version, steps, clientID}) => {
+                        if (version !== memoryDocs[documentID].steps.length) return;
+
+                        // This updates the server version of the document.
+                        steps.forEach(stepJSON => {
+                            let step = Step.fromJSON(schema, stepJSON);
+
+                            memoryDocs[documentID].doc = (step.apply(memoryDocs[documentID].doc)).doc;
+                            memoryDocs[documentID].steps.push(step);
+                            memoryDocs[documentID].stepClientIDs.push(clientID);
+                        })
+
+                        // Save the document every 75 changes
+                        if (memoryDocs[documentID].steps.length % 75 === 0) {
+                            try {
+                                await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
+                                console.info(`SOCKETS Document ${documentID} was successfully saved`);
+                                io.to(`document:${msg._id}/editor`).emit('save-success');
+                            } catch (e) {
+                                console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
+                                io.to(`document:${msg._id}/editor`).emit('save-fail', {error: e})
+                            }
+                        }
+
+                        // Send changes
+                        io.to(`document:${msg._id}/editor`).emit('update', {
+                            version: memoryDocs[documentID].steps.length,
+                            steps: memoryDocs[documentID].steps,
+                            stepClientIDs: memoryDocs[documentID].stepClientIDs
+                        });
+                    })
                 }
                 // The socket also gets added to the regular editor room, where everyone that is currently in the editor joins.
                 socket.join(`document:${msg._id}/editor`)

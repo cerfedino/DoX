@@ -11,11 +11,11 @@ if(config.webserver.https_enabled) {
     // https.createServer({ key, cert }, app).listen(config.webserver.port);
 
     // TODO: Add HTTPS encryption if remote.
-    var server = require('http').createServer(app);
+    const server = require('http').createServer(app);
     websocket.init(server)
     server.listen(config.webserver.port);
 } else {
-    var server = require('http').createServer(app);
+    const server = require('http').createServer(app);
     websocket.init(server)
     server.listen(config.webserver.port);
 }

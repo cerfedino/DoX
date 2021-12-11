@@ -11,10 +11,6 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const methodOverride = require('method-override');
-const {Server} = require("socket.io");
-const {doc_find, doc_set_content, doc_set} = require("./modules/dbops");
-const {ObjectId} = require("mongodb");
-const schema = require('./modules/schema');
 
 // Application config import
 const {webserver} = require('./config/config.js')
@@ -130,7 +126,7 @@ app.set('port', webserver.port)
 
 const server = require('http').createServer(app);
 
-io.on('connection', async (socket) => {
+/*io.on('connection', async (socket) => {
     try {
         let userID = socket.request.session.passport.user.user_id;
         let documentID = socket.handshake.query.documentID;
@@ -276,11 +272,11 @@ io.on('connection', async (socket) => {
         // Unauthorized connection
         socket.disconnect();
     }
-})
+})*/
 
 server.on('listening', function () {
     console.log(`Express server listening on ${domain}:${server.address().port}`);
 });
 
 
-module.exports = server
+module.exports = app

@@ -76,11 +76,9 @@ let editor;
 let connectedClients = {};
 
 // Sockets
-const socket = io({
-    query: {
-        documentID,
-    }
-})
+const socket = io()
+socket.emit('doc-join-request', {_id: documentID});
+
 socket.on('connect', () => {
     console.info('Socket connected');
 })
