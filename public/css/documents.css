@@ -223,7 +223,7 @@ input[name="filter-submit"]:hover {
 ##############################*/
 
 .cards {
-    margin: 10px;
+    margin-left: 20px;
     display: flex;
     flex-direction: row;
     /* display: none; */
@@ -244,7 +244,7 @@ input[name="filter-submit"]:hover {
     display: grid;
 
     grid-template-columns: 1fr 3fr 1fr;
-    grid-template-rows: 2fr 1fr 0.5fr auto;
+    grid-template-rows: 2fr 2fr 0.5fr auto;
     box-shadow: -5px 5px 10px 5px var(--bg-contrast);
 
     grid-template-areas:
@@ -266,7 +266,16 @@ input[name="filter-submit"]:hover {
 
 
 .cards .card-element  span.title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* number of lines to show */
+            line-clamp: 3; 
+    -webkit-box-orient: vertical;
 
+    line-height: 30px;
+    max-height: 90px;
+    word-wrap: break-word;
     grid-area: title;
     font-size:  x-large;
     font-weight: bold;
@@ -386,6 +395,18 @@ a:hover {
 
 
 .list .card-element > span.title {
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* number of lines to show */
+            line-clamp: 1; 
+    -webkit-box-orient: vertical;
+
+    line-height: 30px;
+    max-height: 30px;
+    word-wrap: break-word;
+
     grid-area: title;
     font-size:  x-large;
     font-weight: bold;

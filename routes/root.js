@@ -187,7 +187,7 @@ router.get("/pic/users/:id", async function (req, res){
     } catch(err) {
         res.status(404).end();
     }
-    let user = await dbops.user_fine({_id : id});
+    let user = await dbops.user_find({_id : id});
     if (user) { 
         if (req.accepts("image/png")) {
             res.sendFile(user.profile_pic);
