@@ -135,6 +135,8 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
                         doc: await dbops.doc_find({_id:ObjectId(req.params.id)}),
                         user : await dbops.user_find({_id : ObjectId(req.user.user_id)})
                     })
+            } else if (req.accepts("application/json")) {
+                res.json({doc: await dbops.doc_find({_id:ObjectId(req.params.id)})});
             } else {
                 res.status(406).send("Accepts: text/html").end()
             }

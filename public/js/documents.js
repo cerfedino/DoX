@@ -1,5 +1,6 @@
 let base_documents = []; // Array containing all the documents of the page (without filter)
 let call = false;
+let reverse = false;
 
 function init_documents() {
 
@@ -77,7 +78,6 @@ function setSearchListener() {
 
         let text = search.value;
         document.querySelectorAll('.card-element').forEach((row)=>{
-            debugger
             let owner = row.querySelector('.info.owner').innerHTML;
             let title = row.querySelector('.title').innerHTML;
             if (!title.toLowerCase().includes(text.toLowerCase()) && !owner.toLowerCase().includes(text.toLowerCase())) {
@@ -200,7 +200,9 @@ function setSortListeners() {
         } else {
             type = '.' + action;
         }
-        debugger
+
+        let activeSort = document.querySelector('button.active-sort');
+        activeSort.setAttribute('data-toggle',action);
 
         // First, we take all the actual values
         let values = [];
@@ -217,7 +219,6 @@ function setSortListeners() {
             }
         });
 
-        debugger
 
         // Then we get all the document rows and empty the section
         let documents_rows = [];
@@ -248,13 +249,9 @@ function setSortListeners() {
             sortedValues = values;
         }
 
-        debugger
-
         sortedValues.forEach(val=>{
             let done = false;
-            debugger
             documents_rows.forEach(doc=>{
-                debugger
                 if (!done && doc != undefined && doc.querySelector(type).innerHTML == String(val)){
                     list.innerHTML += doc.outerHTML;
                     documents_rows = documents_rows.filter(x=>(x != doc));
@@ -363,7 +360,6 @@ function setSaveListeners() {
     document.querySelector('input[name="filter-submit"]').addEventListener('click',function(event){
         event.preventDefault();
         
-        debugger
         if (call == false){
             call = true;
             document.getElementById('search').oninput();
