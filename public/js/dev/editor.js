@@ -232,11 +232,15 @@ function SelectionUpdater() {
 }
 
 let colorIndex = -1;
+
 function pickColor() {
     let palette = [
-        ['#ff7070', '#6b0000'],
-        ['#70ff70', '#006b00'],
-        ['#7070ff', '#00006b']
+        ['#ff7070', '#6b0000'], // Red
+        ['#70ff70', '#006b00'], // Green
+        ['#7070ff', '#00006b'], // Blue
+        ['#ffff70', '#6b6b00'], // Yellow
+        ['#ff70ff', '#6b006b'], // Purple
+        ['#70ffff', '#006b6b'], // Cyan
     ]
     colorIndex += 1;
     if (colorIndex >= palette.length || colorIndex < 0) colorIndex = 0;
@@ -249,8 +253,13 @@ function renderConnections() {
     for (let client of Object.values(connectedClients)) {
         newHTML +=
             `<li><span style="color: ${client.colors[1]}" class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
+        newHTML +=
+            '<li class="dropdown-divider"></li>';
     }
+    newHTML += `<li class="dropdown-item-text"><b>Connected: ${Object.values(connectedClients).length}</b></li>`
     active.innerHTML = newHTML;
+
+    document.getElementById('active-users-button').innerText = 'Active: ' + Object.values(connectedClients).length;
 }
 
 // Modals
