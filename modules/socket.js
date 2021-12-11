@@ -3,6 +3,7 @@ const {events} = require("./dbops.js")
 const app = require('../app')
 const dbops = require('./dbops.js')
 const {ObjectId} = require("mongodb");
+const {generate_event} = require("./dbops");
 
 
 /**
@@ -63,7 +64,7 @@ module.exports.init = function (server) {
 
         // Received when a socket wants to be kept updates on any events on a specific documents.
         //  Satisfies the socket's request only if the user is allowed to access the document in the first place.
-        socket.on('subscribe_to_doc_events',async function (msg) {
+        socket.on('subscribe_to_doc_events', async function (msg) {
             if(await dbops.isValidDocument(msg._id) && await dbops.isValidUser(userId) && (await dbops.user_get_perms(ObjectId(userId), ObjectId(msg._id))).length > 0) {
                 console.log("Adding user to room ","document:"+msg._id)
                 socket.join("document:"+msg._id)
@@ -74,7 +75,6 @@ module.exports.init = function (server) {
         //////////
 
         socket.on("doc-join-request",async function (msg) {
-            console.log(msg)
             if (await dbops.isValidUser(userId) && await dbops.isValidDocument(msg._id)) {
                 const perms = await dbops.user_get_perms(ObjectId(userId),ObjectId(msg._id))
                 if(perms.length == 0) {
@@ -99,12 +99,12 @@ module.exports.init = function (server) {
                 socket.join(`document:${msg._id}/editor`)
 
 
-                console.log(socket.rooms)
+                // console.log(socket.rooms)
             }
         })
     });
 
-    //// Relays the database change to every related socket.
+    // Relays the database change to every related socket.
     events.on("db-event", async ev => {
         // console.log(ev)
         if(ev.subject.type == "document") {
@@ -122,7 +122,11 @@ module.exports.init = function (server) {
                 const docs = await dbops.docs_available(ObjectId(userId))
                 docs.reduce((io,doc)=>{return io.to("document"+doc._id.toHexString())},io.to("user:"+userId)).emit(ev.event, ev)
             }
+        }
 
+        // Handles event in case the permissions change
+        if(ev.subject.type == "document" && ev.type == "change" && (ev.data.perm_read || ev.data.perm_edit || ev.data.perm_read_add || ev.data.perm_read_remove || ev.data.perm_edit_add || ev.data.perm_edit_remove || ev.data.owner)) {
+            await update_socket_permissions(ev.subject._id)
         }
     })
 
@@ -148,5 +152,68 @@ module.exports.init = function (server) {
             users = users.filter((v, i, a) => a.indexOf(v) === i);
             users.forEach((usr)=> io.to(usr).emit(ev.event, ev))
         }
+    }
+
+
+    async function update_socket_permissions(doc_id) {
+            const doc = await dbops.doc_find({_id:ObjectId(doc_id)}, {"owner":1,"perm_read":1,"perm_edit":1})
+            if(!doc)
+                return
+
+            var perm_editors = []
+            var perm_readers = []
+
+            doc.owner = doc.owner.toHexString()
+            doc.perm_edit = doc.perm_edit.map(el=>el.toHexString())
+            doc.perm_read = doc.perm_read.map(el=>el.toHexString())
+
+            perm_editors.push(doc.owner, ...doc.perm_edit)
+            perm_readers.push(perm_editors, ...doc.perm_read)
+
+            perm_editors = perm_editors.filter((v, i, a) => a.indexOf(v) === i);
+            perm_readers = perm_readers.filter((v, i, a) => a.indexOf(v) === i);
+
+            var socket_docs            = io.sockets.adapter.rooms.get('document:'+doc_id) || new Set([])
+            var socket_editors         = io.sockets.adapter.rooms.get('document:'+doc_id+"/editor") || new Set([])
+            var socket_editorwriters   = io.sockets.adapter.rooms.get('document:'+doc_id+"/editor/write")  || new Set([])
+
+
+            var sockets = new Set([...socket_docs,
+                                  ...socket_editors,
+                                  ...socket_editorwriters])
+            
+            sockets.forEach(socket => {
+                let user_id = get_user_from_socket(socket)
+                if(!user_id)
+                    return
+
+                if(!perm_readers.includes(user_id)) {
+                    // Removes the rooms in the socket's joined rooms Set.
+                    io.sockets.adapter.sids.get(socket).delete('document:'+doc_id)
+                    socket_docs.delete(socket)
+                    io.sockets.adapter.sids.get(socket).delete('document:'+doc_id+"/editor")
+                    socket_editors.delete(socket)
+                    io.sockets.adapter.sids.get(socket).delete('document:'+doc_id+"/editor/write")
+                    socket_editorwriters.delete(socket)
+
+                    io.to("user:"+user_id).emit('notify-update', generate_event("notify-update","unavailable",{type:"document",_id:doc_id},{message:"no-read"}))
+                } else if(!perm_editors.includes(user_id)) {
+                    io.sockets.adapter.sids.get(socket).delete('document:'+doc_id+"/editor/write")
+                    socket_editorwriters.delete(socket)
+
+                    io.to("user:"+user_id).emit('notify-update', generate_event("notify-update","unavailable",{type:"document",_id:doc_id},{message:"no-edit"}))
+                }
+            })
+
+
+            // TODO: Handle ADDITION of user permissions
+
+    }
+
+    function get_user_from_socket(socket_id) {
+        Object.keys(connected_users).forEach(usr=>{
+            if(connected_users[usr].includes(socket_id))
+                return usr
+        })
     }
 }

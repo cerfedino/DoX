@@ -32,10 +32,11 @@ function run_find(collection, filter) {
 /**
  * Returns a certain user in the database.
  * @param {object} filter the filter of the user to look for.
+ * @param {object} projection specifies the fields to return. Do not specify to return the whole object.
  * @returns {Promise<[]>} A Promise that resolves with the fetched user. Resolves undefined if the user cant be found
  */
-function user_find(filter={}) {
-    return model.users.findOne(filter);
+function user_find(filter={}, projection) {
+    return model.users.findOne(filter,projection?{projection}:undefined);
 }
 
 
@@ -43,10 +44,11 @@ function user_find(filter={}) {
 /**
  * Returns a certain document in the database.
  * @param {object} filter the filter of the user to look for.
+ * @param {object} projection specifies the fields to return. Do not specify to return the whole object.
  * @returns {Promise<[]>} A Promise that resolves with the fetched document. Resolves undefined if the document cant be found
  */
-function doc_find(filter={}) {
-    return model.docs.findOne(filter)
+function doc_find(filter={}, projection) {
+    return model.docs.findOne(filter,projection?{projection}:undefined)
 }
 
 
@@ -84,7 +86,7 @@ function user_create(username,email,password,token='', returnnew=true) {
         }
         model.users.insertOne(new_user).then(() => {
             console.log("[+] Inserted user:",new_user)
-            generate_event("notify-update","add",{type:"user",_id:new_user._id.toHexString()})
+            send_event("notify-update","add",{type:"user",_id:new_user._id.toHexString()})
             resolve(returnnew? new_user : undefined)
         });
 
@@ -130,7 +132,7 @@ function doc_create(owner_id, title="Untitled", returnnew=true) {
         model.docs.insertOne(new_doc).then( (res) => {
             console.log("[+] Inserted doc:",new_doc)
 
-            generate_event("notify-update","add",{type:"document",_id:new_doc._id.toHexString()})
+            send_event("notify-update","add",{type:"document",_id:new_doc._id.toHexString()})
             resolve(returnnew? new_doc: undefined)
         });
 
@@ -146,7 +148,7 @@ function user_delete(user_id) {
     return new Promise(async (resolve,reject) => {
         await model.docs.deleteOne({_id:user_id})
 
-        generate_event("notify-update","remove",{type:"user",_id:user_id.toHexString()})
+        send_event("notify-update","remove",{type:"user",_id:user_id.toHexString()})
 
         resolve()
     })
@@ -161,7 +163,7 @@ function user_delete(user_id) {
 function doc_delete(doc_id) {
     return new Promise(async (resolve,reject)=>{
         await model.docs.deleteOne({_id:doc_id})
-        generate_event("notify-update","remove",{type:"document",_id:doc_id.toHexString()})
+        send_event("notify-update","remove",{type:"document",_id:doc_id.toHexString()})
         resolve()
     })
 }
@@ -284,7 +286,7 @@ function user_set(user_id, tags, returnnew=true) {
             return
         }
         await model.users.findOneAndUpdate({_id:user_id}, {"$set" : tags})
-        generate_event("notify-update","change",{type:"user",_id:user_id.toHexString()},tags)
+        send_event("notify-update","change",{type:"user",_id:user_id.toHexString()},tags)
         resolve(returnnew ? await user_find({_id:user_id}) : undefined)
     })
 }
@@ -303,7 +305,7 @@ function doc_set(doc_id, tags, returnnew=true) {
             return
         }
         await model.docs.findOneAndUpdate({_id:doc_id}, {"$set" : tags})
-        generate_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},tags)
+        send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},tags)
         resolve(returnnew? await doc_find({_id:doc_id}) : undefined)
     })
 }
@@ -341,7 +343,7 @@ function doc_add_permissions(doc_id, perms={perm_read_add:[], perm_edit_add:[]},
             { $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
                     perm_read: { $each: perms.perm_read_add || []} }})
 
-        generate_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
+        send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
         resolve(returnnew ? await doc_find({_id:doc_id}) : undefined)
     })
 }
@@ -368,7 +370,7 @@ function doc_remove_permissions(doc_id, perms={perm_read_remove:[], perm_edit_re
             {  "$pullAll": { perm_edit: perms.perm_edit_remove || [],
                     perm_read: perms.perm_read_remove || [] }})
 
-        generate_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
+        send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
         console.log(await model.docs.findOne({_id : doc_id}))
 
         resolve(returnnew ? await doc_find({_id: doc_id}) : undefined)
@@ -410,9 +412,17 @@ function user_set_email_verification(user_id) {
     return user_set(user_id ,{ email_verification_status : true }, false);
 }
 
+/**
+ * Generates an event and sends it through the server event bus.
+ */
+function send_event(name,type,subject,data={}) {
+    const event = generate_event(name,type,subject,data)
+    if(event)
+        events.emit("db-event", event)
+}
 
 /**
- * Generates a db-event that notifies the server of a change in the stored data in the database.
+ * Generates an event.
  * @param {String} name the name of the event ( e.g 'notify-update' ).
  * @param {String="add"|"change"|"remove"} type the nature of the operation conducted on the database resource.
  * @param {Object{type,_id}} subject the database element that is undergoing change.
@@ -424,19 +434,20 @@ function user_set_email_verification(user_id) {
  */
 function generate_event(name,type,subject,data={}) {
     if (!name || !type || !subject || !subject.type || !subject._id) {
-        console.log("[X] Invalid event: not sending it")
+        console.log("[X] Invalid event")
         return
     }
-    events.emit("db-event", {
+    return {
         "event" : name,
         "type" : type,
         "subject" : subject,
         "data": data
-    })
+    }
 }
 
 module.exports = {
     events,
+    generate_event,
 
     run_find,
     user_find,
