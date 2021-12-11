@@ -15,19 +15,27 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="">
-<script src="/socket.io/socket.io.js"></script>
-<script  onload="init_socket('<%- doc._id%>')" src="/js/socket.js"></script>
-
-
-<header>
+<header class="sticky-top">
     <div id="pageheader" class="py-4 text-white">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <div id="doc-title" class="h3 me-auto col-auto"><%= doc.title %></div>
+                <div class="h3 me-auto col-auto">
+                    <a class="text-white text-decoration-none" href="../docs/" data-bs-toggle="tooltip"
+                       data-bs-placement="bottom"
+                       title="Return to the documents page">
+                        <i class="bi-house-door-fill"></i>
+                    </a>
+                    <span id="doc-title" class="doc-title text-white"><%= doc.title %></span>
+                </div>
                 <div class="text-end d-flex flex-wrap ms-3">
                     <p id="message-save" class="mt-auto mb-auto me-3"></p>
-                    <button id="button-save" type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i>
+                    <button id="button-save" type="button" class="btn btn-success me-1">
+                        <i class="bi-save me-1"></i>
                         Save
+                    </button>
+                    <button id="button-export" type="button" class="btn btn-success me-2">
+                        <i class="bi-download me-1"></i>
+                        Export
                     </button>
                 </div>
             </div>
@@ -35,14 +43,19 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </div>
     <div class="py-2 border-bottom mb-5 bg-light">
         <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
+            <i id="action-undo" class="bi-arrow-counterclockwise" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Undo (Ctrl-Z)"></i>
+            <i id="action-redo" class="bi-arrow-clockwise me-2" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Redo (Ctrl-Shift-Z)"></i>
+
             <i id="action-bold" class="bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
                title="Bold (Ctrl-B)"></i>
             <i id="action-italic" class="bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
                title="Italic (Ctrl-I)"></i>
-            <i id="action-underline" class="bi-type-underline me-2" data-bs-toggle="tooltip" data-bs-placement="top"
+            <i id="action-underline" class="bi-type-underline" data-bs-toggle="tooltip" data-bs-placement="top"
                title="Underline (Ctrl-U)"></i>
 
-            <div class="dropdown me-2">
+            <div class="dropdown ms-2 me-2">
                 <button class="btn-sm btn-secondary dropdown-toggle" type="button" id="headingMenu"
                         data-bs-toggle="dropdown" aria-expanded="false">Normal text
                 </button>
@@ -86,7 +99,19 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                    title="Insert image"></i>
             </a>
 
+            <a data-bs-toggle="modal" data-bs-target="#insertLinkModal">
+                <i class="bi-link" data-bs-toggle="tooltip" data-bs-placement="top"
+                   title="Insert link"></i>
+            </a>
+
             <div class="ms-auto d-flex flex-wrap">
+                <div class="dropdown dropdown-menu-end me-1">
+                    <button class="btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false" id="active-users-button">Active</button>
+                    <ul class="dropdown-menu" aria-labelledby="active-users-button" id="active-users" style="width: 320px">
+                    </ul>
+                </div>
+
                 <button type="button" class="btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal">
                     Rename
                 </button>
@@ -146,7 +171,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                     <label for="new-name" class="col-3 col-form-label">New name</label>
                     <div class="col-9">
                         <input type="text" class="form-control" id="new-name"
-                               placeholder="<%= doc.title %>" required>
+                               placeholder="<%= doc.title %>" required minlength="1" maxlength="100">
                     </div>
                 </div>
             </div>
@@ -157,20 +182,42 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         </form>
     </div>
 </div>
+<!-- Insert link modal -->
+<div class="modal fade" id="insertLinkModal" tabindex="-1" aria-labelledby="inserLinkLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="post" action="/" id="insert-link-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renameLabel">Insert link</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <label for="link-href" class="col-3 col-form-label">URL</label>
+                    <div class="col-9">
+                        <input type="url" class="form-control" id="link-href"
+                               placeholder="https://example.com" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary" id="action-insert-link" value="Insert">
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <script>
     // Get document state and ID as a global varaiable
     const documentID = '<%- doc._id %>'
-    let documentState;
-    try {
-        documentState = JSON.parse('<%- doc.content %>');
-    } catch {
-        documentState = {};
-    }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="module" src="/js/build-editor.js"></script>
 <script>
     let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

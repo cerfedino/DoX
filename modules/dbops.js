@@ -10,7 +10,6 @@ const events = new EventEmitter()
  */
 
 
-
 // ######################
 
 // GETTERS
@@ -38,7 +37,6 @@ function run_find(collection, filter) {
 function user_find(filter={}, projection) {
     return model.users.findOne(filter,projection?{projection}:undefined);
 }
-
 
 
 /**
@@ -69,8 +67,9 @@ function doc_find(filter={}, projection) {
  * @returns {Promise<{}>} If the username is not taken yet, resolves with the new user data,
  *  If the username is already taken, the Promise rejects.
  */
-function user_create(username,email,password,token='', returnnew=true) {
+function user_create(username, email, password, token = '', returnnew = true) {
     // Pwd hashing
+
     return new Promise(async (resolve, reject)=> {
         if(await user_exists({username:username})) {
             reject("Username already taken")
@@ -78,11 +77,11 @@ function user_create(username,email,password,token='', returnnew=true) {
         }
 
         const new_user = {
-            username : username,
-            email : email,
-            password : await auth.encrypt_pwd(password),
+            username: username,
+            email: email,
+            password: await auth.encrypt_pwd(password),
             token: token,
-            email_verification_status : false
+            email_verification_status: false
         }
         model.users.insertOne(new_user).then(() => {
             console.log("[+] Inserted user:",new_user)
@@ -100,10 +99,10 @@ function user_create(username,email,password,token='', returnnew=true) {
  * @param {boolean=true} returnnew whether to return the new database element.
  * @returns {Promise<object>} the data of the new document.
  */
-function doc_create(owner_id, title="Untitled", returnnew=true) {
+function doc_create(owner_id, title = "Untitled", returnnew = true) {
     // Pwd hashing
-    return new Promise(async (resolve, reject)=>{
-        if(!(await user_exists({_id:owner_id}))) {
+    return new Promise(async (resolve, reject) => {
+        if (!(await user_exists({_id: owner_id}))) {
             reject("User not found")
             return
         }
@@ -112,10 +111,16 @@ function doc_create(owner_id, title="Untitled", returnnew=true) {
         const date = new Date()
 
         const new_doc = {
-
             title : title,
 
-            content : {},
+            content: {
+                "type": "doc",
+                "content": [
+                    {
+                        "type": "paragraph"
+                    }
+                ]
+            },
 
             perm_read : [owner_id],
             perm_edit : [owner_id],
@@ -179,11 +184,11 @@ function doc_delete(doc_id) {
  * @param filter the filter of the user to look for.
  * @returns {Promise<boolean>} whether at least a user exists for the specified filter.
  */
-function user_exists(filter={}) {
-    return new Promise((resolve, reject)=> {
-        model.users.countDocuments(filter,(err,count)=>{
+function user_exists(filter = {}) {
+    return new Promise((resolve, reject) => {
+        model.users.countDocuments(filter, (err, count) => {
             if (err) reject(err)
-            resolve(count>0)
+            resolve(count > 0)
         })
     })
 }
@@ -194,11 +199,11 @@ function user_exists(filter={}) {
  * @param filter the filter of the document to look for.
  * @returns {Promise<boolean>} whether at least a document exists for the specified filter.
  */
-function doc_exists(filter={}) {
-    return new Promise( (resolve, reject)=>{
-        model.docs.countDocuments(filter,(err,count)=>{
+function doc_exists(filter = {}) {
+    return new Promise((resolve, reject) => {
+        model.docs.countDocuments(filter, (err, count) => {
             if (err) reject(err)
-            resolve(count>0)
+            resolve(count > 0)
         })
     })
 }
@@ -212,11 +217,11 @@ function doc_exists(filter={}) {
  *      function isValidDocument()
  * @returns {ObjectId[]} an array containing al the valid ObjectIds.
  */
-function getValidObjectIds(hex_arr=[], filtering_promise) {
-    return new Promise(async (resolve,reject)=>{
+function getValidObjectIds(hex_arr = [], filtering_promise) {
+    return new Promise(async (resolve, reject) => {
         var ret = []
 
-        for(idx in hex_arr) {
+        for (idx in hex_arr) {
             if (await (filtering_promise(hex_arr[idx]))) {
                 ret.push(ObjectId(hex_arr[idx]))
             }
@@ -237,6 +242,7 @@ function isValidUser(user_id) {
         resolve(ObjectId.isValid(user_id) && await user_exists({_id : ObjectId(user_id)}))
     })
 }
+
 /**
  * Takes a HEX string and checks whether its a valid DOCUMENT ID.
  * @param {String} doc_id the HEX string to validate.
@@ -249,10 +255,6 @@ function isValidDocument(doc_id) {
 }
 
 
-
-
-
-
 //
 
 // Get documents available to user
@@ -263,10 +265,10 @@ function isValidDocument(doc_id) {
  */
 function docs_available(user_id) {
     const filter = {
-        $or:[
-            {perm_read : {$elemMatch : {$eq : user_id}}},
-            {perm_edit : {$elemMatch : {$eq : user_id}}},
-            {owner : {$eq : user_id}}
+        $or: [
+            {perm_read: {$elemMatch: {$eq: user_id}}},
+            {perm_edit: {$elemMatch: {$eq: user_id}}},
+            {owner: {$eq: user_id}}
         ]
     }
     return run_find(model.docs, filter)
@@ -279,12 +281,13 @@ function docs_available(user_id) {
  * @param {boolean=true} returnnew whether to return the updated user data.
  * @returns {Promise<object>} a promise resolving with the updated user data.
  */
-function user_set(user_id, tags, returnnew=true) {
+function user_set(user_id, tags, returnnew = true) {
     return new Promise(async (resolve, reject) => {
-        if (!(await user_exists({_id:user_id}))) {
+        if (!(await user_exists({_id: user_id}))) {
             reject("Document does not exist")
             return
         }
+      
         await model.users.findOneAndUpdate({_id:user_id}, {"$set" : tags})
         send_event("notify-update","change",{type:"user",_id:user_id.toHexString()},tags)
         resolve(returnnew ? await user_find({_id:user_id}) : undefined)
@@ -298,12 +301,13 @@ function user_set(user_id, tags, returnnew=true) {
  * @param {boolean=true} returnnew whether to return the updated document data.
  * @returns {Promise<object>} a promise resolving with the updated document data.
  */
-function doc_set(doc_id, tags, returnnew=true) {
-    return new Promise(async (resolve, reject)=>{
-        if (!(await doc_exists({_id:doc_id}))) {
+function doc_set(doc_id, tags, returnnew = true) {
+    return new Promise(async (resolve, reject) => {
+        if (!(await doc_exists({_id: doc_id}))) {
             reject("Document does not exist")
             return
         }
+
         await model.docs.findOneAndUpdate({_id:doc_id}, {"$set" : tags})
         send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},tags)
         resolve(returnnew? await doc_find({_id:doc_id}) : undefined)
@@ -317,8 +321,8 @@ function doc_set(doc_id, tags, returnnew=true) {
  * @param {boolean=true} returnnew whether to return the updated document data.
  * @returns {Promise<object>} a promise resolving with the updated document data.
  */
-function doc_set_content(doc_id, content={}, returnnew=true) {
-    return doc_set(doc_id,{"content" : content}, returnnew)
+function doc_set_content(doc_id, content = {}, returnnew = true) {
+    return doc_set(doc_id, {"content": content}, returnnew)
 }
 
 /**
@@ -333,9 +337,9 @@ function doc_set_content(doc_id, content={}, returnnew=true) {
  * @param {boolean=true} returnnew whether to return the updated document data.
  * @returns {Promise<object>} a promise resolving with the updated document data or with undefined.
  */
-function doc_add_permissions(doc_id, perms={perm_read_add:[], perm_edit_add:[]}, returnnew=true) {
-    return new Promise(async (resolve, reject)=>{
-        if (!(await doc_exists({_id : doc_id})))
+function doc_add_permissions(doc_id, perms = {perm_read_add: [], perm_edit_add: []}, returnnew = true) {
+    return new Promise(async (resolve, reject) => {
+        if (!(await doc_exists({_id: doc_id})))
             reject("Document does not exist")
 
         model.docs.findOneAndUpdate (
@@ -347,6 +351,7 @@ function doc_add_permissions(doc_id, perms={perm_read_add:[], perm_edit_add:[]},
         resolve(returnnew ? await doc_find({_id:doc_id}) : undefined)
     })
 }
+
 /**
  * Removes read/edit permissions to an array of users.
  * @param {ObjectId} doc_id the specific document to be updated.
@@ -359,12 +364,12 @@ function doc_add_permissions(doc_id, perms={perm_read_add:[], perm_edit_add:[]},
  * @param {boolean=true} returnnew whether to return the updated document data.
  * @returns {Promise<object>} a promise resolving with the updated document data or with undefined.
  */
-function doc_remove_permissions(doc_id, perms={perm_read_remove:[], perm_edit_remove:[]}, returnnew=true) {
-    return new Promise(async (resolve, reject)=>{
-        if (!(await doc_exists({_id : doc_id})))
+function doc_remove_permissions(doc_id, perms = {perm_read_remove: [], perm_edit_remove: []}, returnnew = true) {
+    return new Promise(async (resolve, reject) => {
+        if (!(await doc_exists({_id: doc_id})))
             reject("Document does not exist")
 
-        console.log(await model.docs.findOne({_id : doc_id}))
+      console.log(await model.docs.findOne({_id : doc_id}))
         model.docs.findOneAndUpdate (
             {_id : doc_id},
             {  "$pullAll": { perm_edit: perms.perm_edit_remove || [],
@@ -387,16 +392,20 @@ function doc_remove_permissions(doc_id, perms={perm_read_remove:[], perm_edit_re
  */
 function user_get_perms(user_id, doc_id) {
     return new Promise(async (resolve, reject) => {
-        const doc = await doc_find({_id:doc_id});
+        const doc = await doc_find({_id: doc_id});
 
         var ret = []
-        if(doc.perm_read.some((usr)=>{return usr.toHexString() == user_id.toHexString()})) {
+        if (doc.perm_read.some((usr) => {
+            return usr.toHexString() == user_id.toHexString()
+        })) {
             ret.push("read")
         }
-        if(doc.perm_edit.some((usr)=>{return usr.toHexString() == user_id.toHexString()})) {
+        if (doc.perm_edit.some((usr) => {
+            return usr.toHexString() == user_id.toHexString()
+        })) {
             ret.push("edit")
         }
-        if(doc.owner.toHexString() == user_id.toHexString())
+        if (doc.owner.toHexString() == user_id.toHexString())
             ret.push("owner")
 
         resolve(ret)
