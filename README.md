@@ -13,6 +13,7 @@ Table of Contents
     - [**Express.js**](#expressjs)
     - [**Passport.js**](#passportjs)
     - [**Bcrypt**](#bcrypt)
+    - [**Bootstrap**](#bootstrap)
 - [The DoX team 👨‍💻](#the-dox-team-)
 - [Guide to compiling :rocket:](#guide-to-compiling-rocket)
     - [1. Install dependencies](#1-install-dependencies)
@@ -67,6 +68,9 @@ Authenticates users and makes the Express routes behave based on evaluating the 
 ### [**Bcrypt**](https://www.npmjs.com/package/bcrypt)
 Hashing of user passwords.
 
+### [**Bootstrap**]()
+<img style="width: 20%" alt="Bootstrap logo" src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" />
+Front-end toolkit
 
 # The DoX team 👨‍💻
 
