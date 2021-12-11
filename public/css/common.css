@@ -125,13 +125,13 @@ p,input,textarea,select, label,span,h1,h2,h3,h4,h5,h6 {
 
 
 #dark-mode-toggle {
-    position: absolute;
+    position: fixed;
     bottom: 1vh;
     right: 1vh;
 }
 
 #alerts {
-    position : absolute;
+    position : fixed;
 
     width: 20%;
 
