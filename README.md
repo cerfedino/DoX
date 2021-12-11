@@ -68,7 +68,7 @@ Authenticates users and makes the Express routes behave based on evaluating the 
 ### [**Bcrypt**](https://www.npmjs.com/package/bcrypt)
 Hashing of user passwords.
 
-### [**Bootstrap**]()
+### [**Bootstrap**](https://getbootstrap.com/)
 <img style="width: 20%" alt="Bootstrap logo" src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" />
 Front-end toolkit
 
