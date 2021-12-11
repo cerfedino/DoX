@@ -67,7 +67,7 @@ body {
 header {
     position: -webkit-sticky;
     position: sticky;
-    z-index: 9999999;
+    z-index: 1;
     top: 0px;
     width: 100%;
     display: flex;
@@ -86,14 +86,30 @@ header #logo {
     min-width: 200px;
     max-width: 200px;
 }
-
+@media only screen and (max-width: 800px) {
+    header #logo {
+        background-image: url('../media/svg/notebook_icon_LIGHT.svg');
+    }
+}
 
 header div#extra {
     display: flex;
     justify-content: space-between;
     /* align-items: center; */
-    min-width: 60vw;
+    width: 60vw;
     margin-left:-140px;
+}
+
+header div#extra h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* number of lines to show */
+            line-clamp: 1; 
+    -webkit-box-orient: vertical;
+    line-height: 50px;
+    min-height: 50px;
+    font-size: 40px;
 }
 
 header #profile_pic {
@@ -270,11 +286,11 @@ input[type=file]:active::before {
 }
 
 /* Added */
-a {
+/* a {
     color: var(--text);
     text-decoration: none;
 }
 
 a:hover {
     opacity: 70%;
-}
+} */
