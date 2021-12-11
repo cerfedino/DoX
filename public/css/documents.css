@@ -110,7 +110,6 @@ svg#logo {
 }
 
 .switch-list-grid {
-    /* border: 2px solid var(--bg-contrast); */
     border-radius: 10px;
     min-width: 80px;
     display: flex;
@@ -155,13 +154,18 @@ svg#logo {
 
 .tools-bar .btn-secondary.dropdown-toggle {
     color: var(--text);
-    background-color: var(--bg-tool-bar);
+    background-color: var(--bg);
     border: 0;
 }
 
 .tools-bar .btn-secondary.dropdown-toggle:hover {
     background-color: var(--bg);
 }
+
+.filter .dropdown-menu {
+    background-color: var(--bg);
+}
+
 #filters {
     padding: 10px;
 }
@@ -204,14 +208,15 @@ input[name="filter-submit"]:hover {
     margin-right: 2px;
     border: 0;
     background-color: var(--bg-contrast);
-    /* max-width: 50px; */
     text-align: left;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
 }
 
-
+#reverse-sort {
+    background-color: var(--bg);
+}
 
 
 
@@ -260,10 +265,9 @@ input[name="filter-submit"]:hover {
 }
 
 
-.cards .card-element > .actual-creation-date, .actual-edit-date, p.owner, span[class='info creation-date'] {
+.cards .card-element > .actual-creation-date, .actual-edit-date, button.active-sort, p.owner, span[class='info creation-date'] {
     display: none;
 }
-
 
 .cards .card-element  span.title {
     overflow: hidden;
