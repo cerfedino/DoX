@@ -129,12 +129,6 @@ app.use(function (err, req, res, next) {
 app.set('port', webserver.port)
 
 const server = require('http').createServer(app);
-const io = new Server(server);
-let memoryDocs = {}
-
-io.use((socket, next) => {
-    sessionMiddleware(socket.request, {}, next);
-})
 
 io.on('connection', async (socket) => {
     try {
