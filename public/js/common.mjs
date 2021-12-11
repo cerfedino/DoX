@@ -57,24 +57,47 @@ document.querySelector("#dark-mode-toggle")?.addEventListener('change',
 
 
 
+// Edit user modal form
+
 let form = document.querySelector(".modal-body form")
   
-// Submission of the User update form
-// form.addEventListener("submit",function(e){
-//     e.preventDefault()
-
-//     // Check for invalid fields
-//     // const mistakes = validateForm(this)
-//     // if(mistakes) {
-//     //     // showAlert(document.querySelector("#alerts"),"warning",mistakes,false)
-//     //     return
-//     // }
-//     // //
+form.addEventListener("submit",function(e){
     
 
-//     // console.log(this.method, this.action)
-//     console.log(document.querySelector(".modal-body form #username").value);
-//     let body = new FormData(form);
-//     console.log('body', body);
-//     fetch('/user',{ method : "PUT", body})
-// })
+    const mistakes = validateForm(this);
+    if(mistakes) {
+        return
+    }
+
+    fetch(this.action, {
+        method: this.method,
+        headers: {
+            "Content-Type" : "application/json",
+        },
+        body: JSON.stringify({
+            username: form.querySelector("input[name='username']").value, 
+            password: form.querySelector("input[name='password']").value
+        })
+    })
+})
+
+function validateForm(form) {
+    var mistakes = false
+
+    const username = form.querySelector("#username").value.trim()
+    console.log("USERNAME :" + username)
+    const pwd = form.querySelector("#password").value
+    const confirm_pwd = form.querySelector("#cpassword").value
+
+    if(pwd !== confirm_pwd) {
+        showAlert(document.querySelector("#alerts"),"warning","Passwords are not matching",true)
+        mistakes = true;
+    }
+    if (username === "") {
+        showAlert(document.querySelector("#alerts"),"warning","Username cannot be empty",true)
+        mistakes = true;
+    }
+    
+    return mistakes;
+}
+

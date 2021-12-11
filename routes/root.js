@@ -389,9 +389,10 @@ router.put('/user', async (req,res)=> {
 
         console.log("[+] Updated user")
         req.flash("messageSuccess","User has been updated")
-        res.redirect('/docs')
+        res.redirect("/docs");
 
     })
+    
     
 })
 
