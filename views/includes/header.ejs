@@ -54,6 +54,7 @@
                 <div id="info">
                     <h2><%= user.username %></h2>
                     <p><%= user.email %></p>
+
                 </div>
                 <form style="display:none" method="post" action="/user?_method=PUT" encType="multipart/form-data">
                     <div>
@@ -75,6 +76,10 @@
                 
             </div>
             <div class="modal-footer">
+                <div class="dark-mode">
+                    <input id="dark-mode-toggle" type="checkbox" name="dark-mode">
+                    <label for="dark-mode">Dark mode</label>
+                </div>
                 <div id="button">
                     <button class="btn btn-sm btn-warning" onclick="show_edit_user_form()">Edit</button>
                 </div>
@@ -82,6 +87,7 @@
                 <form action="/auth/logout?_method=DELETE" method="post" class="logout">
                     <input type="submit" class="btn btn-sm btn-danger" value="Log out"></input> 
                 </form>
+                
             </div>
         </div>
     </div>

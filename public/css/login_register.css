@@ -30,6 +30,16 @@ main.login-form {
     margin: auto;
 }
 
+.login-form input {
+    color: var(--text);
+}
+
+.login-form input:active, .login-form input:focus {
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+
 /* Both login and register forms */
 .login-form input#username {
     margin-bottom: -1px;
@@ -39,20 +49,25 @@ main.login-form {
 
 /* Both login and register forms */
 .login-form input#password, .login-form input#confirmPassword {
-    margin-bottom: 15px;
+    margin-bottom: -1px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
 
 /* Only register form */
-.login-form input#newPassword {
+.login-form input#newPassword, .login-form input#email {
     margin-bottom: -1px;
     border-radius: 0;
 }
 
 /* Both login and register forms */
 .login-form input[type="submit"] {
+    margin-top: 15px;
     margin-bottom: 10px;
+}
+
+.btn-lg {
+    border: none;
 }
 
 
@@ -61,4 +76,10 @@ div#logo {
     background-repeat: no-repeat;
     background-position: center;
     height: 100px;
+}
+
+.dark-mode {
+    position: fixed;
+    bottom: 1vh;
+    margin-left: 20px;
 }

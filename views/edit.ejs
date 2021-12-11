@@ -1,3 +1,17 @@
+<!-- trying to fix white flashes when opening a page using dark mode-->
+<script>
+    if (localStorage.getItem("dark_mode") == 'true') {
+        document.body.classList.add("dark-theme")
+        document.querySelector("#dark-mode-toggle").checked = true
+    } else {
+        document.body.classList.remove('dark-theme')
+        document.querySelector("#dark-mode-toggle").checked = false
+    }
+</script>
+
+
+
+
 <%
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';

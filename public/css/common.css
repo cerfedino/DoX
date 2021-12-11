@@ -32,6 +32,7 @@ body,body * {
     --bg-contrastt: #383838;
     --text: #333333;
     --contrast-text: #000000;
+    --shadow: #c9c9c9;
     
     --logo-minimal: url('../media/svg/logo_minimal.svg');
     --logo-composed: url('../media/svg/logo_composed.svg');
@@ -49,6 +50,7 @@ body.dark-theme, body.dark-theme * {
     --bg-contrastt: #cbcbcb;
     --text: #cccccc;
     --contrast-text: #ffffff;
+    --shadow: #000000;
     
     --logo-minimal: url('../media/svg/logo_minimal_LIGHT.svg');
     --logo-composed: url('../media/svg/logo_composed_LIGHT.svg');
@@ -116,6 +118,7 @@ header #profile_pic {
     width: 60px;
     height: 60px;
     border-radius: 50%;
+    cursor: pointer;
 }
 
 .modal #profile_pic {
@@ -139,13 +142,6 @@ p,input,textarea,select, label,span,h1,h2,h3,h4,h5,h6 {
     background: var(--bg-contrastt);
 }
 
-
-#dark-mode-toggle {
-    position: fixed;
-    bottom: 1vh;
-    right: 1vh;
-}
-
 #alerts {
     position : fixed;
 
@@ -165,10 +161,12 @@ button.close {
     /* border: none; */
     border: 2px solid gray;
     border-radius: 3px;
+    margin-left: auto;
 }
 
 button.close span {
     color: black;
+    margin-left: auto;
 }
 
 
@@ -189,21 +187,23 @@ button.close span {
     width: 100%; 
     height: 100%; 
     overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.2);
+    /* background-color: rgb(0,0,0); */
+    background-color: rgba(0,0,0,0.4);
 }
 
 .modal-user .modal-content {
     text-align: center;
     position: relative;
-    background-color: #fefefe;
+    background-color: var(--bg);
     margin-right: 20px;
     margin-left: auto;
     padding: 10px;
     border: none;
     border-radius: 20px;
     width: 20%;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    /* box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19); */
+    box-shadow: -6px 6px 16px 10px rgba(0,0,0,0.2);
+    
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
@@ -211,16 +211,17 @@ button.close span {
 }
 
 .modal-user .modal-content .modal-body {
-    border-top: 1px solid gray;
-    border-bottom: 1px solid gray;
+    border-top: 1px solid var(--bg-contrast);
+    border-bottom: 1px solid var(--bg-contrast);
 }
 
 .modal-user .modal-header {
     justify-content: center;
 }
 
-
-
+.dark-mode {
+    margin-right: auto;
+}
 
 /* Add Animation */
 @-webkit-keyframes animatetop {

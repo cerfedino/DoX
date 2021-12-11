@@ -1,3 +1,16 @@
+<!-- trying to fix white flashes when opening a page using dark mode-->
+<script>
+    if (localStorage.getItem("dark_mode") == 'true') {
+        document.body.classList.add("dark-theme")
+        document.querySelector("#dark-mode-toggle").checked = true
+    } else {
+        document.body.classList.remove('dark-theme')
+        document.querySelector("#dark-mode-toggle").checked = false
+    }
+</script>
+
+
+
 <%
 if(!docs) {
     var docs = []
@@ -207,8 +220,6 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         -->
 
     </main>
-
-<input id="dark-mode-toggle" type="checkbox">
 
 <div id="alerts">
     

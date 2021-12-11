@@ -35,10 +35,9 @@ input#search {
     border-radius: 10px;
     padding: 5px 15px;
     height: 60px;
-    min-width: 50vw;
     background-color: var(--bg);
     color: var(--text);
-
+    width: 100%
 }
 
 
@@ -93,7 +92,7 @@ svg#logo {
     padding: 10px;
     /* border-radius: 0  0 20px 20px; */
     background-color: var(--bg);
-    box-shadow: 0px 6px 8px 0px var(--bg-contrast);
+    box-shadow: 0px 6px 8px 0px var(--shadow);
     margin-bottom: 20px;
 
     display: flex;
@@ -260,8 +259,7 @@ a {
 
     grid-template-columns: 1fr 3fr 1fr;
     grid-template-rows: 2fr 2fr 0.5fr auto;
-    box-shadow: -3px 3px 8px 2px var(--bg-contrast);
-    transition: box-shadow 0.4s;
+    box-shadow: -3px 3px 8px 2px var(--shadow);
 
     grid-template-areas:
         "icon icon icon"
@@ -271,7 +269,7 @@ a {
 }
 
 .cards .card-element:hover {
-    box-shadow: -6px 6px 16px 10px var(--bg-contrast);
+    box-shadow: -6px 6px 16px 10px var(--shadow);
     transition: box-shadow 0.4s;
 }
 
@@ -389,13 +387,13 @@ a {
     grid-template-columns: 50px  3fr  1fr  0.5fr    1fr      1fr   0.1fr;
     grid-template-areas: "icon title owner perms last-edit created delete";
     
-    box-shadow: -3px 3px 8px 2px var(--bg-contrast);
+    box-shadow: -3px 3px 8px 2px var(--shadow);
     transition: box-shadow 0.4s;
     align-items: center;
 }
 
 .list .card-element:hover {
-    box-shadow: -6px 6px 16px 10px var(--bg-contrast);
+    box-shadow: -6px 6px 16px 10px var(--shadow);
     transition: box-shadow 0.4s;
 }
 
