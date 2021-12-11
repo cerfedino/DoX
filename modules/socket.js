@@ -73,18 +73,35 @@ module.exports.init = function (server) {
 
         //////////
 
-        // socket.on("doc-join-request",async function (msg) {
-        //     console.log(msg)
-        //     if (await dbops.isValidUser(userId) && await dbops.isValidDocument(msg.doc_id)) {
-        //         const perms = await dbops.user_get_perms(ObjectId(userId),ObjectId(msg.doc_id))
-        //         if(perms.includes("edit") || perms.includes("owner")) {
-        //             console.log("USER IS ALLOWED")
-        //             socket.join(`${msg.doc_id}-PRIVATE`)
-        //         }
-        //         if(perms.length > 0)
-        //             socket.join(`${msg.doc_id}`)
-        //     }
-        // })
+        socket.on("doc-join-request",async function (msg) {
+            console.log(msg)
+            if (await dbops.isValidUser(userId) && await dbops.isValidDocument(msg._id)) {
+                const perms = await dbops.user_get_perms(ObjectId(userId),ObjectId(msg._id))
+                if(perms.length == 0) {
+                    return
+                }
+
+                // Remove the sockets from all previous document rooms
+                socket.rooms.forEach((room)=>{
+                    if(room.match(/^document:/)) {
+                        socket.leave(room)
+                    }
+                })
+                //
+
+                // Makes the socket monitor just the state of the document in the editor.
+                socket.join("document:"+msg._id)
+                if(perms.includes("edit") || perms.includes("owner")) {
+                    // If the user has edit access, it gets added to the reserved room for users with write access
+                    socket.join(`document:${msg._id}/editor/write`)
+                }
+                // The socket also gets added to the regular editor room, where everyone that is currently in the editor joins.
+                socket.join(`document:${msg._id}/editor`)
+
+
+                console.log(socket.rooms)
+            }
+        })
     });
 
     //// Relays the database change to every related socket.

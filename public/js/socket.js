@@ -7,10 +7,9 @@ function init_socket(doc_id) {
     server.on("connect",() => {
         console.log("[+] Connected to server")
 
-        // If the socket has to join a document editor room. To be used only when opening the editor for a document.
+        // If the socket has to join a document editor room.
         if(doc_id) {
-            console.log(doc_id)
-            // server.emit("doc-join-request",{doc_id:doc_id})
+            server.emit("doc-join-request",{_id:doc_id})
         } else {
             server.on("notify-update",(msg) => {
                 // If a new document concerning this user has been added
