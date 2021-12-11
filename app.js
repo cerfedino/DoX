@@ -53,15 +53,13 @@ app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
 
-const sessionMiddleware = session({
-    name: 'dox.auth',
+// INIT session
+app.sessionMid = session({
     secret: "secret",
     resave: false,
     saveUninitialized: true,
-});
-
-// INIT session
-app.use(sessionMiddleware);
+})
+app.use(app.sessionMid);
 
 // INIT passport on every route call.
 app.use(passport.initialize());

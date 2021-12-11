@@ -25,7 +25,7 @@
     "flash": "^1.1.0",
     "fs-extra": "^10.0.0",
     "greenlock-express": "^4.0.3",
-    "https": "^1.0.0",
+    "http": "^0.0.1-security",
     "method-override": "^3.0.0",
     "mkcert": "^1.4.0",
     "mongodb": "^4.2.0",

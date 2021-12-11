@@ -2,6 +2,9 @@ const {model} = require('../models')
 const auth = require("./auth.js")
 const {ObjectId} = require("mongodb");
 
+const EventEmitter = require('events')
+const events = new EventEmitter()
+
 /**
  * Contains all database operations.
  */
@@ -28,20 +31,22 @@ function run_find(collection, filter) {
 /**
  * Returns a certain user in the database.
  * @param {object} filter the filter of the user to look for.
+ * @param {object} projection specifies the fields to return. Do not specify to return the whole object.
  * @returns {Promise<[]>} A Promise that resolves with the fetched user. Resolves undefined if the user cant be found
  */
-function user_find(filter = {}) {
-    return model.users.findOne(filter);
+function user_find(filter={}, projection) {
+    return model.users.findOne(filter,projection?{projection}:undefined);
 }
 
 
 /**
  * Returns a certain document in the database.
  * @param {object} filter the filter of the user to look for.
+ * @param {object} projection specifies the fields to return. Do not specify to return the whole object.
  * @returns {Promise<[]>} A Promise that resolves with the fetched document. Resolves undefined if the document cant be found
  */
-function doc_find(filter = {}) {
-    return model.docs.findOne(filter)
+function doc_find(filter={}, projection) {
+    return model.docs.findOne(filter,projection?{projection}:undefined)
 }
 
 
@@ -64,8 +69,9 @@ function doc_find(filter = {}) {
  */
 function user_create(username, email, password, token = '', returnnew = true) {
     // Pwd hashing
-    return new Promise(async (resolve, reject) => {
-        if (await user_exists({username: username})) {
+
+    return new Promise(async (resolve, reject)=> {
+        if(await user_exists({username:username})) {
             reject("Username already taken")
             return
         }
@@ -78,9 +84,9 @@ function user_create(username, email, password, token = '', returnnew = true) {
             email_verification_status: false
         }
         model.users.insertOne(new_user).then(() => {
-            console.log("[+] Inserted user:", new_user)
-
-            resolve(returnnew ? new_user : undefined)
+            console.log("[+] Inserted user:",new_user)
+            send_event("notify-update","add",{type:"user",_id:new_user._id.toHexString()})
+            resolve(returnnew? new_user : undefined)
         });
 
     })
@@ -105,8 +111,7 @@ function doc_create(owner_id, title = "Untitled", returnnew = true) {
         const date = new Date()
 
         const new_doc = {
-
-            title: title,
+            title : title,
 
             content: {
                 "type": "doc",
@@ -117,22 +122,23 @@ function doc_create(owner_id, title = "Untitled", returnnew = true) {
                 ]
             },
 
-            perm_read: [owner_id],
-            perm_edit: [owner_id],
+            perm_read : [owner_id],
+            perm_edit : [owner_id],
 
-            owner: owner_id,
+            owner : owner_id,
 
-            read_link: undefined,
-            edit_link: undefined,
+            read_link : undefined,
+            edit_link : undefined,
 
-            edit_date: date,
-            created_date: date,
+            edit_date : date,
+            created_date : date,
         }
 
-        model.docs.insertOne(new_doc).then((res) => {
-            console.log("[+] Inserted doc:", new_doc)
+        model.docs.insertOne(new_doc).then( (res) => {
+            console.log("[+] Inserted doc:",new_doc)
 
-            resolve(returnnew ? new_doc : undefined)
+            send_event("notify-update","add",{type:"document",_id:new_doc._id.toHexString()})
+            resolve(returnnew? new_doc: undefined)
         });
 
     })
@@ -144,7 +150,14 @@ function doc_create(owner_id, title = "Untitled", returnnew = true) {
  * @returns { Promise<DeleteResult>} resolves when the action has been performed.
  */
 function user_delete(user_id) {
-    return model.docs.deleteOne({_id: user_id})
+    return new Promise(async (resolve,reject) => {
+        await model.docs.deleteOne({_id:user_id})
+
+        send_event("notify-update","remove",{type:"user",_id:user_id.toHexString()})
+
+        resolve()
+    })
+    return
 }
 
 /**
@@ -153,7 +166,11 @@ function user_delete(user_id) {
  * @returns { Promise<DeleteResult>} resolves when the action has been performed.
  */
 function doc_delete(doc_id) {
-    return model.docs.deleteOne({_id: doc_id})
+    return new Promise(async (resolve,reject)=>{
+        await model.docs.deleteOne({_id:doc_id})
+        send_event("notify-update","remove",{type:"document",_id:doc_id.toHexString()})
+        resolve()
+    })
 }
 
 // ######################
@@ -222,7 +239,7 @@ function getValidObjectIds(hex_arr = [], filtering_promise) {
  */
 function isValidUser(user_id) {
     return new Promise(async (resolve, reject) => {
-        resolve(ObjectId.isValid(user_id) && await user_exists({_id: ObjectId(user_id)}))
+        resolve(ObjectId.isValid(user_id) && await user_exists({_id : ObjectId(user_id)}))
     })
 }
 
@@ -233,7 +250,7 @@ function isValidUser(user_id) {
  */
 function isValidDocument(doc_id) {
     return new Promise(async (resolve, reject) => {
-        resolve(ObjectId.isValid(doc_id) && await doc_exists({_id: ObjectId(doc_id)}))
+        resolve(ObjectId.isValid(doc_id) && await doc_exists({_id : ObjectId(doc_id)}))
     })
 }
 
@@ -270,8 +287,10 @@ function user_set(user_id, tags, returnnew = true) {
             reject("Document does not exist")
             return
         }
-        await model.users.findOneAndUpdate({_id: user_id}, {"$set": tags})
-        resolve(returnnew ? await user_find({_id: user_id}) : undefined)
+      
+        await model.users.findOneAndUpdate({_id:user_id}, {"$set" : tags})
+        send_event("notify-update","change",{type:"user",_id:user_id.toHexString()},tags)
+        resolve(returnnew ? await user_find({_id:user_id}) : undefined)
     })
 }
 
@@ -288,8 +307,10 @@ function doc_set(doc_id, tags, returnnew = true) {
             reject("Document does not exist")
             return
         }
-        await model.docs.findOneAndUpdate({_id: doc_id}, {"$set": tags})
-        resolve(returnnew ? await doc_find({_id: doc_id}) : undefined)
+
+        await model.docs.findOneAndUpdate({_id:doc_id}, {"$set" : tags})
+        send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},tags)
+        resolve(returnnew? await doc_find({_id:doc_id}) : undefined)
     })
 }
 
@@ -321,15 +342,13 @@ function doc_add_permissions(doc_id, perms = {perm_read_add: [], perm_edit_add: 
         if (!(await doc_exists({_id: doc_id})))
             reject("Document does not exist")
 
-        model.docs.findOneAndUpdate(
-            {_id: doc_id},
-            {
-                $addToSet: {
-                    perm_edit: {$each: perms.perm_edit_add || []},
-                    perm_read: {$each: perms.perm_read_add || []}
-                }
-            })
-        resolve(returnnew ? await doc_find({_id: doc_id}) : undefined)
+        model.docs.findOneAndUpdate (
+            {_id :doc_id},
+            { $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
+                    perm_read: { $each: perms.perm_read_add || []} }})
+
+        send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
+        resolve(returnnew ? await doc_find({_id:doc_id}) : undefined)
     })
 }
 
@@ -350,18 +369,14 @@ function doc_remove_permissions(doc_id, perms = {perm_read_remove: [], perm_edit
         if (!(await doc_exists({_id: doc_id})))
             reject("Document does not exist")
 
-        console.log(await model.docs.findOne({_id: doc_id}))
-        model.docs.findOneAndUpdate(
-            {_id: doc_id},
-            {
-                "$pullAll": {
-                    perm_edit: perms.perm_edit_remove || [],
-                    perm_read: perms.perm_read_remove || []
-                }
-            })
+      console.log(await model.docs.findOne({_id : doc_id}))
+        model.docs.findOneAndUpdate (
+            {_id : doc_id},
+            {  "$pullAll": { perm_edit: perms.perm_edit_remove || [],
+                    perm_read: perms.perm_read_remove || [] }})
 
-
-        console.log(await model.docs.findOne({_id: doc_id}))
+        send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
+        console.log(await model.docs.findOne({_id : doc_id}))
 
         resolve(returnnew ? await doc_find({_id: doc_id}) : undefined)
     })
@@ -403,11 +418,46 @@ function user_get_perms(user_id, doc_id) {
  * @returns {Promise<[]>} A Promise that resolves with the updated user. Resolves undefined if the user cant be found
  */
 function user_set_email_verification(user_id) {
-    return user_set(user_id, {email_verification_status: true}, false);
+    return user_set(user_id ,{ email_verification_status : true }, false);
 }
 
+/**
+ * Generates an event and sends it through the server event bus.
+ */
+function send_event(name,type,subject,data={}) {
+    const event = generate_event(name,type,subject,data)
+    if(event)
+        events.emit("db-event", event)
+}
+
+/**
+ * Generates an event.
+ * @param {String} name the name of the event ( e.g 'notify-update' ).
+ * @param {String="add"|"change"|"remove"} type the nature of the operation conducted on the database resource.
+ * @param {Object{type,_id}} subject the database element that is undergoing change.
+ *      subject : {
+ *          {String="user"|"document"} type  : The type of the element, either "user" or "document".
+ *          {String} _id    : The ID of the element.
+ *      }
+ * @param {object={}} data contains the fields of the database element that have changed or additional data in general.
+ */
+function generate_event(name,type,subject,data={}) {
+    if (!name || !type || !subject || !subject.type || !subject._id) {
+        console.log("[X] Invalid event")
+        return
+    }
+    return {
+        "event" : name,
+        "type" : type,
+        "subject" : subject,
+        "data": data
+    }
+}
 
 module.exports = {
+    events,
+    generate_event,
+
     run_find,
     user_find,
     doc_find,
