@@ -86,7 +86,6 @@ svg#logo {
 ##############################*/
 
 .tools-bar {
-    z-index: 1;
     position: -webkit-sticky;
     position: sticky;
     margin-top:-20px;
@@ -126,6 +125,14 @@ svg#logo {
     padding: 10px;
     color: var(--text);
     font-weight: bold;
+
+    letter-spacing: 1px;
+    transition: letter-spacing 0.5s;
+}
+
+.tools-bar a.new-doc:hover {
+    letter-spacing: 3px;
+    transition: all 0.5s;
 }
 
 .list-view, .grid-view {
@@ -141,6 +148,10 @@ svg#logo {
 .grid-view {
     color: var(--accent);
     background-color: var(--bg-contrast);
+}
+
+.grid-view:hover {
+    color: var(--accent);
 }
 
 .active {
@@ -218,9 +229,6 @@ a {
     text-decoration: none;
 }
 
-a:hover {
-    color: rgb(53, 90, 255);
-}
 
 
 /* ############################

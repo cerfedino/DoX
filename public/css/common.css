@@ -67,7 +67,7 @@ body {
 header {
     position: -webkit-sticky;
     position: sticky;
-    z-index: 9999999;
+    z-index: 1;
     top: 0px;
     width: 100%;
     display: flex;
@@ -92,8 +92,17 @@ header div#extra {
     display: flex;
     justify-content: space-between;
     /* align-items: center; */
-    min-width: 60vw;
+    width: 60vw;
     margin-left:-140px;
+}
+
+header div#extra h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* number of lines to show */
+            line-clamp: 1; 
+    -webkit-box-orient: vertical;
 }
 
 header #profile_pic {
