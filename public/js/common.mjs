@@ -34,7 +34,7 @@ function showAlert(container, alert_type="warning", text="", append=true, auto_d
 }
 
 
-if (sessionStorage.getItem("dark_mode") == 'true') {
+if (localStorage.getItem("dark_mode") == 'true') {
     document.body.classList.add("dark-theme")
     document.querySelector("#dark-mode-toggle").checked = true
 } else {
@@ -46,10 +46,10 @@ document.querySelector("#dark-mode-toggle")?.addEventListener('change',
     function() {
         if(this.checked) {
             document.body.classList.add("dark-theme");
-            sessionStorage.setItem("dark_mode", 'true');
+            localStorage.setItem("dark_mode", 'true');
         } else {
             document.body.classList.remove('dark-theme');
-            sessionStorage.setItem("dark_mode", 'false');
+            localStorage.setItem("dark_mode", 'false');
         }
     });
 
