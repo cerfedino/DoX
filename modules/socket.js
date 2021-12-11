@@ -151,10 +151,10 @@ module.exports.init = function (server) {
                             try {
                                 await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
                                 console.info(`SOCKETS Document ${documentID} was successfully saved`);
-                                io.to(`document:${msg._id}/editor`).emit('save-success');
+                                io.to(`document:${msg._id}/editor/write`).emit('save-success');
                             } catch (e) {
                                 console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
-                                io.to(`document:${msg._id}/editor`).emit('save-fail', {error: e})
+                                io.to(`document:${msg._id}/editor/write`).emit('save-fail', {error: e})
                             }
                         }
 
@@ -165,10 +165,63 @@ module.exports.init = function (server) {
                             stepClientIDs: memoryDocs[documentID].stepClientIDs
                         });
                     })
+                    socket.on('save', async () => {
+                        try {
+                            await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
+                            console.info(`SOCKETS Document ${documentID} was successfully saved`);
+                            io.to(`document:${msg._id}/editor/write`).emit('save-success');
+                        } catch (e) {
+                            console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
+                            io.to(`document:${msg._id}/editor/write`).emit('save-fail', {error: e})
+                        }
+                    })
+
+                    socket.on('rename', async (newName) => {
+                        try {
+                            if (typeof newName !== 'string') {
+                                socket.emit('rename-fail', {error: 'Title should be a string'});
+                                return;
+                            }
+                            if (newName.length > 100 || newName.length < 1) {
+                                socket.emit('rename-fail', {error: 'Length of the title must be between 1 and 100'})
+                                return;
+                            }
+
+                            await doc_set(new ObjectId(documentID), {title: newName}, false);
+                            io.to(`document:${msg._id}/editor`).emit('rename-success', {newName});
+                        } catch (e) {
+                            socket.emit('rename-fail', {error: 'Unknown error: ' + e});
+                        }
+                    })
+
+                    socket.on('selection-changed', ({from, to}) => {
+                        memoryDocs[documentID].connected[socket.id].selection = {
+                            from,
+                            to
+                        }
+                        io.to(`document:${msg._id}/editor/write`).emit('selection-changed', memoryDocs[documentID].connected);
+                    })
                 }
                 // The socket also gets added to the regular editor room, where everyone that is currently in the editor joins.
                 socket.join(`document:${msg._id}/editor`)
 
+                // Extended disconnect logic for the document editor
+                socket.on('disconnect', async () => {
+                    delete memoryDocs[documentID].connected[socket.id]
+                    io.to(`document:${msg._id}/editor`).emit('client-disconnect', socket.id);
+
+                    // Clean the memory, if no one is connected
+                    if (Object.values(memoryDocs[documentID].connected).length === 0) {
+                        console.info(`SOCKETS Document with ID ${documentID} is not opened by anyone anymore, it will be removed from the memory`);
+                        try {
+                            await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
+                            console.info(`SOCKETS Document ${documentID} was successfully saved`);
+                        } catch (e) {
+                            console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
+                        }
+                        delete memoryDocs[documentID];
+                    }
+                })
 
                 // console.log(socket.rooms)
             }
