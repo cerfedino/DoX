@@ -84,6 +84,12 @@ socket.on('connect', () => {
 })
 socket.on('disconnect', () => {
     console.warn('Socket was disconnected')
+    connectedClients = {};
+    renderConnections();
+    let activity = document.getElementById('active-users-button');
+    activity.classList.remove('btn-primary');
+    activity.classList.add('btn-warning');
+    activity.innerText = 'You\'re offline!';
 })
 socket.on('init', (data) => {
     console.info('Received INIT event. Version: ' + data.version);
