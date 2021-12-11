@@ -89,7 +89,7 @@ module.exports.init = function (server) {
 
     //// Relays the database change to every related socket.
     events.on("db-event", async ev => {
-        console.log(ev)
+        // console.log(ev)
         if(ev.subject.type == "document") {
             if(ev.type == "add") {  // If a new document has been added, manually notifies every involved user.
                 await manually_relay_to_involved_users(ev.subject._id, ev)
@@ -99,7 +99,13 @@ module.exports.init = function (server) {
             }
         } else if(ev.subject.type == "user") {
             // Events regarding user data
-            // TODO: Handle user data change.
+            // TODO: To be tested
+            const userId = ev.subject._id
+            if(await dbops.isValidUser(userId)) {
+                const docs = await dbops.docs_available(ObjectId(userId))
+                docs.reduce((io,doc)=>{return io.to("document"+doc._id.toHexString())},io.to("user:"+userId)).emit(ev.event, ev)
+            }
+
         }
     })
 

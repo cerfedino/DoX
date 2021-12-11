@@ -16,7 +16,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 </head>
 <body class="">
 <script src="/socket.io/socket.io.js"></script>
-<script  onload="init_socket()" src="/js/socket.js"></script>
+<script  onload="init_socket('<%- doc._id%>')" src="/js/socket.js"></script>
 
 
 <header>
