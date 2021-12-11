@@ -86,7 +86,11 @@ header #logo {
     min-width: 200px;
     max-width: 200px;
 }
-
+@media only screen and (max-width: 800px) {
+    header #logo {
+        background-image: url('../media/svg/notebook_icon_LIGHT.svg');
+    }
+}
 
 header div#extra {
     display: flex;
@@ -103,6 +107,9 @@ header div#extra h1 {
     -webkit-line-clamp: 1; /* number of lines to show */
             line-clamp: 1; 
     -webkit-box-orient: vertical;
+    line-height: 50px;
+    min-height: 50px;
+    font-size: 40px;
 }
 
 header #profile_pic {
