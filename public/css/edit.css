@@ -74,3 +74,8 @@
     box-shadow: 0 20px 20px 0 var(--bg-contrast);
     margin-bottom: 20px;
 }
+
+.editor-tools #actions {
+    min-width:60%;
+    max-width: 60%;
+}
