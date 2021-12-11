@@ -86,7 +86,7 @@ svg#logo {
 ##############################*/
 
 .tools-bar {
-
+    z-index: 1;
     position: -webkit-sticky;
     position: sticky;
     margin-top:-20px;
@@ -120,23 +120,18 @@ svg#logo {
     background-color: var(--accent);
     width: 160px;
     height: 40px;
-    margin-left: auto;
     border-radius: 10px;
     align-items: center;
     text-align: center;
     padding: 10px;
-    color: black;
-}
-
-.tools-bar .new-doc i {
-    width: 30px;
-    height: 30px;
-
+    color: var(--text);
+    font-weight: bold;
 }
 
 .list-view, .grid-view {
     color: var(--text);
     border-radius: 10px;
+    border:none;
     padding: 10px;
     flex: 1;
     transition: color 0.5s;
@@ -218,7 +213,14 @@ input[name="filter-submit"]:hover {
     background-color: var(--bg);
 }
 
+a {
+    color: var(--text);
+    text-decoration: none;
+}
 
+a:hover {
+    color: rgb(53, 90, 255);
+}
 
 
 /* ############################
@@ -240,6 +242,7 @@ input[name="filter-submit"]:hover {
 }
 
 .cards .card-element {
+
     width: 250px !important;
     max-height: 350px !important;
     margin: 10px;
@@ -337,11 +340,6 @@ input[name="filter-submit"]:hover {
 
 
 .card-element a { 
-    text-decoration: none;
-    color: var(--text);
-}
-
-a:hover {
     text-decoration: none;
     color: var(--text);
 }

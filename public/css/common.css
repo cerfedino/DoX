@@ -270,11 +270,11 @@ input[type=file]:active::before {
 }
 
 /* Added */
-a {
+/* a {
     color: var(--text);
     text-decoration: none;
 }
 
 a:hover {
     opacity: 70%;
-}
+} */
