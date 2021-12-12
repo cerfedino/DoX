@@ -8,6 +8,22 @@ let base = {
     marks: basicSchema.schema.spec.marks
 }
 
+base.marks = base.marks.addToEnd('color', {
+    attrs: {
+        color: {default: '#000'}
+    },
+    toDOM(node) {
+        return ['span', {class: 'color', style: 'color: ' + node.attrs.color}]
+    },
+    parseDOM: [{
+        tag: 'span.color',
+        getAttrs(dom) {
+            return {
+                color: dom.style.split(': ')[1], // 'style="color: #fff", will return #fff
+            }
+        }
+    }]
+});
 base.marks = base.marks.addToEnd('underline', {
     toDOM() {
         return ['u', 0]
