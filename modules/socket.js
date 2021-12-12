@@ -186,7 +186,7 @@ module.exports.init = function (server) {
                                 socket.emit('rename-fail', {error: 'Length of the title must be between 1 and 100'})
                                 return;
                             }
-
+                            
                             await doc_set(new ObjectId(documentID), {title: newName}, false);
                             io.to(`document:${msg._id}/editor`).emit('rename-success', {newName});
                         } catch (e) {
