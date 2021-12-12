@@ -156,17 +156,26 @@ p,input,textarea,select, label,span,h1,h2,h3,h4,h5,h6 {
     justify-content: space-between;
 }
 
+.alert {
+    border-radius: 10px;
+    justify-content: space-between;
+    align-items: center;
+    display:flex;
+}
 
-button.close {
-    /* border: none; */
+.alert .close {
+    margin-left: auto !important;
     border: 2px solid gray;
     border-radius: 3px;
     margin-left: auto;
+    position: absolute;
+    right: 1em;
+    border: none;
+    background-color: inherit;
 }
 
 button.close span {
     color: black;
-    margin-left: auto;
 }
 
 
