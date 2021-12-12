@@ -135,8 +135,6 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                         <img src="/media/svg/delete.svg" class="svgimgform"></img>
                     </a>
 
-                    <p id="content">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ducimus, inventore. In, quaerat facere earum repellendus cum maxime tenetur nemo. Nemo assumenda voluptas eveniet ab consectetur excepturi expedita. Ex, nulla iure?</p>
-
                     <% let doc_perms = [] 
                         doc.perm_edit.forEach(u=>{ 
                             if (String(doc.owner) != String(u)) {
@@ -167,7 +165,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                             <a class="dropdown-item">Document not shared</a>
                         <% } %>
 
-                        '><%= doc_perms.length %> <img src="/media/svg/share.svg" alt="Options">
+                        '><%= doc_perms.length %> <img id="shared" src="/media/svg/share.svg" alt="Options">
                         </a>
 
                     <a id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-title="Document Information" 

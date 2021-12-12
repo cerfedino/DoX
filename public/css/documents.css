@@ -476,3 +476,8 @@ a {
 .list .card-element .info.owner {
     grid-area: owner;
 }
+
+
+body.dark-theme .delete img, body.dark-theme img#threedots, body.dark-theme img#shared {
+    filter: invert(1);
+}
