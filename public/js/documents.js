@@ -236,7 +236,7 @@ function getUsernameById(id){
         .then(res=>res.json())
         .then(user=>{
             if (user.username == document.querySelector('#info > h2').innerHTML) {
-                resolve("me");
+                resolve("<i>me</i>");
             } else {
                 resolve(user.username);
             }
@@ -265,26 +265,19 @@ function setUsernameById(dom, id){
 
 // Set usernames instead of Ids in the permissions section of the document
 function setEditReadUsernames() {
-    document.querySelectorAll('a[data-title="Shared with"]').forEach(el=>{
+    document.querySelectorAll('a.perms#end').forEach(el=>{
         let articles = document.createElement('SECTION');
         articles.innerHTML = el.getAttribute('data-content');
         let promises = [];
-        articles.querySelectorAll('.dropdown-item').forEach(item=>{
-            let parts = item.innerHTML.split(' ');
-            let i = 0;
-            while(parts[i] != 'edit' && parts[i] != 'read' && parts[i] != 'Document') {
-                i++;
-            }
-            if (parts[i+1] != 'not' && parts[i+2] != 'shared') {
-                promises.push(new Promise((resolve,reject)=>{
-                    setUsernameById(item,parts[i-1])
-                    .then((dom)=>{
-                        item = dom;
-                        item.innerHTML += ' ' + parts[i];
-                        resolve();
-                    })
-                }))
-            }
+        articles.querySelectorAll('.dropdown-item.user').forEach(item=>{
+            let user = item.querySelector(".user").innerHTML;
+
+            promises.push(new Promise((resolve,reject)=>{
+                setUsernameById(item.querySelector(".user"), user)
+                .then((dom)=>{
+                    resolve();
+                })
+            }))
         })
         Promise.all(promises)
         .then(()=>{  
@@ -537,18 +530,18 @@ function insertionSort(a){
 
 ///////////////////////////////// TESTING
 
-document.querySelector("#send_put").addEventListener('submit',function(e){
-    e.preventDefault();
+// document.querySelector("#send_put").addEventListener('submit',function(e){
+//     e.preventDefault();
     
-    fetch(`/docs/61b5f0ea7c3c3522425dfb72`,{
-        method: "PUT",
-        headers: {  "Content-Type":"application/json"},
-        body: JSON.stringify({tags: {
-            title: "ALBERT",
-            perm_edit_add: ['61b5f2947c3c3522425dfb73'],
-            // perm_read: [],
-            // owner: "61ace1efb83303c3053efa78" // Albert
-            // owner: '61ace20fb83303c3053efa79' // Ale
-        }})
-    });
-})
+//     fetch(`/docs/61b5f0ea7c3c3522425dfb72`,{
+//         method: "PUT",
+//         headers: {  "Content-Type":"application/json"},
+//         body: JSON.stringify({tags: {
+//             title: "ALBERT",
+//             perm_edit_add: ['61b5f2947c3c3522425dfb73'],
+//             // perm_read: [],
+//             // owner: "61ace1efb83303c3053efa78" // Albert
+//             // owner: '61ace20fb83303c3053efa79' // Ale
+//         }})
+//     });
+// })
