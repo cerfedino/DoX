@@ -1,3 +1,15 @@
+<!-- trying to fix white flashes when opening a page using dark mode-->
+<script>
+    if (localStorage.getItem("dark_mode") == 'true') {
+        document.body.classList.add("dark-theme")
+        document.querySelector("#dark-mode-toggle").checked = true
+    } else {
+        document.body.classList.remove('dark-theme')
+        document.querySelector("#dark-mode-toggle").checked = false
+    }
+</script>
+
+
 <% 
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
@@ -25,7 +37,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
 <main class="login-form">
     <form method="POST" action="/auth/login">
-        <svg id="logo" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595.06 133.62"><defs><style>.cls-1{font-size:175px;font-family:jumper_XBdIt, Jumper;font-weight:700;font-style:italic;}.cls-2{letter-spacing:-0.01em;}</style></defs><text class="cls-1" transform="translate(0 126.81)"><tspan class="cls-2"></tspan><tspan x="102.9" y="0">DoX</tspan></text></svg>
+        <div id="logo"></div>
 
         <h1 class="h3 mb-3 fw-normal">Welcome to DoX!</h1>
 
@@ -47,7 +59,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
 <div id="alerts"></div>
 
-<input id="dark-mode-toggle" type="checkbox">
+<div class="dark-mode">
+    <input id="dark-mode-toggle" type="checkbox" name="dark-mode">
+    <label for="dark-mode">Dark mode</label>
+</div>
 
 <script src="/js/common.mjs"></script>
 <script src="/js/login.js" onload="init_login()" ></script>

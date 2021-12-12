@@ -1,3 +1,16 @@
+<!-- trying to fix white flashes when opening a page using dark mode-->
+<script>
+    if (localStorage.getItem("dark_mode") == 'true') {
+        document.body.classList.add("dark-theme")
+        document.querySelector("#dark-mode-toggle").checked = true
+    } else {
+        document.body.classList.remove('dark-theme')
+        document.querySelector("#dark-mode-toggle").checked = false
+    }
+</script>
+
+
+
 <%
 if(!docs) {
     var docs = []
@@ -6,34 +19,7 @@ if(!docs) {
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
 
-
-var doc_cards = ""
-docs.forEach(doc=>{
-    doc_cards += generate_document_card(doc)
-})
-
-/**
- * Generates the html code for a document card.
- * @param {object} doc the document to generate the card from.
- * @returns {string} the generated html code.
- */
-function generate_document_card(doc) {
-    return `<div class="card document">
-            <div class="card-body">
-                <h6 class="card-title">${doc.title}</h6>
-                <p class="card-text">${doc.body}</p>
-            </div>
-            <div class="card-footer">
-                <a href="/docs/${doc._id}" class="btn btn-sm btn-primary">Edit</a>
-                <form _method="DELETE" action="/docs/${doc._id}" class="delete-doc"> <input type="submit" href="#" class="btn btn-sm btn-danger" value="Delete"></input> </form>
-            </div>
-        </div>`
-}
-
-
-
-
- %>
+%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -42,6 +28,7 @@ function generate_document_card(doc) {
     <title>DoX - Documents</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <!-- SVG FontAwesome Icons -->
     <script defer src="/media/fontawesome-free-5.15.4-web/js/all.js"></script>
     <style type="text/css">
@@ -53,29 +40,147 @@ function generate_document_card(doc) {
 <script src="/socket.io/socket.io.js"></script>
 <script  onload="init_socket()" src="/js/socket.js"></script>
 
+    <%- include('includes/header', {'extra' : 'search'}) %>
 
-<header id="pageheader" class="p-3 mb-4 text-white">
-        <div class="container">
-            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <div class="h3 me-auto col-auto">
-                    <svg id="logo" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595.06 133.62"><defs><style>.cls-1{font-size:175px;font-family:jumper_XBdIt, Jumper;font-weight:700;font-style:italic;}.cls-2{letter-spacing:-0.01em;}</style></defs><text class="cls-1" transform="translate(0 126.81)"><tspan class="cls-2"></tspan><tspan x="102.9" y="0">DoX</tspan></text></svg>
-                </div>
-                <form class="col-auto">
-                    <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
+    <section class="tools-bar">
+        <a class="new-doc" href="/docs/new"><i class="bi bi-file-earmark-plus-fill"></i> New</a>
+
+        <!-- Card/Grid view buttons -->
+        <div class="switch-list-grid">
+            <a class="grid-view" href=""><i class="fa fa-th"></i></a>
+            <a class="list-view" href=""><i class="fa fa-list"></i></a>
+        </div>
+
+        <!-- Sort section -->
+        <div class="dropdown show sort">
+            <a class="btn btn-secondary dropdown-toggle" href="#" data-toggle="dropdown">
+                Sort by
+            </a>
+          
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" rel="creation-date">Create Date</a>
+                <a class="dropdown-item" href="#" rel="edit-date">Edit Date</a>
+                <a class="dropdown-item" href="#" rel="title">Title</a>
+                <a class="dropdown-item" href="#" rel="owner">Owner</a>
+                <a class="dropdown-item" href="#" rel="shared"># of shares</a>
+            </div>
+        </div>
+        <a id="reverse-sort" href="">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sort-alpha-down-alt" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371h-1.781zm1.57-.785L11 2.687h-.047l-.652 2.157h1.351z"/>
+                <path d="M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645V14zM4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293V2.5z"/>
+            </svg>
+        </a>
+        <button class="active-sort"></button>
+
+        <!-- Filter section -->
+        <div class="dropdown show filter">
+            <a class="btn btn-secondary dropdown-toggle" href="#" data-toggle="dropdown">
+                Filter
+            </a>
+            <div class="dropdown-menu">
+                <form id="filters">
+                    <article class="dropdown-item filter">
+                        <label for="filter-owned">Owned by me</label>
+                        <input name="filter-owned" type="checkbox">
+                    </article>
+                    <article class="dropdown-item filter">
+                        <label for="filter-read">Reading Permissions</label>
+                        <input name="filter-read" type="checkbox">
+                    </article>
+                    <article class="dropdown-item filter">
+                        <label for="filter-write">Writing Permissions</label>
+                        <input name="filter-write" type="checkbox">
+                    </article>
+                    <article class="dropdown-item filter">
+                        <label for="filter-shared">Shared Documents</label>
+                        <input name="filter-shared" type="checkbox">
+                    </article>
+                    <input name="filter-submit" type="submit" value="Save">
                 </form>
             </div>
         </div>
-    </header>
+        <section class="active-filters">
+            
+        </section>
+    </section>
 
-    <main class=" ps-3 d-flex flex-wrap">
-        <div class="card document document-create">
-            <a href="/docs/new"><i class="far fa-plus-square"></i></a>
-        </div>
 
-        <%- doc_cards %>
+    <main >
+        
+        <section class="cards" id="table-of-documents">
+            <article class="list-element head">
+                <span class="info"></span>
+                <span class="info"><b><a href="#" rel="title">Title</a></b></span>
+                <span class="info"><b><a href="#" rel="owner">Owner</a></b></span>
+                <span class="info"><b><a href="#" rel="shared">Shared</a></b></span>
+                <span class="info"><b><a href="#" rel="edit-date">Last Edit</a></b></span>
+                <span class="info"><b><a href="#" rel="creation-date">Creation Date</a></b></span>
+                <span class="info"><b><a href="#">Delete</a></b></span>
+            </article>
+
+            <% docs.forEach((doc)=>{ %>
+                <article id="<%= doc._id %>" class="card-element">
+                    <a id="icon" href="docs/<%= doc._id %>">
+                        <img src="/media/svg/notebook_icon_LIGHT.svg" alt="Card image cap">
+                    </a>
+                    <span class="title"><%= doc.title %></span>
+                    <p class="actual-creation-date"><%= doc.created_date %></p>
+                    <span class="info creation-date"><%= doc.created_date %></span>
+                    <p class="actual-edit-date"><%= doc.edit_date %></p>
+                    <span class="info edit-date"><%= doc.edit_date %></span>
+                    <span class="info"></span>
+                    
+                    <p class="owner"><%= doc.owner %></p>
+                    <span class="info owner"></span>
+                    <a class="delete" id="docs/<%= doc._id %>">
+                        <img src="/media/svg/delete.svg" class="svgimgform"></img>
+                    </a>
+
+                    <% let doc_perms = [] 
+                        doc.perm_edit.forEach(u=>{ 
+                            if (String(doc.owner) != String(u)) {
+                                doc_perms.push(`<a class="dropdown-item user" href="#">${u} edit</a>`)
+                            }
+                        })
+                        doc.perm_read.forEach(u=>{
+                            if (String(doc.owner) != String(u)) {
+                                let contained = false;
+                                doc_perms.forEach(p=>{
+                                    if (p.includes(String(u))) {
+                                        contained = true;
+                                    }
+                                });
+                                if (!contained) {
+                                    doc_perms.push(`<a class="dropdown-item user" href="#">${u} read</a>`);
+                                }
+                            }
+                        }) %>
+                    <p class="shared"><%= doc_perms.length %></p>
+                    <a class="perms" id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Shared with" 
+                        data-content='
+                        
+                        <% doc_perms.forEach(u=>{ %>
+                            <%- u %>
+                        <% }) 
+                        if (doc_perms.length == 0) { %>
+                            <a class="dropdown-item">Document not shared</a>
+                        <% } %>
+
+                        '><%= doc_perms.length %> <img id="shared" src="/media/svg/share.svg" alt="Options">
+                        </a>
+
+                    <a class="options" id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title="Document Information" 
+                        data-content="Created on: <%= doc.created_date.toDateString() %> <br />
+                        Owner: <%= doc.owner %> <br />
+                        Size: <%= doc.size %> <br />
+                        "><img id="threedots" src="/media/svg/options.svg" alt="Options"></a>
+
+                </article>
+            <% }); %>
+        </section>
+
     </main>
-
-<input id="dark-mode-toggle" type="checkbox">
 
 <div id="alerts">
     
@@ -92,13 +197,42 @@ function generate_document_card(doc) {
 <%- messagefailure %>
 
 
+<script>
+
+    // Returns the username matching the given User's Id
+    function getUsernameById(id){
+        return new Promise((resolve,reject)=>{
+            let filter = {_id: id};
+            fetch('users/'+filter._id)
+            .then(res=>res.json())
+            .then(user=>{
+                if (user.username == document.querySelector('#info > h2').innerHTML) {
+                    resolve("me");
+                } else {
+                    resolve(user.username);
+                }
+            })
+            .catch(err=>{
+                if (dom.innerHTML == ""){
+                    reject("invalid user");
+                }
+            });
+            
+        })
+    }
+</script>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-
-
+<script>
+    $(document).ready(function(){
+        $('[data-toggle="popover"]').popover({
+            html:true
+        });   
+    });
+    </script>
 
 </body>
 </html>

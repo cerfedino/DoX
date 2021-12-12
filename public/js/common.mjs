@@ -2,8 +2,6 @@
  * Contains declarations to be used across the site.
  */
 
-
-
 /**
  * Generates a new Bootstrap alert and inserts it into the container element.
  * @param {HTMLElement} container the HTML element to put the newly generated alert in.
@@ -35,11 +33,71 @@ function showAlert(container, alert_type="warning", text="", append=true, auto_d
     }
 }
 
+
+if (localStorage.getItem("dark_mode") == 'true') {
+    document.body.classList.add("dark-theme")
+    document.querySelector("#dark-mode-toggle").checked = true
+} else {
+    document.body.classList.remove('dark-theme')
+    document.querySelector("#dark-mode-toggle").checked = false
+}
 // Dark-theme toggle
 document.querySelector("#dark-mode-toggle")?.addEventListener('change',
     function() {
-        if(this.checked)
-            document.body.classList.add("dark-theme")
-        else
-            document.body.classList.remove('dark-theme')
+        if(this.checked) {
+            document.body.classList.add("dark-theme");
+            localStorage.setItem("dark_mode", 'true');
+        } else {
+            document.body.classList.remove('dark-theme');
+            localStorage.setItem("dark_mode", 'false');
+        }
     });
+
+
+
+
+
+// Edit user modal form
+
+let form = document.querySelector(".modal-body form")
+  
+form.addEventListener("submit",function(e){
+    
+
+    const mistakes = validateForm(this);
+    if(mistakes) {
+        return
+    }
+
+    fetch(this.action, {
+        method: this.method,
+        headers: {
+            "Content-Type" : "application/json",
+        },
+        body: JSON.stringify({
+            username: form.querySelector("input[name='username']").value, 
+            password: form.querySelector("input[name='password']").value
+        })
+    })
+})
+
+function validateForm(form) {
+    var mistakes = false
+
+    const username = form.querySelector("#username").value.trim()
+    console.log("USERNAME :" + username)
+    const pwd = form.querySelector("#password").value
+    const confirm_pwd = form.querySelector("#cpassword").value
+
+    if(pwd !== confirm_pwd) {
+        showAlert(document.querySelector("#alerts"),"warning","Passwords are not matching",true)
+        mistakes = true;
+    }
+    if (username === "") {
+        showAlert(document.querySelector("#alerts"),"warning","Username cannot be empty",true)
+        mistakes = true;
+    }
+    
+    return mistakes;
+}
+

@@ -124,5 +124,5 @@ router.post("/register",  function(req, res, next) {
 router.delete("/logout", (req,res) => {
     req.logOut();
     req.flash('messageSuccess', 'Successfully logged out');
-    res.status(302).redirect("/login");
+    res.redirect('/login');
 })

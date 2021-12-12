@@ -1,3 +1,17 @@
+<!-- trying to fix white flashes when opening a page using dark mode-->
+<script>
+    if (localStorage.getItem("dark_mode") == 'true') {
+        document.body.classList.add("dark-theme")
+        document.querySelector("#dark-mode-toggle").checked = true
+    } else {
+        document.body.classList.remove('dark-theme')
+        document.querySelector("#dark-mode-toggle").checked = false
+    }
+</script>
+
+
+
+
 <%
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
@@ -15,8 +29,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="">
-<header class="sticky-top">
-    <div id="pageheader" class="py-4 text-white">
+<%- include('includes/header', {'extra' : "editor"}) %>
+
+<!-- <header class="style"> -->
+    <!-- <div id="pageheader" class="py-4 text-white">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <div class="h3 me-auto col-auto">
@@ -40,8 +56,9 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 </div>
             </div>
         </div>
-    </div>
-    <div class="py-2 border-bottom mb-5 bg-light">
+    </div> -->
+    
+    <div class="editor-tools">
         <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
             <i id="action-undo" class="bi-arrow-counterclockwise" data-bs-toggle="tooltip" data-bs-placement="top"
                title="Undo (Ctrl-Z)"></i>
@@ -110,6 +127,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             </a>
 
             <div class="ms-auto d-flex flex-wrap">
+            
                 <div class="dropdown dropdown-menu-end me-1">
                     <button class="btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                             aria-expanded="false" id="active-users-button">Active
@@ -122,10 +140,22 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <button type="button" class="btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal">
                     Rename
                 </button>
+                
+
+                <div style="display: flex;">
+
+                    <button type="button-share" class="btn btn-warning px-3"><i class="bi bi-share"></i></button>
+
+                    <div class="text-end d-flex flex-wrap ms-3">
+
+                        <button id="button-save" type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i></button>
+                        <p style="position:absolute; margin-left: 100px;" id="message-save" class="mt-auto mb-auto me-3"></p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</header>
+<!-- </header> -->
 <main class="document-view">
     <div id="editor" class="p-5">
     </div>
@@ -177,8 +207,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <div class="row mb-3">
                     <label for="new-name" class="col-3 col-form-label">New name</label>
                     <div class="col-9">
-                        <input type="text" class="form-control" id="new-name"
-                               placeholder="<%= doc.title %>" required minlength="1" maxlength="100">
+                        <input type="text" class="form-control" id="new-name" value="<%= doc.title %>" required>
                     </div>
                 </div>
             </div>

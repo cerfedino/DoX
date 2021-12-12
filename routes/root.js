@@ -11,6 +11,13 @@ const router = express.Router();
 const dbops = require('../modules/dbops.js')
 const {ObjectId} = require("mongodb");
 
+const auth = require('../modules/auth.js');
+
+const fs = require('fs-extra');
+const path = require('path');
+const { use } = require('bcrypt/promises');
+
+
 
 module.exports = router;
 
@@ -104,9 +111,9 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
     if (req.params.id && !ObjectId.isValid(req.params.id)) {
         
         if(req.accepts("text/html")) {
-            res.status(404).render('../views/error.ejs', {s: 404, m: `Invalid user ID. Check if there is a typo in: ${req.url}`});
+            res.status(404).render('../views/error.ejs', {s: 404, m: `Invalid document ID. Check if there is a typo in: ${req.url}`});
         } else {
-            res.status(404).send(`Invalid user ID. Check if there is a typo in: ${req.url}`).end();
+            res.status(404).send(`Invalid document ID. Check if there is a typo in: ${req.url}`).end();
         }
         return
     }
@@ -123,7 +130,13 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
         
         if((await dbops.user_get_perms(ObjectId(req.user.user_id),ObjectId(req.params.id))).length > 0) {
             if(req.accepts("text/html")) {
-                res.status(200).render('../views/edit.ejs',{doc: await dbops.doc_find({_id:ObjectId(req.params.id)})})
+                res.status(200).render('../views/edit.ejs',
+                    {
+                        doc: await dbops.doc_find({_id:ObjectId(req.params.id)}),
+                        user : await dbops.user_find({_id : ObjectId(req.user.user_id)})
+                    })
+            } else if (req.accepts("application/json")) {
+                res.json({doc: await dbops.doc_find({_id:ObjectId(req.params.id)})});
             } else {
                 res.status(406).send("Accepts: text/html").end()
             }
@@ -131,7 +144,11 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
     } else { // Render document list
         if(req.accepts("text/html")) {
             console.log(await dbops.docs_available(ObjectId(req.user.user_id)))
-            res.status(200).render('../views/documents.ejs', {docs: await dbops.docs_available(ObjectId(req.user.user_id))})
+            res.status(200).render('../views/documents.ejs', 
+                {
+                    docs: await dbops.docs_available(ObjectId(req.user.user_id)),
+                    user : await dbops.user_find({_id : ObjectId(req.user.user_id)})
+                })
         } else {
             res.status(406).send("Accepts: text/html").end();
         }
@@ -139,6 +156,52 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
 
 })
 
+
+/* 
+    GET /users/:id
+    Returns the username matching the given user ID
+*/
+router.get('/users/:id', async function (req, res){
+    let id;
+    try {
+        id = ObjectId(req.params.id);
+    } catch(err) {
+        res.status(404).end();
+    }
+    let user = await dbops.user_find({_id : id});
+    if (req.accepts("application/json")){
+        if (user == undefined || user == null) {
+            res.status(404).end();
+        } else {
+            res.json({username:user.username});
+        }
+    } else {
+        res.status(406).end();
+    }
+})
+
+// Gets user profile picture based on ID
+
+router.get("/pic/users/:id", async function (req, res){
+    let id;
+    try {
+        id = ObjectId(req.params.id);
+    } catch(err) {
+        res.status(404).end();
+    }
+    let user = await dbops.user_find({_id : id});
+    if (user) { 
+        if (req.accepts("image/png")) {
+            res.sendFile(user.profile_pic);
+        } else {
+            console.log("err")
+        } 
+    } else {
+        res.status(404).end();
+    }
+    
+
+})
 
 // ###############
 // PUT REQUESTS
@@ -245,7 +308,6 @@ router.put('/docs/:id', checkAuthenticated, async (req,res)=> {
 
 
 
-
 function get_editable_doc_fields(obj={}) {
     var ret = {
         title: obj.title,
@@ -268,6 +330,75 @@ function get_editable_doc_fields(obj={}) {
     Object.keys(ret).forEach(key => { if(!ret[key]) delete ret[key]})
     return ret
 }
+
+
+
+/*
+    PUT /user
+    Updates a user data.
+
+    Updates user only if the request is coming from the user himself.
+*/
+router.put('/user', async (req,res)=> {
+    if (!ObjectId.isValid(req.user.user_id)) {
+        res.status(400).send(`Invalid user ID.`);
+        return
+    }
+    if(!(await dbops.user_exists({_id:ObjectId(req.user.user_id)}))) {
+        if(req.accepts("text/html")) {
+            res.status(404).render('../views/error.ejs', {s: 404, m: "User does not exist"});
+        } else {
+            res.status(404).send("User does not exist").end();
+        }
+        return
+    }
+    
+    let tags = {}
+    
+    if (req.body.username && (!await (dbops.user_exists({username : req.body.username})))) {
+        tags.username = req.body.username;
+    }
+    if (req.body.password) {
+        tags.password = await auth.encrypt_pwd(req.body.password);
+    }
+
+
+
+    if (req.files && Object.keys(req.files).length > 0) {
+        // new profile picture uploaded
+
+        let file = req.files["file"];
+        let ext = path.extname(file.name);
+
+        if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
+            return res.status(400).send("bad file type");
+        }
+
+        let file_url = "./public/media/profile_pics/" + req.user.user_id + ".png";
+
+        await file.mv(file_url, function(err) { 
+            if(err) throw err;
+            console.log("[+] File moved to folder")
+        })
+
+        tags.profile_pic = file_url;
+
+    }
+
+    dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
+
+        console.log("[+] Updated user")
+        req.flash("messageSuccess","User has been updated")
+        res.redirect("/docs");
+
+    })
+    
+    
+})
+
+
+
+
   
 // ###############
 // DELETE REQUESTS
