@@ -494,6 +494,9 @@ function buildKeymap(schema) {
     bind('Mod-i', toggleMark(schema.marks.em));
     bind('Mod-u', toggleMark(schema.marks.underline));
 
+    bind('Mod-Shift-7', wrapInList(schema.nodes.ordered_list, {level: 1}));
+    bind('Mod-Shift-8', wrapInList(schema.nodes.bullet_list, {}));
+
     bind('Enter', splitListItem(schema.nodes.list_item));
 
     return keys;
