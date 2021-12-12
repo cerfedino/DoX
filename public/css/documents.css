@@ -390,7 +390,6 @@ a {
     grid-template-areas: "icon title owner perms last-edit created delete";
     
     box-shadow: -3px 3px 8px 2px var(--shadow);
-    transition: box-shadow 0.4s;
     align-items: center;
 }
 
