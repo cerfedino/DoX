@@ -110,7 +110,7 @@ npm run build
 ```
 
 ### 3. Run the application
-Finally run the application with
+Finally run the application locally with
 ```bash
 npm run local
 ```
