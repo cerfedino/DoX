@@ -68,6 +68,17 @@ class MenuView {
                 }
             }
         }
+
+        // Update color picker
+        let pos = this.editorView.state.selection.$head;
+        let color = '#000000'
+        for (let mark of pos.marks()) {
+            if (mark.type === schema.marks.color) {
+                color = mark.attrs.color;
+                break;
+            }
+        }
+        document.getElementById('action-pick-color').value = color;
     }
 }
 
