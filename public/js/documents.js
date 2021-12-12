@@ -27,37 +27,6 @@ function init_documents() {
     setSortListeners();
 
     formatDates();
-
-    // document.querySelector("#send_put").addEventListener('submit',function(e){
-    //     e.preventDefault();
-        
-    //     fetch(`/docs/61ace214b83303c3053efa7a`,{
-    //         method: "PUT",
-    //         headers: {  "Content-Type":"application/json"},
-    //         body: JSON.stringify({tags: {
-    //             title: "ALBERT",
-    //             // perm_edit_remove: ['61ace1efb83303c3053efa78'],
-    //             // perm_read: [],
-    //             owner: "61ace1efb83303c3053efa78" // Albert
-    //             // owner: '61ace20fb83303c3053efa79' // Ale
-    //         }})
-    //     });
-    // })
-
-
-    document.querySelectorAll(".svgimgform").forEach(btn => {
-        btn.addEventListener("click", deletecard)
-    })
-
-    function deletecard(e) {
-        let id = e.target.parentNode.id;
-        fetch(id, {
-            method: "DELETE"
-        }).then(res => {
-            console.log(res.status);
-            e.target.parentNode.parentNode.parentNode.parentNode.parentNode.remove();
-        })
-    }
 }
 
 // Set search listener on any input to search between all the titles and owners
@@ -135,34 +104,27 @@ function setSwitchButtonListener(){
 
 // Set both edit and delete listeners buttons
 function setDeleteListeners() {
-    // Delete document button on every document card.
-    document.querySelectorAll("form.delete-doc").forEach(x=>x.addEventListener('submit',function(e) {
-        e.preventDefault()
-        // Sends DELETE request for the document
-        fetch(this.action,
-            {
-                method: this.getAttribute('_method'),
-                headers: {  "Accept":"application/json"},
-            })
-    }))
 
-    // Set delete button on each document line (list view)
-    document.querySelectorAll('a[rel="del"]').forEach(x=>x.addEventListener('click',function(event){
-        event.preventDefault();
+    document.querySelectorAll(".svgimgform").forEach(btn => {
+        btn.addEventListener("click", deletecard)
+    })
 
-        fetch(this.href,
-            {
-                method: this.getAttribute('_method'),
-                headers: {  "Accept":"application/json"},
-            })
-    }))
+    function deletecard(e) {
+        let id = e.target.parentNode.id;
+        fetch(id, {
+            method: "DELETE"
+        }).then(res => {
+            console.log(res.status);
+            e.target.parentNode.parentNode.remove();
+        })
+    }
 }
 
 // Set list edit links for each document and sort links for the header buttons
 function setEditListeners() {
     document.querySelectorAll('.card-element').forEach(row=>{
         row.childNodes.forEach(el=>{
-            if (el.classList != undefined && !el.classList.contains('delete')){
+            if ((el.classList != undefined && !el.classList.contains('delete'))) {
                 el.addEventListener('click',function(event){
                     window.location = row.querySelector('a#icon').href;
                 })

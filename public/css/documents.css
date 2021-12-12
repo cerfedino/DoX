@@ -254,6 +254,7 @@ a {
     margin: 10px;
     border-radius: 10px;
     padding:10px;
+    cursor: pointer;
 
     display: grid;
 
@@ -381,6 +382,7 @@ a {
     margin: 10px;
     border-radius: 10px;
     padding:10px;
+    cursor: pointer;
 
     display: grid;
 
