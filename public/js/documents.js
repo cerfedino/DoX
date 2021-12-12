@@ -471,7 +471,6 @@ function formatTime(date) {
     let hour = checkLess(date.getHours());
     let minutes = checkLess(date.getMinutes());
     
-
     if (day === nowday && month === nowmonth && year === nowyear) {
         return "Today at " + hour + ":" + minutes;
     }

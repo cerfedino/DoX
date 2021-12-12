@@ -1,11 +1,13 @@
-const {Schema} = require('prosemirror-model');
 const {Plugin, EditorState} = require('prosemirror-state');
-const {EditorView} = require('prosemirror-view');
+const {EditorView, Decoration, DecorationSet} = require('prosemirror-view');
 const {undo, redo, history} = require('prosemirror-history');
 const {keymap} = require('prosemirror-keymap');
-const {baseKeymap, toggleMark, setBlockType, lift} = require('prosemirror-commands');
-const basicSchema = require('prosemirror-schema-basic')
-const {wrapInList, addListNodes, splitListItem, liftListItem} = require("prosemirror-schema-list");
+const {baseKeymap, toggleMark, setBlockType} = require('prosemirror-commands');
+const {wrapInList, splitListItem, liftListItem} = require("prosemirror-schema-list");
+const collab = require('prosemirror-collab');
+const io = require('socket.io-client')
+const schema = require('../../../modules/schema');
+const {Step} = require("prosemirror-transform");
 
 /**
  * Menu component
@@ -66,110 +68,302 @@ class MenuView {
                 }
             }
         }
+
+        // Update color picker
+        let pos = this.editorView.state.selection.$head;
+        let color = '#000000'
+        for (let mark of pos.marks()) {
+            if (mark.type === schema.marks.color) {
+                color = mark.attrs.color;
+                break;
+            }
+        }
+        document.getElementById('action-pick-color').value = color;
     }
 }
 
-// Editor setup
-let editor = initEditor();
+//region Editor setup
+let editor;
+let connectedClients = {};
 
-// Events
-document.getElementById('insertImageModal').addEventListener('shown.bs.modal', () => {
-    document.getElementById('image-src').focus();
-});
-document.getElementById('insertImageModal').addEventListener('hidden.bs.modal', () => {
-    editor.focus();
+// Sockets
+const socket = io()
+socket.emit('doc-join-request', {_id: documentID});
+
+socket.on('connect', () => {
+    console.info('Socket connected');
 })
-document.getElementById('insert-image-form').addEventListener('submit', insertImage);
-document.getElementById('button-save').addEventListener('click', async (e) => {
-    document.getElementById('button-save').innerHTML = 'Saving...'
+socket.on('disconnect', () => {
+    console.warn('Socket was disconnected')
+    connectedClients = {};
+    renderConnections();
+    let activity = document.getElementById('active-users-button');
+    activity.classList.remove('btn-primary');
+    activity.classList.add('btn-warning');
+    activity.innerText = 'You\'re offline!';
+})
+socket.on('init', (data) => {
+    console.info('Received INIT event. Version: ' + data.version);
+    console.info(data.document);
+    editor = initEditor(schema.nodeFromJSON(data.document), data.version);
 
-    let result = await fetch('/docs/' + documentID, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            tags: {
-                content: JSON.stringify(editor.state.toJSON()),
-            }
-        })
-    })
-
-    let messageSave = document.getElementById('message-save');
-    if (!result.ok) {
-        let error = await result.text();
-        messageSave.innerText = 'Error occurred while saving!';
-        messageSave.classList.add('text-danger');
-        messageSave.classList.remove('text-secondary');
-        e.target.innerHTML = '<i class="bi-save me-1"></i> Save';
-        return;
+    for (let client of Object.entries(data.connected)) {
+        connectedClients[client[0]] = {
+            userID: client[1].userID,
+            permission: client[1].permission,
+            selection: client[1].selection ? client[1].selection : {
+                from: 1,
+                to: 1
+            },
+            colors: pickColor()
+        }
     }
+    renderConnections();
+
+    editor.dispatch(
+        editor.state.tr.setMeta('update-selections', true)
+    )
+})
+socket.on('client-connect', data => {
+    connectedClients[data.id] = {
+        userID: data.userID,
+        permission: data.permission,
+        colors: pickColor()
+    }
+    renderConnections();
+})
+socket.on('client-disconnect', id => {
+    delete connectedClients[id];
+    renderConnections();
+})
+socket.on('update', ({version, steps, stepClientIDs}) => {
+    console.info(`Received UPDATE event. Version: ${version}. With data: `, steps, stepClientIDs);
+    let currentVersion = collab.getVersion(editor.state);
+    let newSteps = steps.slice(currentVersion).map(step => Step.fromJSON(schema, step));
+    let newClientIDs = stepClientIDs.slice(currentVersion);
+
+    editor.dispatch(
+        collab.receiveTransaction(editor.state, newSteps, newClientIDs)
+    )
+})
+socket.on('save-success', () => {
+    console.info('Received SAVE-SUCCESS event');
+    document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
+    let messageSave = document.getElementById('message-save');
 
     messageSave.innerText = 'Saved successfully!';
     messageSave.classList.remove('text-danger');
     messageSave.classList.add('text-secondary');
 
-    document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
-
     setTimeout(() => {
         messageSave.innerText = '';
     }, 5000)
 })
+socket.on('save-fail', ({error}) => {
+    console.error('Received SAVE-FAIL event with data: ', error);
+    document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
+    let messageSave = document.getElementById('message-save');
+
+    messageSave.classList.add('text-danger');
+    messageSave.classList.remove('text-secondary');
+    messageSave.innerText = 'Error occurred while saving!';
+})
+socket.on('rename-success', ({newName}) => {
+    console.info('Received RENAME-SUCCESS event with new title ' + newName);
+
+    document.getElementById('doc-title').innerText = newName;
+    document.querySelector('title').innerText = 'DoX - Edit - ' + newName;
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('renameModal')).hide();
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-name').placeholder = newName;
+})
+socket.on('rename-fail', ({error}) => {
+    console.error('Received RENAME-FAIL event. ' + error);
+    alert(error);
+})
+socket.on('selection-changed', connected => {
+    let entries = Object.entries(connected);
+    for (let entry of entries) {
+        if (!connectedClients[entry[0]]) {
+            console.warn('Received data about unknown client ' + entry[0]);
+            continue;
+        }
+
+        connectedClients[entry[0]].selection = entry[1].selection ? entry[1].selection : {
+            from: 1,
+            to: 1
+        }
+    }
+
+    editor.dispatch(
+        editor.state.tr.setMeta('update-selections', true)
+    )
+})
+
+function SelectionUpdater() {
+    return new Plugin({
+        state: {
+            init() {
+
+            },
+            apply(tr, _, old) {
+                // Check if the selection has changed after the transaction
+                if (tr.selection.from !== old.tr.selection.from || tr.selection.to !== old.tr.selection.to) {
+                    socket.emit('selection-changed', {
+                        from: tr.selection.anchor,
+                        to: tr.selection.head
+                    })
+                    return;
+                }
+
+                if (tr.getMeta('update-selections')) {
+                    let decos = [];
+                    for (let clientData of Object.entries(connectedClients)) {
+                        if (clientData[0] === socket.id) continue;
+
+                        // As we send anchor and head instead of from and to, we should perform an additional check
+                        let from = clientData[1].selection.from < clientData[1].selection.to ?
+                            clientData[1].selection.from : clientData[1].selection.to;
+                        let to = clientData[1].selection.from > clientData[1].selection.to ?
+                            clientData[1].selection.from : clientData[1].selection.to;
+                        decos.push(Decoration.inline(
+                            from,
+                            to,
+                            {style: `background-color: ${clientData[1].colors[0]}; color: ${clientData[1].colors[1]}`}
+                        ))
+                    }
+
+                    return DecorationSet.create(tr.doc, decos);
+                }
+            }
+        },
+        props: {
+            decorations(state) {
+                return this.getState(state);
+            }
+        }
+    });
+}
+
+let colorIndex = -1;
+
+function pickColor() {
+    let palette = [
+        ['#ff7070', '#6b0000'], // Red
+        ['#70ff70', '#006b00'], // Green
+        ['#7070ff', '#00006b'], // Blue
+        ['#ffff70', '#6b6b00'], // Yellow
+        ['#ff70ff', '#6b006b'], // Purple
+        ['#70ffff', '#006b6b'], // Cyan
+    ]
+    colorIndex += 1;
+    if (colorIndex >= palette.length || colorIndex < 0) colorIndex = 0;
+    return palette[colorIndex];
+}
+
+function renderConnections() {
+    let active = document.getElementById('active-users');
+    let newHTML = '';
+    for (let client of Object.values(connectedClients)) {
+        newHTML +=
+            `<li><span style="color: ${client.colors[1]}" class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
+        newHTML +=
+            '<li class="dropdown-divider"></li>';
+    }
+    newHTML += `<li class="dropdown-item-text"><b>Connected: ${Object.values(connectedClients).length}</b></li>`
+    active.innerHTML = newHTML;
+
+    document.getElementById('active-users-button').innerText = 'Active: ' + Object.values(connectedClients).length;
+}
+
+// Modals
+
+// Insert image
+document.getElementById('insertImageModal').addEventListener('shown.bs.modal', () => {
+    document.getElementById('image-src').focus();
+});
+document.getElementById('insertImageModal').addEventListener('hidden.bs.modal', () => {
+    document.getElementById('image-src').value = '';
+    document.getElementById('image-alt').value = '';
+
+    editor.focus();
+});
+document.getElementById('insert-image-form').addEventListener('submit', insertImage);
+// Rename
 document.getElementById('renameModal').addEventListener('shown.bs.modal', () => {
     document.getElementById('new-name').focus();
 });
 document.getElementById('renameModal').addEventListener('hidden.bs.modal', () => {
+    document.getElementById('new-name').value = '';
     editor.focus();
-})
+});
 document.getElementById('rename-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('renameModal'));
-
     let name = document.getElementById('new-name');
-    let result = await fetch('/docs/' + documentID, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            tags: {
-                title: name.value
-            }
-        })
-    })
-
-    if (!result.ok) {
-        alert('Error occurred! Please try again');
-        return;
-    }
-
-    document.getElementById('doc-title').innerText = name.value;
-    document.querySelector('title').innerText = 'DoX - Edit - ' + name.value;
-
-    name.value = '';
-    name.placeholder = name.value;
-    modal.hide();
+    socket.emit('rename', name.value);
 });
+// Insert link
+document.getElementById('insertLinkModal').addEventListener('shown.bs.modal', () => {
+    document.getElementById('link-href').focus();
+})
+document.getElementById('insertLinkModal').addEventListener('hidden.bs.modal', () => {
+    document.getElementById('link-href').value = '';
+    editor.focus();
+})
+document.getElementById('insert-link-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('insertLinkModal'));
+
+    toggleMark
+    (editor.state.schema.marks.link, {href: document.getElementById('link-href').value})
+    (editor.state, editor.dispatch);
+
+    modal.hide();
+})
+// Change color
+document.getElementById('action-pick-color').addEventListener('change', (e) => {
+    toggleColor(e.target.value)(editor.state, editor.dispatch);
+    editor.focus();
+})
+
+// Document operations
+document.getElementById('button-save').addEventListener('click', save);
+document.getElementById('button-export').addEventListener('click', async () => {
+    const title = document.getElementById('doc-title').innerText;
+    editor.focus();
+    html2pdf(document.querySelector('#editor > .ProseMirror'), {
+        margin: [12, 15],
+        filename: title + '.pdf',
+        pagebreak: {mode: ['avoid-all']},
+        image: {quality: 1}
+    });
+});
+
+//endregion
 
 // Functions
 /**
  * Initializes an editor inside of the element with ID 'editor'.
- * This function uses documentState global variable to set up the editor state.
+ *
+ * @param {Object} doc Document node
+ * @param version
  */
-function initEditor() {
-    // Base scheme loaded from prosemirror-scheme-basic and prosemirror-scheme-list
-    let base = {
-        nodes: addListNodes(basicSchema.schema.spec.nodes, 'paragraph block*', 'block'),
-        marks: basicSchema.schema.spec.marks
-    }
-
-    // Extended features
-    base.marks = base.marks.addToEnd('underline', {
-        toDOM() {
-            return ['u', 0]
-        },
-        parseDOM: [{tag: 'u'}]
-    })
-    let schema = new Schema(base);
-
+function initEditor(doc, version) {
     // Menu setup
     let menu = menuPlugin([
+        {
+            name: 'undo',
+            type: 'history',
+            command: undo,
+            dom: document.getElementById('action-undo')
+        },
+        {
+            name: 'redo',
+            type: 'history',
+            command: redo,
+            dom: document.getElementById('action-redo')
+        },
         {
             name: 'strong',
             type: 'mark',
@@ -250,44 +444,32 @@ function initEditor() {
         }
     ])
 
-    let state;
-    if (typeof documentState === "object" && Object.keys(documentState).length !== 0) {
-        // Create state from the global variable
-        try {
-            state = EditorState.fromJSON({
-                schema,
-                plugins: [
-                    history(),
-                    keymap(buildKeymap(schema)),
-                    keymap(baseKeymap),
-                    menu
-                ]
-            }, documentState);
-        } catch {
-            // Can't create a state from current documentState
-            state = EditorState.create({
-                schema,
-                plugins: [
-                    history(),
-                    keymap(buildKeymap(schema)),
-                    keymap(baseKeymap),
-                    menu
-                ]
-            });
-        }
-    } else {
-        // Create an empty state
-        state = EditorState.create({
-            schema,
-            plugins: [
-                history(),
-                keymap(buildKeymap(schema)),
-                keymap(baseKeymap),
-                menu
-            ]
+    let state = EditorState.create({
+        schema,
+        doc,
+        plugins: [
+            collab.collab({version}),
+            history(),
+            keymap(buildKeymap(schema)),
+            keymap(baseKeymap),
+            SelectionUpdater(),
+            menu
+        ]
+    })
+    let editorView = new EditorView(document.getElementById("editor"),
+        {
+            state,
+            dispatchTransaction(transaction) {
+                // This function overwrites default transaction behaviour
+                let newState = editorView.state.apply(transaction);
+                editorView.updateState(newState);
+                let sendable = collab.sendableSteps(newState);
+                if (sendable) {
+                    console.info('Emitting UPDATE event with data: ', sendable);
+                    socket.emit('update', sendable);
+                }
+            }
         });
-    }
-    let editorView = new EditorView(document.getElementById("editor"), {state});
 
     editorView.focus();
     return editorView;
@@ -303,12 +485,17 @@ function buildKeymap(schema) {
         keys[key] = cmd;
     }
 
+    bind('Mod-s', save);
+
     bind('Mod-z', undo)
-    bind('Shift-Mod-z', redo)
+    bind('Mod-Shift-z', redo)
 
     bind('Mod-b', toggleMark(schema.marks.strong));
     bind('Mod-i', toggleMark(schema.marks.em));
     bind('Mod-u', toggleMark(schema.marks.underline));
+
+    bind('Mod-Shift-7', wrapInList(schema.nodes.ordered_list, {level: 1}));
+    bind('Mod-Shift-8', wrapInList(schema.nodes.bullet_list, {}));
 
     bind('Enter', splitListItem(schema.nodes.list_item));
 
@@ -326,6 +513,14 @@ function menuPlugin(items) {
             return new MenuView(items, editorView);
         }
     })
+}
+
+/**
+ * Saves the document
+ */
+async function save() {
+    document.getElementById('button-save').innerHTML = 'Saving...'
+    socket.emit('save');
 }
 
 /**
@@ -349,11 +544,7 @@ function insertImage(e) {
             editor.state.schema.nodes.image.createAndFill({src: src.value, alt: alt.value}),
             false
         ));
-    editor.focus();
 
-    // Clear form and hide the modal
-    src.value = '';
-    alt.value = '';
     modal.hide();
 }
 
@@ -424,4 +615,62 @@ function getCurrentHeaderLevel(editorView, headingNode) {
 
     // If the function hasn't return anything in the cycle, the selection isn't a heading
     return 'p';
+}
+
+function markApplies(doc, ranges, type) {
+    for (let i = 0; i < ranges.length; i++) {
+        let {$from, $to} = ranges[i]
+        let can = $from.depth === 0 ? doc.type.allowsMarkType(type) : false
+        doc.nodesBetween($from.pos, $to.pos, node => {
+            if (can) return false
+            can = node.inlineContent && node.type.allowsMarkType(type)
+        })
+        if (can) return true
+    }
+    return false
+}
+
+/**
+ * Toggles color mark on the current selection
+ * @param color Color for the style attribute
+ * @returns {(function(*, *): (boolean))|*} Command
+ */
+function toggleColor(color) {
+    const markType = schema.marks.color;
+    const attrs = {color}
+    return function (state, dispatch) {
+        let {empty, $cursor, ranges} = state.selection
+        if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) return false
+        if (dispatch) {
+            if ($cursor) {
+                let tr = state.tr;
+                if (markType.isInSet(state.storedMarks || $cursor.marks()))
+                    tr.removeStoredMark(markType) // Remove existing color
+                dispatch(tr.addStoredMark(markType.create(attrs)))
+            } else {
+                let has = false, tr = state.tr
+                for (let i = 0; !has && i < ranges.length; i++) {
+                    let {$from, $to} = ranges[i]
+                    has = state.doc.rangeHasMark($from.pos, $to.pos, markType)
+                }
+                for (let i = 0; i < ranges.length; i++) {
+                    let {$from, $to} = ranges[i]
+                    if (has) {
+                        tr.removeMark($from.pos, $to.pos, markType)
+                    }
+
+                    let from = $from.pos, to = $to.pos, start = $from.nodeAfter, end = $to.nodeBefore
+                    let spaceStart = start && start.isText ? /^\s*/.exec(start.text)[0].length : 0
+                    let spaceEnd = end && end.isText ? /\s*$/.exec(end.text)[0].length : 0
+                    if (from + spaceStart < to) {
+                        from += spaceStart;
+                        to -= spaceEnd
+                    }
+                    tr.addMark(from, to, markType.create(attrs))
+                }
+                dispatch(tr.scrollIntoView())
+            }
+        }
+        return true
+    }
 }

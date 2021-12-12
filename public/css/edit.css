@@ -45,6 +45,13 @@
     background-color: #e5e5e5;
 }
 
+#action-pick-color {
+    border: none;
+    cursor: pointer;
+    width: 35px;
+    height: 25px;
+}
+
 .ProseMirror:focus {
     outline: none;
 }

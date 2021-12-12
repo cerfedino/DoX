@@ -31,6 +31,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </style>
 </head>
 <body class="text-center">
+<script src="/socket.io/socket.io.js"></script>
+<script  onload="init_socket()" src="/js/socket.js"></script>
+
+
 <main class="login-form">
     <form method="POST" action="/auth/login">
         <div id="logo"></div>
