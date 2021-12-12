@@ -310,6 +310,11 @@ document.getElementById('insert-link-form').addEventListener('submit', (e) => {
 
     modal.hide();
 })
+// Change color
+document.getElementById('action-pick-color').addEventListener('change', (e) => {
+    toggleColor(e.target.value)(editor.state, editor.dispatch);
+    editor.focus();
+})
 
 // Document operations
 document.getElementById('button-save').addEventListener('click', save);
@@ -596,4 +601,62 @@ function getCurrentHeaderLevel(editorView, headingNode) {
 
     // If the function hasn't return anything in the cycle, the selection isn't a heading
     return 'p';
+}
+
+function markApplies(doc, ranges, type) {
+    for (let i = 0; i < ranges.length; i++) {
+        let {$from, $to} = ranges[i]
+        let can = $from.depth === 0 ? doc.type.allowsMarkType(type) : false
+        doc.nodesBetween($from.pos, $to.pos, node => {
+            if (can) return false
+            can = node.inlineContent && node.type.allowsMarkType(type)
+        })
+        if (can) return true
+    }
+    return false
+}
+
+/**
+ * Toggles color mark on the current selection
+ * @param color Color for the style attribute
+ * @returns {(function(*, *): (boolean))|*} Command
+ */
+function toggleColor(color) {
+    const markType = schema.marks.color;
+    const attrs = {color}
+    return function (state, dispatch) {
+        let {empty, $cursor, ranges} = state.selection
+        if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) return false
+        if (dispatch) {
+            if ($cursor) {
+                let tr = state.tr;
+                if (markType.isInSet(state.storedMarks || $cursor.marks()))
+                    tr.removeStoredMark(markType) // Remove existing color
+                dispatch(tr.addStoredMark(markType.create(attrs)))
+            } else {
+                let has = false, tr = state.tr
+                for (let i = 0; !has && i < ranges.length; i++) {
+                    let {$from, $to} = ranges[i]
+                    has = state.doc.rangeHasMark($from.pos, $to.pos, markType)
+                }
+                for (let i = 0; i < ranges.length; i++) {
+                    let {$from, $to} = ranges[i]
+                    if (has) {
+                        tr.removeMark($from.pos, $to.pos, markType)
+                    }
+
+                    let from = $from.pos, to = $to.pos, start = $from.nodeAfter, end = $to.nodeBefore
+                    let spaceStart = start && start.isText ? /^\s*/.exec(start.text)[0].length : 0
+                    let spaceEnd = end && end.isText ? /\s*$/.exec(end.text)[0].length : 0
+                    if (from + spaceStart < to) {
+                        from += spaceStart;
+                        to -= spaceEnd
+                    }
+                    tr.addMark(from, to, markType.create(attrs))
+                }
+                dispatch(tr.scrollIntoView())
+            }
+        }
+        return true
+    }
 }
