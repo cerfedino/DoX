@@ -308,6 +308,7 @@ function doc_set(doc_id, tags, returnnew = true) {
             return
         }
 
+        tags.edit_date = new Date()
         await model.docs.findOneAndUpdate({_id:doc_id}, {"$set" : tags})
         send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},tags)
         resolve(returnnew? await doc_find({_id:doc_id}) : undefined)
@@ -344,8 +345,9 @@ function doc_add_permissions(doc_id, perms = {perm_read_add: [], perm_edit_add: 
 
         model.docs.findOneAndUpdate (
             {_id :doc_id},
-            { $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
-                    perm_read: { $each: perms.perm_read_add || []} }})
+            { edit_date : new Date(), 
+              $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
+                           perm_read: { $each: perms.perm_read_add || []} }})
 
         send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
         resolve(returnnew ? await doc_find({_id:doc_id}) : undefined)
@@ -372,7 +374,8 @@ function doc_remove_permissions(doc_id, perms = {perm_read_remove: [], perm_edit
       console.log(await model.docs.findOne({_id : doc_id}))
         model.docs.findOneAndUpdate (
             {_id : doc_id},
-            {  "$pullAll": { perm_edit: perms.perm_edit_remove || [],
+            {  edit_date : new Date(),
+               "$pullAll": { perm_edit: perms.perm_edit_remove || [],
                     perm_read: perms.perm_read_remove || [] }})
 
         send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
