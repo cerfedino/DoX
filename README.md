@@ -29,7 +29,7 @@ DoX is clearly inspired to well known online word processors such as [**Google D
 \
 \
 \
-This project spans from *22 November 2021* to *22 December 2021*.\
+This project spans from *22 November 2021* to *22 December 2021* (30 days).\
 Developed as part of the final group project for _Software Atelier 3: The Web SA 2020-2021_, part of BSc INF at USI Lugano.
 
 # Features :zap:
