@@ -31,18 +31,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
 <div class="editor-tools">
     <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
-        <i id="action-undo" class="action bi-arrow-counterclockwise" data-bs-toggle="tooltip" data-bs-placement="top"
-           title="Undo (Ctrl-Z)"></i>
-        <i id="action-redo" class="action bi-arrow-clockwise" data-bs-toggle="tooltip" data-bs-placement="top"
-           title="Redo (Ctrl-Shift-Z)"></i>
-
-        <i id="action-bold" class="action bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
-           title="Bold (Ctrl-B)"></i>
-        <i id="action-italic" class="action bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
-           title="Italic (Ctrl-I)"></i>
-        <i id="action-underline" class="action bi-type-underline" data-bs-toggle="tooltip" data-bs-placement="top"
-           title="Underline (Ctrl-U)"></i>
-
+        
         <div class="dropdown me-2">
             <button class="btn-sm btn-secondary dropdown-toggle" type="button" id="headingMenu"
                     data-bs-toggle="dropdown" aria-expanded="false">Normal text
@@ -75,6 +64,14 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 </li>
             </ul>
         </div>
+ 
+
+        <i id="action-bold" class="action bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Bold (Ctrl-B)"></i>
+        <i id="action-italic" class="action bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Italic (Ctrl-I)"></i>
+        <i id="action-underline" class="action bi-type-underline" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Underline (Ctrl-U)"></i>
 
         <input class="me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Text color"
                id="action-pick-color"
@@ -98,6 +95,14 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                title="Insert link"></i>
         </a>
 
+        <i id="action-undo" class="action bi-arrow-counterclockwise" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Undo (Ctrl-Z)"></i>
+        <i id="action-redo" class="action bi-arrow-clockwise" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Redo (Ctrl-Shift-Z)"></i>
+
+
+
+
         <div class="ms-auto d-flex flex-wrap">
             <div class="text-end d-flex flex-wrap ms-3">
                 <div class="dropdown dropdown-menu-end me-2">
@@ -108,9 +113,9 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                         style="width: 320px">
                     </ul>
                 </div>
-                <button type="button" class="btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#renameModal">
+                <!-- <button type="button" class="btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#renameModal">
                     Rename
-                </button>
+                </button> -->
                 <button id="button-share" type="button" class="btn btn-warning px-3 me-2">
                     <i class="bi-share"></i>
                 </button>

@@ -10,6 +10,7 @@
 
 .action-icons {
     font-size: 1.3rem;
+    color: var(--text);
 }
 
 .action-icons i.action {
@@ -17,34 +18,50 @@
     margin-right: 2px;
     border-radius: 5px;
     cursor: pointer;
+    transition: all 0.1s;
 }
 
 .action-icons i.action.active {
-    color: #1818ff;
-    background-color: #dbdbff;
+    color: var(--accent);
+    background-color: var(--bg-contrast);
+    transition: all 0.1s;
 }
 
 .action-icons i.action.disabled {
     cursor: auto;
-    color: #a3a3a3;
-    background-color: #e5e5e5;
+    color: var(--bg-contrast);
+    background-color: var(--bg);
+    transition: all 0.1s;
 }
 
 .action-icons i.action:hover {
-    background-color: #e5e5e5;
+    
+    background-color: var(--bg-hover);
+    transition: all 0.1s;
 }
 
 .action-icons i.action.active:hover {
-    color: #1818ff;
-    background-color: #dbdbff;
+    color: var(--accent);
+    background-color: var(--bg-contrast);
+    transition: all 0.1s;
 }
 
 .action-icons i.action.disabled:hover {
-    color: #a3a3a3;
-    background-color: #e5e5e5;
+    color: var(--text);
+    transition: all 0.1s;
+    background-color: var(--bg-hover);
+}
+
+.dropdown-toggle#headingMenu {
+    background-color: var(--bg);
+    color: var(--text);
+    width: 110px;
+    border-radius: 5px;
+    border: 2px solid var(--text);
 }
 
 #action-pick-color {
+    background-color: var(--bg);
     border: none;
     cursor: pointer;
     width: 35px;
