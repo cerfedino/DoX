@@ -6,13 +6,13 @@
     <% if(extra) { %>
         <div id="extra">
 
-            <% if (extra == "search") { %>
+            <% if (extra === "search") { %>
                 <input id="search" type="text" placeholder="Search...">
 
 
-            <% } else if ( extra == "editor") { %>
+            <% } else if ( extra === "editor") { %>
 
-                <h1 data-bs-toggle="modal" data-bs-target="#renameModal"><%= doc.title %></h1>
+                <h1 id="doc-title" data-bs-toggle="modal" data-bs-target="#renameModal"><%= doc.title %></h1>
 
                 <!-- <div style="display: flex;">
                     <button>Share</button>

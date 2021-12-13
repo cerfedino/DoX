@@ -10,8 +10,6 @@
 </script>
 
 
-
-
 <%
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
@@ -31,128 +29,101 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 <body class="">
 <%- include('includes/header', {'extra' : "editor"}) %>
 
-<!-- <header class="style">
-    <div id="pageheader" class="py-4 text-white">
-        <div class="container">
-            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <div class="h3 me-auto col-auto">
-                    <a class="text-white text-decoration-none" href="../docs/" data-bs-toggle="tooltip"
-                       data-bs-placement="bottom"
-                       title="Return to the documents page">
-                        <i class="bi-house-door-fill"></i>
-                    </a>
-                    <span id="doc-title" class="doc-title text-white"><%= doc.title %></span>
-                </div>
-                <div class="text-end d-flex flex-wrap ms-3">
-                    <p id="message-save" class="mt-auto mb-auto me-3"></p>
-                    <button id="button-save" type="button" class="btn btn-success me-1">
-                        <i class="bi-save me-1"></i>
-                        Save
-                    </button>
-                    
-                </div>
-            </div>
+<div class="editor-tools">
+    <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
+        <i id="action-undo" class="action bi-arrow-counterclockwise" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Undo (Ctrl-Z)"></i>
+        <i id="action-redo" class="action bi-arrow-clockwise" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Redo (Ctrl-Shift-Z)"></i>
+
+        <i id="action-bold" class="action bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Bold (Ctrl-B)"></i>
+        <i id="action-italic" class="action bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Italic (Ctrl-I)"></i>
+        <i id="action-underline" class="action bi-type-underline" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Underline (Ctrl-U)"></i>
+
+        <div class="dropdown me-2">
+            <button class="btn-sm btn-secondary dropdown-toggle" type="button" id="headingMenu"
+                    data-bs-toggle="dropdown" aria-expanded="false">Normal text
+            </button>
+
+            <ul class="dropdown-menu" aria-labelledby="headingMenu">
+                <li>
+                    <button id="action-h1" class="dropdown-item h1">Heading 1</button>
+                </li>
+                <li>
+                    <button id="action-h2" class="dropdown-item h2">Heading 2</button>
+                </li>
+                <li>
+                    <button id="action-h3" class="dropdown-item h3">Heading 3</button>
+                </li>
+                <li>
+                    <button id="action-h4" class="dropdown-item h4">Heading 4</button>
+                </li>
+                <li>
+                    <button id="action-h5" class="dropdown-item h5">Heading 5</button>
+                </li>
+                <li>
+                    <button id="action-h6" class="dropdown-item h6">Heading 6</button>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <button id="action-p" class="dropdown-item">Normal text</button>
+                </li>
+            </ul>
         </div>
-    </div> -->
-    
-    <div class="editor-tools">
-        <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
-            <i id="action-undo" class="bi-arrow-counterclockwise" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Undo (Ctrl-Z)"></i>
-            <i id="action-redo" class="bi-arrow-clockwise" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Redo (Ctrl-Shift-Z)"></i>
 
-            <i id="action-bold" class="bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Bold (Ctrl-B)"></i>
-            <i id="action-italic" class="bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Italic (Ctrl-I)"></i>
-            <i id="action-underline" class="bi-type-underline" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Underline (Ctrl-U)"></i>
+        <input class="me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Text color"
+               id="action-pick-color"
+               type="color" value="#000000"
+               aria-label="Text color">
 
-            <div class="dropdown me-2">
-                <button class="btn-sm btn-secondary dropdown-toggle" type="button" id="headingMenu"
-                        data-bs-toggle="dropdown" aria-expanded="false">Normal text
-                </button>
-                
-                <ul class="dropdown-menu" aria-labelledby="headingMenu">
-                    <li>
-                        <button id="action-h1" class="dropdown-item h1">Heading 1</button>
-                    </li>
-                    <li>
-                        <button id="action-h2" class="dropdown-item h2">Heading 2</button>
-                    </li>
-                    <li>
-                        <button id="action-h3" class="dropdown-item h3">Heading 3</button>
-                    </li>
-                    <li>
-                        <button id="action-h4" class="dropdown-item h4">Heading 4</button>
-                    </li>
-                    <li>
-                        <button id="action-h5" class="dropdown-item h5">Heading 5</button>
-                    </li>
-                    <li>
-                        <button id="action-h6" class="dropdown-item h6">Heading 6</button>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <button id="action-p" class="dropdown-item">Normal text</button>
-                    </li>
-                </ul>
-            </div>
+        <i id="action-lift-item" class="action bi-text-indent-left" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Lift list item"></i>
+        <i id="action-bullet-list" class="action bi-list-ul" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Bulleted list (Ctrl-Shift-8)"></i>
+        <i id="action-ordered-list" class="action bi-list-ol" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Ordered list (Ctrl-Shift-7)"></i>
 
-            <input class="me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Text color"
-                   id="action-pick-color"
-                   type="color" value="#000000"
-                   aria-label="Text color">
+        <a data-bs-toggle="modal" data-bs-target="#insertImageModal">
+            <i class="action bi-image" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Insert image"></i>
+        </a>
 
-            <i id="action-lift-item" class="bi-text-indent-left" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Lift list item"></i>
-            <i id="action-bullet-list" class="bi-list-ul" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Bulleted list (Ctrl-Shift-8)"></i>
-            <i id="action-ordered-list" class="bi-list-ol" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Ordered list (Ctrl-Shift-7)"></i>
+        <a data-bs-toggle="modal" data-bs-target="#insertLinkModal">
+            <i class="action bi-link" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Insert link"></i>
+        </a>
 
-            <a data-bs-toggle="modal" data-bs-target="#insertImageModal">
-                <i class="bi-image" data-bs-toggle="tooltip" data-bs-placement="top"
-                   title="Insert image"></i>
-            </a>
-
-            <a data-bs-toggle="modal" data-bs-target="#insertLinkModal">
-                <i class="bi-link" data-bs-toggle="tooltip" data-bs-placement="top"
-                   title="Insert link"></i>
-            </a>
-
-            <div class="ms-auto d-flex flex-wrap">
-            
-                <div class="dropdown dropdown-menu-end me-1">
-                    <button class="btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+        <div class="ms-auto d-flex flex-wrap">
+            <div class="text-end d-flex flex-wrap ms-3">
+                <div class="dropdown dropdown-menu-end me-2">
+                    <button class="btn-sm btn-primary dropdown-toggle h-100" type="button" data-bs-toggle="dropdown"
                             aria-expanded="false" id="active-users-button">Active
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="active-users-button" id="active-users"
                         style="width: 320px">
                     </ul>
                 </div>
-
-                <button type="button" class="btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal">
+                <button type="button" class="btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#renameModal">
                     Rename
                 </button>
-                
-
-                <div style="display: flex;">
-
-                    <button type="button-share" class="btn btn-warning px-3"><i class="bi bi-share"></i></button>
-
-                    <div class="text-end d-flex flex-wrap ms-3">
-
-                        <button id="button-save" type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i></button>
-                        <p style="position:absolute; margin-left: 100px;" id="message-save" class="mt-auto mb-auto me-3"></p>
-                    </div>
-                </div>
+                <button id="button-share" type="button" class="btn btn-warning px-3 me-2">
+                    <i class="bi bi-share"></i>
+                </button>
+                <button id="button-save" type="button" class="btn btn-success">
+                    <i class="bi-save me-1"></i>
+                </button>
+                <p id="message-save"
+                   class="mt-auto mb-auto me-3"></p>
             </div>
+
         </div>
     </div>
+</div>
 <!-- </header> -->
 <main class="document-view">
     <div id="editor" class="p-5">
@@ -211,7 +182,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <input type="submit" class="btn btn-primary" id="action-insert-image" value="Rename">
+                <input type="submit" class="btn btn-primary" id="action-rename" value="Rename">
             </div>
         </form>
     </div>

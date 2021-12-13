@@ -148,7 +148,7 @@ socket.on('update', ({version, steps, stepClientIDs}) => {
 })
 socket.on('save-success', () => {
     console.info('Received SAVE-SUCCESS event');
-    document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
+    //document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
     let messageSave = document.getElementById('message-save');
 
     messageSave.innerText = 'Saved successfully!';
@@ -161,26 +161,20 @@ socket.on('save-success', () => {
 })
 socket.on('save-fail', ({error}) => {
     console.error('Received SAVE-FAIL event with data: ', error);
-    document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
+    //document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
     let messageSave = document.getElementById('message-save');
 
     messageSave.classList.add('text-danger');
     messageSave.classList.remove('text-secondary');
     messageSave.innerText = 'Error occurred while saving!';
 })
-socket.on('rename-success', ({newName}) => {
-    console.info('Received RENAME-SUCCESS event with new title ' + newName);
+socket.on('notify-update', ({data}) => {
+    console.info('Received NOTIFY-UPDATE event');
+    if (!data.title) return;
 
-    document.getElementById('doc-title').innerText = newName;
-    document.querySelector('title').innerText = 'DoX - Edit - ' + newName;
-
-    bootstrap.Modal.getOrCreateInstance(document.getElementById('renameModal')).hide();
-    document.getElementById('new-name').value = '';
-    document.getElementById('new-name').placeholder = newName;
-})
-socket.on('rename-fail', ({error}) => {
-    console.error('Received RENAME-FAIL event. ' + error);
-    alert(error);
+    document.getElementById('new-name').value = data.title;
+    document.getElementById('doc-title').innerText = data.title;
+    document.querySelector('title').innerText = 'DoX - Edit - ' + data.title;
 })
 socket.on('selection-changed', connected => {
     let entries = Object.entries(connected);
@@ -301,7 +295,27 @@ document.getElementById('renameModal').addEventListener('hidden.bs.modal', () =>
 document.getElementById('rename-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     let name = document.getElementById('new-name');
-    socket.emit('rename', name.value);
+    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('renameModal'));
+
+    let result = await fetch('/docs/' + documentID, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            tags: {
+                title: name.value
+            }
+        })
+    })
+
+    if (!result.ok) {
+        alert('Error occurred! Please try again');
+        return;
+    }
+
+    document.getElementById('doc-title').innerText = name.value;
+    document.querySelector('title').innerText = 'DoX - Edit - ' + name.value;
+
+    modal.hide();
 });
 // Insert link
 document.getElementById('insertLinkModal').addEventListener('shown.bs.modal', () => {
