@@ -378,6 +378,15 @@ a {
     align-items: center;
 }
 
+.reverse-sort, .rev {
+    display: none;
+}
+
+.active-sort-display {
+    display: inline-block;
+    margin-top: 4px;
+}
+
 .list .card-element {
     
     max-height: 350px !important;
@@ -442,6 +451,10 @@ a {
     font-style: italic;
 }
 
+.info {
+    display: flex;
+    flex-direction: row;
+}
 
 .list .card-element .info.creation-date {
     display: block;

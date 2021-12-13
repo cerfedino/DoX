@@ -155,6 +155,7 @@ function setSortListeners() {
     row.querySelectorAll('a').forEach(a=>a.addEventListener('click',function(event){
         event.preventDefault();
 
+        debugger
         let type;
         let action = a.getAttribute('rel');
         if (action.endsWith('-date')) {
@@ -166,7 +167,14 @@ function setSortListeners() {
         let activeSort = document.querySelector('button.active-sort');
         activeSort.setAttribute('data-toggle',action);
         document.querySelector('div.sort > .btn-secondary.dropdown-toggle').innerHTML = action;
-
+        document.querySelectorAll('.reverse-sort').forEach(item=>{
+            if (item.classList.contains('active-sort-display')) {
+                item.classList.remove('active-sort-display');
+            }
+        })
+        debugger
+        this.parentNode.parentNode.querySelector('.reverse-sort').classList.add('active-sort-display');
+        
         // First, we take all the actual values
         let values = [];
         let nonCaseSensitiveValues = [];
