@@ -532,7 +532,6 @@ function menuPlugin(items) {
  * Saves the document
  */
 async function save() {
-    document.getElementById('button-save').innerHTML = 'Saving...'
     socket.emit('save');
 }
 
