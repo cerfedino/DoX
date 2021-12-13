@@ -210,12 +210,14 @@ input[name="filter-submit"]:hover {
     flex: 1;
     margin-left: 2px;
     margin-right: 2px;
-    border: 0;
-    background-color: var(--bg-contrast);
+    border: none;
+    border-radius: 10px;
+    padding: 5px 10px;
+    background-color: var(--bg-hover);
     text-align: left;
-    text-overflow: ellipsis;
+    width: fit-content;
+    color: var(--text);
     white-space: nowrap;
-    overflow: hidden;
 }
 
 #reverse-sort {
