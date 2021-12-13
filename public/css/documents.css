@@ -510,6 +510,19 @@ a {
     color: var(--text);
 }
 
+#no-documents {
+    position: absolute;
+    width: 100%;
+    margin: 0;
+    padding-top: 20px;
+    display: flex;
+    justify-content: center;
+    background-color: var(--bg);
+    font-size: xx-large;
+    font-style: italic;
+    color: var(--text);
+}
+
 body.dark-theme .delete img, body.dark-theme img#threedots, body.dark-theme img#shared {
     filter: invert(1);
 }

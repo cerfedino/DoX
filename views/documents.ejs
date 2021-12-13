@@ -105,20 +105,23 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         </section>
     </section>
 
-
     <main >
+        <% if(docs.length == 0) { %>
+            <div id="no-documents">No documents</div>
+        <% } %>
+    
         
         <section class="cards" id="table-of-documents">
-            <article class="list-element head">
-                <span class="info"></span>
-                <span class="info"><b><a href="#" rel="title">Title</a></b></span>
-                <span class="info"><b><a href="#" rel="owner">Owner</a></b></span>
-                <span class="info"><b><a href="#" rel="shared">Shared</a></b></span>
-                <span class="info"><b><a href="#" rel="edit-date">Last Edit</a></b></span>
-                <span class="info"><b><a href="#" rel="creation-date">Creation Date</a></b></span>
-                <span class="info"><b><a href="#">Delete</a></b></span>
-            </article>
-
+                <article class="list-element head">
+                    <span class="info"></span>
+                    <span class="info"><b><a href="#" rel="title">Title</a></b></span>
+                    <span class="info"><b><a href="#" rel="owner">Owner</a></b></span>
+                    <span class="info"><b><a href="#" rel="shared">Shared</a></b></span>
+                    <span class="info"><b><a href="#" rel="edit-date">Last Edit</a></b></span>
+                    <span class="info"><b><a href="#" rel="creation-date">Creation Date</a></b></span>
+                    <span class="info"><b><a href="#">Delete</a></b></span>
+                </article>
+            
             <% docs.forEach((doc)=>{ %>
                 <article id="<%= doc._id %>" class="card-element">
                     <a id="icon" href="docs/<%= doc._id %>">
