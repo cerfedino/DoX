@@ -65,7 +65,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <a class="dropdown-item" href="#" rel="shared"># of shares</a>
             </div>
         </div>
-        <a id="reverse-sort" href="">
+        <a id="reverse-sort" href="#">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sort-alpha-down-alt" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371h-1.781zm1.57-.785L11 2.687h-.047l-.652 2.157h1.351z"/>
                 <path d="M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645V14zM4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293V2.5z"/>
@@ -89,8 +89,8 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                         <input name="filter-read" type="checkbox">
                     </article>
                     <article class="dropdown-item filter">
-                        <label for="filter-write">Writing Permissions</label>
-                        <input name="filter-write" type="checkbox">
+                        <label for="filter-edit">Writing Permissions</label>
+                        <input name="filter-edit" type="checkbox">
                     </article>
                     <article class="dropdown-item filter">
                         <label for="filter-shared">Shared Documents</label>
@@ -172,7 +172,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                                 }
                             }
                         }) %>
-                    <p class="shared"><%= doc_perms.length %></p>
+                    <p class="shared"><%= doc_perms.length - 1 %></p>
                     <a class="perms" id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title='<div class="popovertitle">Shared with</div>'
                         data-content='
                         
@@ -212,31 +212,6 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 <%- messagesuccess %>
 <%- messagefailure %>
 
-
-<script>
-
-    // Returns the username matching the given User's Id
-    function getUsernameById(id){
-        return new Promise((resolve,reject)=>{
-            let filter = {_id: id};
-            fetch('users/'+filter._id)
-            .then(res=>res.json())
-            .then(user=>{
-                if (user.username == document.querySelector('#info > h2').innerHTML) {
-                    resolve("me");
-                } else {
-                    resolve(user.username);
-                }
-            })
-            .catch(err=>{
-                if (dom.innerHTML == ""){
-                    reject("invalid user");
-                }
-            });
-            
-        })
-    }
-</script>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>

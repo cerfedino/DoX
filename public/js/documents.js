@@ -321,6 +321,7 @@ function setSaveListeners() {
             call = false;
         }
 
+
         // First reset the whole page so that the filters are all reapplied
         let toBeReseted = [];
         let list = document.getElementById('table-of-documents');
@@ -352,6 +353,10 @@ function setSaveListeners() {
                     button.classList.add(checkbox.name);
                     button.innerHTML = item.innerHTML + " X";
                     active.appendChild(button);
+                    button.addEventListener('click',(event)=>{
+                        checkbox.click();
+                        document.querySelector('input[name="filter-submit"]').click();
+                    });
                 }
                 setActiveFilter(checkbox);
             } else {
@@ -361,11 +366,6 @@ function setSaveListeners() {
                 }
             }
         })
-
-        /* filteredDocuments = [];
-        document.querySelectorAll('.card-element').forEach(row=>{
-            filteredDocuments.push(row);
-        }) */
     })
 }
 
@@ -377,6 +377,7 @@ function setActiveFilter(checkbox){
     if (checkbox.type != 'checkbox') {
         return undefined;
     }
+    debugger
 
     let rows = [];
     document.querySelectorAll('.card-element').forEach(el=>{
@@ -385,29 +386,32 @@ function setActiveFilter(checkbox){
         }
     })
     let type = checkbox.name.split('-')[1];
+    debugger
     if (type == 'owned'){
         rows.forEach(row=>{
-            if (row.querySelector('.info.owner').innerHTML != 'me'){
+            debugger
+            if (row.querySelector('.info.owner').innerHTML != '<i>me</i>'){
                 row.parentNode.removeChild(row);
             }
         })
     } else if (type == 'read' || type == 'edit'){
         rows.forEach(row=>{
+            debugger
             let articles = document.createElement('SECTION');
-            articles.innerHTML = row.querySelector('a[data-title="Shared with"]').getAttribute('data-content');
+            articles.innerHTML = row.querySelector('a.perms').getAttribute('data-content');
             articles.querySelectorAll('.dropdown-item').forEach(item=>{
-                let parts = item.innerHTML.split(' ');
-                let i = 0;
-                while (parts[i] != 'read' && parts[i] != 'edit' && parts[i] != 'Document') {
-                    i++;
-                }
-                if (parts[i] != type || parts[i-1] != 'me'){
-                    row.parentNode.removeChild(row);
+                if (!item.innerHTML.includes('Document not shared')) {
+                    let role = item.querySelector('.role').innerHTML;
+                    let user = item.querySelector('.user').innerHTML;
+                    if (role != type || user != '<i>me</i>'){
+                        row.parentNode.removeChild(row);
+                    }
                 }
             })
         })
     } else {
         rows.forEach(row=>{
+            debugger
             let n = parseInt(row.querySelector('p.shared').innerHTML);
             if (n == 0) {
                 row.parentNode.removeChild(row);
@@ -421,8 +425,6 @@ function setBaseDocuments() {
     base_documents = [];
     document.querySelectorAll('.card-element').forEach(el=>{
         base_documents.push(el);
-        // filteredDocuments.push(el);
-        // searchDocuments.push(el);
     })
 }
 
