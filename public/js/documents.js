@@ -165,6 +165,7 @@ function setSortListeners() {
 
         let activeSort = document.querySelector('button.active-sort');
         activeSort.setAttribute('data-toggle',action);
+        document.querySelector('div.sort > .btn-secondary.dropdown-toggle').innerHTML = action;
 
         // First, we take all the actual values
         let values = [];
