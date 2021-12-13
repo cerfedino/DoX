@@ -289,7 +289,6 @@ document.getElementById('renameModal').addEventListener('shown.bs.modal', () => 
     document.getElementById('new-name').focus();
 });
 document.getElementById('renameModal').addEventListener('hidden.bs.modal', () => {
-    document.getElementById('new-name').value = '';
     editor.focus();
 });
 document.getElementById('rename-form').addEventListener('submit', async (e) => {
