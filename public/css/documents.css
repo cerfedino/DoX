@@ -4,6 +4,20 @@
 ########################
 */
 
+body {
+    display: flex;
+    flex-direction: column;
+    --bg-tool-bar: rgb(165, 165, 165);
+    --bg-tool-bar-button: #007bff;
+    --text-tool-bar-button: white;
+    --bg-active-mode: rgb(200, 200, 200);
+}
+
+body.dark-theme, body.dark-theme * {
+    --bg-tool-bar: rgb(44, 44, 44);
+    --bg-active-mode: rgb(165, 165, 165);
+}
+
 .card.document {
     background: var(--bg);
     border: var(--text) 2px solid;
@@ -15,6 +29,16 @@
 /*
 ########################
 */
+
+input#search {
+    border: 1px solid var(--bg-contrast);
+    border-radius: 10px;
+    padding: 5px 15px;
+    height: 60px;
+    background-color: var(--bg);
+    color: var(--text);
+    width: 100%
+}
 
 
 .form-control-dark:focus {
@@ -50,4 +74,470 @@ div.card div.card-footer *{
 
 svg#logo {
     height: 3vmax;
+}
+
+
+
+/* ############################
+
+    TOOLBAR
+
+##############################*/
+
+.tools-bar {
+    position: -webkit-sticky;
+    position: sticky;
+    margin-top:-20px;
+    top: 80px;
+    padding: 10px;
+    /* border-radius: 0  0 20px 20px; */
+    background-color: var(--bg);
+    box-shadow: 0px 6px 8px 0px var(--shadow);
+    margin-bottom: 20px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.tools-bar > * {
+    margin-left: 10px;
+    margin-right: 10px;
+
+}
+
+.switch-list-grid {
+    border-radius: 10px;
+    min-width: 80px;
+    display: flex;
+    flex-direction: row;
+}
+
+.tools-bar a.new-doc {
+    background-color: var(--accent);
+    width: 160px;
+    height: 40px;
+    border-radius: 10px;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+
+    letter-spacing: 1px;
+    transition: letter-spacing 0.5s;
+}
+
+.tools-bar a.new-doc:hover {
+    letter-spacing: 3px;
+    transition: all 0.5s;
+}
+
+.list-view, .grid-view {
+    color: var(--text);
+    border-radius: 10px;
+    border:none;
+    padding: 10px;
+    flex: 1;
+    transition: color 0.5s;
+    transition: background-color 0.5s;
+}
+
+.grid-view {
+    color: var(--accent);
+    background-color: var(--bg-contrast);
+}
+
+.grid-view:hover {
+    color: var(--accent);
+}
+
+.active {
+    background-color: var(--bg-active-mode);
+}
+
+.tools-bar .btn-secondary.dropdown-toggle {
+    color: var(--text);
+    background-color: var(--bg);
+    border: 0;
+}
+
+.tools-bar .btn-secondary.dropdown-toggle:hover {
+    background-color: var(--bg);
+}
+
+.filter .dropdown-menu {
+    background-color: var(--bg);
+}
+
+#filters {
+    padding: 10px;
+}
+
+#filters > article {
+    display: flex;
+    flex-direction: row;
+}
+
+#filters > article > label {
+    flex: 97%;
+}
+
+#filters > article > input {
+    margin-top: 5px;
+    flex: 3%;
+}
+
+input[name="filter-submit"] {
+    border-radius: 5px;
+    background-color: var(--bg-tool-bar-button);
+    color: var(--text-tool-bar-button);
+    width: 100%;
+    border: 0;
+    opacity: 1;
+}
+
+input[name="filter-submit"]:hover {
+    --bg-tool-bar-button: rgb(45, 84, 212);
+}
+
+.active-filters {
+    display: flex;
+    flex-direction: row;
+}
+
+.active-filters > * {
+    flex: 1;
+    margin-left: 2px;
+    margin-right: 2px;
+    border: none;
+    border-radius: 10px;
+    padding: 5px 10px;
+    background-color: var(--bg-hover);
+    text-align: left;
+    width: fit-content;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+#reverse-sort {
+    background-color: var(--bg);
+}
+
+a {
+    color: var(--text);
+    text-decoration: none;
+}
+
+
+
+/* ############################
+
+    GRID VIEW
+
+##############################*/
+
+.cards {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: row;
+    /* display: none; */
+    flex-wrap: wrap;
+}
+
+.cards .list-element.head {
+    display: none;
+}
+
+.cards .card-element {
+
+    width: 250px !important;
+    max-height: 350px !important;
+    margin: 10px;
+    border-radius: 10px;
+    padding:10px;
+    cursor: pointer;
+
+    display: grid;
+
+    grid-template-columns: 1fr 3fr 1fr;
+    grid-template-rows: 2fr 2fr 0.5fr auto;
+    box-shadow: -3px 3px 8px 2px var(--shadow);
+
+    grid-template-areas:
+        "icon icon icon"
+        "title title title"
+        "date date date"
+        "delete perms info";
+}
+
+.cards .card-element:hover {
+    box-shadow: -6px 6px 16px 10px var(--shadow);
+    transition: box-shadow 0.4s;
+}
+
+
+.cards .card-element > .actual-creation-date, .actual-edit-date, button.active-sort, p.owner, span[class='info creation-date'] {
+    display: none;
+}
+
+.cards .card-element  span.title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* number of lines to show */
+            line-clamp: 3; 
+    -webkit-box-orient: vertical;
+
+    line-height: 30px;
+    max-height: 90px;
+    word-wrap: break-word;
+    grid-area: title;
+    font-size:  x-large;
+    font-weight: bold;
+}
+
+.cards .card-element > #icon {
+    grid-area: icon;
+    border-bottom: 1px solid black;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cards .card-element #icon img {
+    height: 180px;
+    padding: 10px;
+}
+
+
+
+.cards .card-element > span[class="info edit-date"] {
+    grid-area: date;
+    font-size: small;
+    font-style: italic;
+}
+
+.cards .card-element a.delete {
+    grid-area: delete;
+}
+
+
+.cards .card-element > a#end {
+    grid-area: perms;
+    text-align: right;
+}
+
+.cards .card-element > a#start {
+    grid-area: info;
+    text-align: right;
+}
+
+
+.cards .card-element > #content {
+    display: none;
+    margin: 10px;
+    grid-area: content;
+    font-family: monospace;
+    font-size: small;
+    
+}
+
+.cards .card-element > span[class="info owner"] {
+    display: none;
+}
+
+
+
+.card-element a { 
+    text-decoration: none;
+    color: var(--text);
+}
+
+
+/* ############################
+
+    LIST VIEW
+
+##############################*/
+
+.list {
+    margin: 10px;
+
+    flex-direction: column;
+}
+
+.list .list-element.head {
+    display: grid;
+    margin: 10px -10px;
+    margin-top: -20px;
+    padding: 20px;
+    padding-bottom: 10px;
+    margin-right: 10px;
+    grid-template-columns: 50px 3fr 1fr 0.5fr 1fr 1fr 0.1fr;
+    grid-template-areas: "icon title owner perms last-edit created delete";
+    align-items: center;
+}
+
+.reverse-sort, .rev {
+    display: none;
+}
+
+.active-sort-display {
+    display: inline-block;
+    margin-top: 4px;
+}
+
+.list .card-element {
+    
+    max-height: 350px !important;
+    margin: 10px;
+    border-radius: 10px;
+    padding:10px;
+    cursor: pointer;
+
+    display: grid;
+
+    grid-template-columns: 50px  3fr  1fr  0.5fr    1fr      1fr   0.1fr;
+    grid-template-areas: "icon title owner perms last-edit created delete";
+    
+    box-shadow: -3px 3px 8px 2px var(--shadow);
+    align-items: center;
+}
+
+.list .card-element:hover {
+    box-shadow: -6px 6px 16px 10px var(--shadow);
+    transition: box-shadow 0.4s;
+}
+
+
+.list .card-element > .actual-creation-date, .actual-edit-date, p.shared, p.owner {
+    display: none;
+}
+
+
+.list .card-element > span.title {
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* number of lines to show */
+            line-clamp: 1; 
+    -webkit-box-orient: vertical;
+
+    line-height: 30px;
+    max-height: 30px;
+    word-wrap: break-word;
+
+    grid-area: title;
+    font-size:  x-large;
+    font-weight: bold;
+}
+
+.list .card-element #icon {
+    grid-area: icon;
+    margin-top: auto;
+    margin-bottom: auto;
+    
+}
+
+.list .card-element #icon img {
+    padding: 6px;   
+}
+
+
+.list .card-element > span[class="info edit-date"] {
+    grid-area: last-edit;
+    font-size: small;
+    font-style: italic;
+}
+
+.info {
+    display: flex;
+    flex-direction: row;
+}
+
+.list .card-element .info.creation-date {
+    display: block;
+    grid-area: created;
+    font-size: small;
+    font-style: italic;
+}
+
+
+.list .card-element a.delete {
+    grid-area: delete;
+    text-align: right;
+    padding-right: 20px;
+}
+
+
+.list .card-element > a#end {
+    grid-area: perms;
+}
+
+.list .card-element > a#start {
+    display: none;
+}
+
+
+.list .card-element > #content {
+    display: none;
+    margin: 10px;
+    grid-area: content;
+    font-family: monospace;
+    font-size: small;
+    
+}
+
+.list .card-element .info.owner {
+    grid-area: owner;
+}
+
+.dropdown-item.user {
+    display: flex;
+    justify-content: space-between;
+}
+
+.dropdown-item.user.user {
+    margin-right: 10px;
+}
+.dropdown-item.doc {
+    color: var(--text);
+    text-align: center;
+    font-style: italic;
+}
+
+.popovertitle {
+    background-color: var(--bg-contrast);
+    margin: -17px;
+    padding: 10px 16px;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid var(--bg-contrast);
+    color: var(--text);
+}
+
+.popover {
+    min-width: 200px;
+    background-color: var(--bg);
+    border-radius: 10px;
+    border-color: var(--bg-contrast);
+    box-shadow: -3px 3px 8px 2px var(--shadow);
+    color: var(--text);
+}
+
+#no-documents {
+    position: absolute;
+    width: 100%;
+    margin: 0;
+    padding-top: 20px;
+    display: flex;
+    justify-content: center;
+    background-color: var(--bg);
+    font-size: xx-large;
+    font-style: italic;
+    color: var(--text);
+}
+
+body.dark-theme .delete img, body.dark-theme img#threedots, body.dark-theme img#shared {
+    filter: invert(1);
 }

@@ -27,10 +27,17 @@ body,body * {
     --accent: #E63946;
     --accent-darker: #ad2933;
     --bg: #ffffff;
+    --bg-hover: #eeeeee;
     --bg-contrast: #c9c9c9;
     --bg-contrastt: #383838;
     --text: #333333;
     --contrast-text: #000000;
+    --shadow: #c9c9c9;
+    
+    --logo-minimal: url('../media/svg/logo_minimal.svg');
+    --logo-composed: url('../media/svg/logo_composed.svg');
+    --logo-notebook: url('../media/svg/notebook_icon_LIGHT.svg');
+
 }
 
 /* dark-theme */
@@ -38,10 +45,17 @@ body.dark-theme, body.dark-theme * {
     --accent: #E63946;
     --accent-darker: #ad2933;
     --bg: #1e1e1e;
+    --bg-hover: #333333;
     --bg-contrast: #565656;
     --bg-contrastt: #cbcbcb;
     --text: #cccccc;
     --contrast-text: #ffffff;
+    --shadow: #000000;
+    
+    --logo-minimal: url('../media/svg/logo_minimal_LIGHT.svg');
+    --logo-composed: url('../media/svg/logo_composed_LIGHT.svg');
+    --logo-notebook: url('../media/svg/notebook_icon.svg');
+
 }
 
 /*
@@ -50,6 +64,70 @@ body.dark-theme, body.dark-theme * {
 body {
     background-color: var(--bg);
 }
+
+
+header {
+    position: -webkit-sticky;
+    position: sticky;
+    z-index: 1;
+    top: 0px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: var(--bg);
+    /* box-shadow: 0 10px 30px 15px var(--bg-contrast); */
+    margin-bottom: 20px;
+}
+
+header #logo {
+    cursor: pointer;
+    background-image: url('../media/svg/logo_composed.svg');
+    background-repeat: no-repeat;
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+}
+@media only screen and (max-width: 800px) {
+    header #logo {
+        background-image: url('../media/svg/notebook_icon_LIGHT.svg');
+    }
+}
+
+header div#extra {
+    display: flex;
+    justify-content: space-between;
+    /* align-items: center; */
+    width: 60vw;
+    margin-left:-140px;
+}
+
+header div#extra h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* number of lines to show */
+            line-clamp: 1; 
+    -webkit-box-orient: vertical;
+    line-height: 50px;
+    min-height: 50px;
+    font-size: 40px;
+}
+
+header #profile_pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.modal #profile_pic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+}
+
+
 
 svg#logo {
     fill: var(--accent);
@@ -64,15 +142,8 @@ p,input,textarea,select, label,span,h1,h2,h3,h4,h5,h6 {
     background: var(--bg-contrastt);
 }
 
-
-#dark-mode-toggle {
-    position: absolute;
-    bottom: 1vh;
-    right: 1vh;
-}
-
 #alerts {
-    position : absolute;
+    position : fixed;
 
     width: 20%;
 
@@ -81,4 +152,155 @@ p,input,textarea,select, label,span,h1,h2,h3,h4,h5,h6 {
 }
 #alerts *{
     position : block;
+    display: flex;
+    justify-content: space-between;
 }
+
+.alert {
+    border-radius: 10px;
+    justify-content: space-between;
+    align-items: center;
+    display:flex;
+}
+
+.alert .close {
+    margin-left: auto !important;
+    border: 2px solid gray;
+    border-radius: 3px;
+    margin-left: auto;
+    position: absolute;
+    right: 1em;
+    border: none;
+    background-color: inherit;
+}
+
+button.close span {
+    color: black;
+}
+
+
+
+
+
+#renameModal {
+    border-radius: 20px;
+}
+
+.modal-user {
+    display: none; 
+    position: fixed; 
+    z-index: 99999;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto;
+    /* background-color: rgb(0,0,0); */
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-user .modal-content {
+    text-align: center;
+    position: relative;
+    background-color: var(--bg);
+    margin-right: 20px;
+    margin-left: auto;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    width: 20%;
+    /* box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19); */
+    box-shadow: -6px 6px 16px 10px rgba(0,0,0,0.2);
+    
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+.modal-user .modal-content .modal-body {
+    border-top: 1px solid var(--bg-contrast);
+    border-bottom: 1px solid var(--bg-contrast);
+}
+
+.modal-user .modal-header {
+    justify-content: center;
+}
+
+.dark-mode {
+    margin-right: auto;
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from { opacity:0} 
+    to {right:0; opacity:1}
+}
+  
+@keyframes animatetop {
+    from { opacity:0}
+    to {right:0; opacity:1}
+}
+
+
+.modal-user .modal-body input {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.modal-user .modal-body input#username, .modal .modal-body input#password{
+    margin-bottom: 10px;
+    border-radius: 10pt;
+    border: 1px solid var(--bg-contrast);
+    width: 100%;
+    margin-bottom: 10px;
+    background-color: var(--bg);
+    color: var(--text);
+    padding: 6px;
+}
+
+.modal-user .modal-body input#username {
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+}
+
+
+input[type=file]::-webkit-file-upload-button {
+    display: none; 
+}
+input[type=file] {
+    cursor: pointer;
+    font-size: 10pt;
+    width: 300px;
+    padding: 10px;
+    margin-left: -20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+input[type=file]::before {
+    color: var(--text);
+    content: 'Upload profile picture';
+    background-color: var(--bg-contrast);
+    font-size: 10pt;
+    padding: 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+    width: 200px;
+}
+
+input[type=file]:active::before {
+    background-color: gray;
+}
+
+/* Added */
+/* a {
+    color: var(--text);
+    text-decoration: none;
+}
+
+a:hover {
+    opacity: 70%;
+} */

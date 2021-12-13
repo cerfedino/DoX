@@ -4,45 +4,68 @@
     margin-bottom: 10%;
     border-radius: 5px;
     border: 1px solid #dddddd;
-    box-shadow: -15px 10px 30px 15px var(--bg-contrast);
+    box-shadow: -15px 10px 30px 15px var(--shadow);
     background: white;
 }
 
 .action-icons {
     font-size: 1.3rem;
+    color: var(--text);
 }
 
-.action-icons i {
-    padding-right: 5px;
-    padding-left: 5px;
+.action-icons i.action {
+    padding: 4px;
     margin-right: 2px;
     border-radius: 5px;
     cursor: pointer;
+    transition: all 0.1s;
 }
 
-.action-icons i.active {
-    color: #1818ff;
-    background-color: #dbdbff;
+.action-icons i.action.active {
+    color: var(--accent);
+    background-color: var(--bg-contrast);
+    transition: all 0.1s;
 }
 
-.action-icons i.disabled {
+.action-icons i.action.disabled {
     cursor: auto;
-    color: #a3a3a3;
-    background-color: #e5e5e5;
+    color: var(--bg-contrast);
+    background-color: var(--bg);
+    transition: all 0.1s;
 }
 
-.action-icons i:hover {
-    background-color: #e5e5e5;
+.action-icons i.action:hover {
+    
+    background-color: var(--bg-hover);
+    transition: all 0.1s;
 }
 
-.action-icons i.active:hover {
-    color: #1818ff;
-    background-color: #dbdbff;
+.action-icons i.action.active:hover {
+    color: var(--accent);
+    background-color: var(--bg-contrast);
+    transition: all 0.1s;
 }
 
-.action-icons i.disabled:hover {
-    color: #a3a3a3;
-    background-color: #e5e5e5;
+.action-icons i.action.disabled:hover {
+    color: var(--text);
+    transition: all 0.1s;
+    background-color: var(--bg-hover);
+}
+
+.dropdown-toggle#headingMenu {
+    background-color: var(--bg);
+    color: var(--text);
+    width: 110px;
+    border-radius: 5px;
+    border: 2px solid var(--text);
+}
+
+#action-pick-color {
+    background-color: var(--bg);
+    border: none;
+    cursor: pointer;
+    width: 35px;
+    height: 25px;
 }
 
 .ProseMirror:focus {
@@ -54,4 +77,26 @@
     margin-left: auto;
     margin-right: auto;
     display: block;
+}
+
+
+.editor-tools {
+    position: -webkit-sticky;
+    position: sticky;
+    margin-top:-20px;
+    top: 80px;
+    justify-content:center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    /* border-radius: 0  0 20px 20px; */
+    background-color: var(--bg);
+    /* box-shadow: 0 20px 20px 0 var(--shadow); */
+    box-shadow: 0px 6px 8px 0px var(--shadow);
+
+    margin-bottom: 20px;
+}
+
+.editor-tools #actions {
+    min-width:60%;
+    max-width: 60%;
 }

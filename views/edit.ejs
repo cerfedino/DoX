@@ -1,3 +1,15 @@
+<!-- trying to fix white flashes when opening a page using dark mode-->
+<script>
+    if (localStorage.getItem("dark_mode") == 'true') {
+        document.body.classList.add("dark-theme")
+        document.querySelector("#dark-mode-toggle").checked = true
+    } else {
+        document.body.classList.remove('dark-theme')
+        document.querySelector("#dark-mode-toggle").checked = false
+    }
+</script>
+
+
 <%
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
@@ -15,81 +27,109 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="">
-<header>
-    <div id="pageheader" class="py-4 text-white">
-        <div class="container">
-            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <div id="doc-title" class="h3 me-auto col-auto"><%= doc.title %></div>
-                <div class="text-end d-flex flex-wrap ms-3">
-                    <p id="message-save" class="mt-auto mb-auto me-3"></p>
-                    <button id="button-save" type="button" class="btn btn-success me-1"><i class="bi-save me-1"></i>
-                        Save
+<%- include('includes/header', {'extra' : "editor"}) %>
+
+<div class="editor-tools">
+    <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
+        
+        <div class="dropdown me-2">
+            <button class="btn-sm btn-secondary dropdown-toggle" type="button" id="headingMenu"
+                    data-bs-toggle="dropdown" aria-expanded="false">Normal text
+            </button>
+
+            <ul class="dropdown-menu" aria-labelledby="headingMenu">
+                <li>
+                    <button id="action-h1" class="dropdown-item h1">Heading 1</button>
+                </li>
+                <li>
+                    <button id="action-h2" class="dropdown-item h2">Heading 2</button>
+                </li>
+                <li>
+                    <button id="action-h3" class="dropdown-item h3">Heading 3</button>
+                </li>
+                <li>
+                    <button id="action-h4" class="dropdown-item h4">Heading 4</button>
+                </li>
+                <li>
+                    <button id="action-h5" class="dropdown-item h5">Heading 5</button>
+                </li>
+                <li>
+                    <button id="action-h6" class="dropdown-item h6">Heading 6</button>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <button id="action-p" class="dropdown-item">Normal text</button>
+                </li>
+            </ul>
+        </div>
+ 
+
+        <i id="action-bold" class="action bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Bold (Ctrl-B)"></i>
+        <i id="action-italic" class="action bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Italic (Ctrl-I)"></i>
+        <i id="action-underline" class="action bi-type-underline" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Underline (Ctrl-U)"></i>
+
+        <input class="me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Text color"
+               id="action-pick-color"
+               type="color" value="#000000"
+               aria-label="Text color">
+
+        <i id="action-lift-item" class="action bi-text-indent-left" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Lift list item"></i>
+        <i id="action-bullet-list" class="action bi-list-ul" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Bulleted list (Ctrl-Shift-8)"></i>
+        <i id="action-ordered-list" class="action bi-list-ol" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Ordered list (Ctrl-Shift-7)"></i>
+
+        <a data-bs-toggle="modal" data-bs-target="#insertImageModal">
+            <i class="action bi-image" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Insert image"></i>
+        </a>
+
+        <a data-bs-toggle="modal" data-bs-target="#insertLinkModal">
+            <i class="action bi-link" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Insert link"></i>
+        </a>
+
+        <i id="action-undo" class="action bi-arrow-counterclockwise" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Undo (Ctrl-Z)"></i>
+        <i id="action-redo" class="action bi-arrow-clockwise" data-bs-toggle="tooltip" data-bs-placement="top"
+           title="Redo (Ctrl-Shift-Z)"></i>
+
+
+
+
+        <div class="ms-auto d-flex flex-wrap">
+            <div class="text-end d-flex flex-wrap ms-3">
+                <div class="dropdown dropdown-menu-end me-2">
+                    <button class="btn-sm btn-primary dropdown-toggle h-100" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false" id="active-users-button">Active
                     </button>
+                    <ul class="dropdown-menu" aria-labelledby="active-users-button" id="active-users"
+                        style="width: 320px">
+                    </ul>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="py-2 border-bottom mb-5 bg-light">
-        <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
-            <i id="action-bold" class="bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Bold (Ctrl-B)"></i>
-            <i id="action-italic" class="bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Italic (Ctrl-I)"></i>
-            <i id="action-underline" class="bi-type-underline me-2" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Underline (Ctrl-U)"></i>
-
-            <div class="dropdown me-2">
-                <button class="btn-sm btn-secondary dropdown-toggle" type="button" id="headingMenu"
-                        data-bs-toggle="dropdown" aria-expanded="false">Normal text
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="headingMenu">
-                    <li>
-                        <button id="action-h1" class="dropdown-item h1">Heading 1</button>
-                    </li>
-                    <li>
-                        <button id="action-h2" class="dropdown-item h2">Heading 2</button>
-                    </li>
-                    <li>
-                        <button id="action-h3" class="dropdown-item h3">Heading 3</button>
-                    </li>
-                    <li>
-                        <button id="action-h4" class="dropdown-item h4">Heading 4</button>
-                    </li>
-                    <li>
-                        <button id="action-h5" class="dropdown-item h5">Heading 5</button>
-                    </li>
-                    <li>
-                        <button id="action-h6" class="dropdown-item h6">Heading 6</button>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <button id="action-p" class="dropdown-item">Normal text</button>
-                    </li>
-                </ul>
-            </div>
-
-            <i id="action-lift-item" class="bi-text-indent-left" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Lift list item"></i>
-            <i id="action-bullet-list" class="bi-list-ul" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Create bullet list"></i>
-            <i id="action-ordered-list" class="bi-list-ol me-2" data-bs-toggle="tooltip" data-bs-placement="top"
-               title="Create ordered list"></i>
-
-            <a data-bs-toggle="modal" data-bs-target="#insertImageModal">
-                <i class="bi-image" data-bs-toggle="tooltip" data-bs-placement="top"
-                   title="Insert image"></i>
-            </a>
-
-            <div class="ms-auto d-flex flex-wrap">
-                <button type="button" class="btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal">
+                <!-- <button type="button" class="btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#renameModal">
                     Rename
+                </button> -->
+                <button id="button-share" type="button" class="btn btn-warning px-3 me-2">
+                    <i class="bi-share"></i>
                 </button>
+                <button id="button-save" type="button" class="btn btn-success">
+                    <i class="bi-save"></i>
+                </button>
+                <p id="message-save"
+                   class="mt-auto mb-auto me-3"></p>
             </div>
+
         </div>
     </div>
-</header>
+</div>
+
 <main class="document-view">
     <div id="editor" class="p-5">
     </div>
@@ -141,32 +181,53 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <div class="row mb-3">
                     <label for="new-name" class="col-3 col-form-label">New name</label>
                     <div class="col-9">
-                        <input type="text" class="form-control" id="new-name"
-                               placeholder="<%= doc.title %>" required>
+                        <input type="text" class="form-control" id="new-name" value="<%= doc.title %>" required>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <input type="submit" class="btn btn-primary" id="action-insert-image" value="Rename">
+                <input type="submit" class="btn btn-primary" id="action-rename" value="Rename">
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Insert link modal -->
+<div class="modal fade" id="insertLinkModal" tabindex="-1" aria-labelledby="inserLinkLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="post" action="/" id="insert-link-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renameLabel">Insert link</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <label for="link-href" class="col-3 col-form-label">URL</label>
+                    <div class="col-9">
+                        <input type="url" class="form-control" id="link-href"
+                               placeholder="https://example.com" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary" id="action-insert-link" value="Insert">
             </div>
         </form>
     </div>
 </div>
 
+
 <script>
     // Get document state and ID as a global varaiable
     const documentID = '<%- doc._id %>'
-    let documentState;
-    try {
-        documentState = JSON.parse('<%- doc.content %>');
-    } catch {
-        documentState = {};
-    }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="module" src="/js/build-editor.js"></script>
 <script>
     let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
