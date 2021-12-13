@@ -12,8 +12,9 @@ Table of Contents
     - [**Nodemailer**](#nodemailer)
     - [**Express.js**](#expressjs)
     - [**Passport.js**](#passportjs)
+    - [**Socket.io**](#socketio)
     - [**Bcrypt**](#bcrypt)
-    - [**Bootstrap**](#bootstrap)
+    - [**Bootstrap 4**](#bootstrap-4)
 - [The DoX team 👨‍💻](#the-dox-team-)
 - [Guide to compiling :rocket:](#guide-to-compiling-rocket)
     - [1. Install dependencies](#1-install-dependencies)
@@ -57,16 +58,26 @@ Toolkit for building rich-text editors, easily scalable and extensible.
 <img style="width: 20%;" src="./documentation/resources/README/nodemailer.png">\
 Allows the server to send email confirmations to the users that sign up on DoX.
 
-
 ### [**Express.js**](https://expressjs.com)
 <img style="width: 30%;" src="./documentation/resources/README/expressjs.jpeg">\
 HTTP server handling all the routes and traffic.
+
 ### [**Passport.js**](https://www.passportjs.org)
 <img style="width: 50%;" src="./documentation/resources/README/passportjs.png">\
 Authenticates users and makes the Express routes behave based on evaluating the user's status and permissions.
 
+### [**Socket.io**](https://socket.io)
+<img style="width: 40%;" src="./documentation/resources/README/socketio.png">\
+Tracks active users on the site. Relays important database change events and synchronization data between users. Shares session data with Passport.js for  additional authentication. Fundamental for real-time collaborative editing.
+
 ### [**Bcrypt**](https://www.npmjs.com/package/bcrypt)
+<img style="width: 18%;" src="./documentation/resources/README/bcrypt.png">\
 Hashing of user passwords.
+
+### [**Bootstrap 4**](https://getbootstrap.com)
+<img style="width: 30%;" src="./documentation/resources/README/boostrap.png">\
+Responsive and pre-styled DOM elements.
+
 
 # The DoX team 👨‍💻
 
@@ -99,7 +110,7 @@ npm run build
 ```
 
 ### 3. Run the application
-Finally run the application with
+Finally run the application locally with
 ```bash
 npm run local
 ```
