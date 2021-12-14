@@ -102,7 +102,7 @@ function user_create(username, email, password, token = '', returnnew = true) {
             joined_date: new Date()
         }
         model.users.insertOne(new_user).then(() => {
-            console.log("[+] Inserted user:",new_user)
+            console.log("[+] Inserted user")
             send_event("notify-update","add",{type:"user",_id:new_user._id.toHexString()})
             resolve(returnnew? new_user : undefined)
         });
@@ -153,7 +153,7 @@ function doc_create(owner_id, title = "Untitled", returnnew = true) {
         }
 
         model.docs.insertOne(new_doc).then( (res) => {
-            console.log("[+] Inserted doc:",new_doc)
+            console.log("[+] Inserted doc")
 
             send_event("notify-update","add",{type:"document",_id:new_doc._id.toHexString()})
             resolve(returnnew? new_doc: undefined)
@@ -383,7 +383,6 @@ function doc_remove_permissions(doc_id, perms = {perm_read_remove: [], perm_edit
         if (!(await doc_exists({_id: doc_id})))
             reject("Document does not exist")
 
-      console.log(await model.docs.findOne({_id : doc_id}))
         model.docs.findOneAndUpdate (
             {_id : doc_id},
             {  edit_date : new Date(),
@@ -391,7 +390,6 @@ function doc_remove_permissions(doc_id, perms = {perm_read_remove: [], perm_edit
                     perm_read: perms.perm_read_remove || [] }})
 
         send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
-        console.log(await model.docs.findOne({_id : doc_id}))
 
         resolve(returnnew ? await doc_find({_id: doc_id}) : undefined)
     })

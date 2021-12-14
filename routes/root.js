@@ -140,8 +140,7 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
         }
     } else { // Render document list
         if(req.accepts("text/html")) {
-            console.log(await dbops.docs_available(ObjectId(req.user.user_id)))
-            res.status(200).render('../views/documents.ejs', 
+            res.status(200).render('../views/documents.ejs',
                 {
                     docs: await dbops.docs_available(ObjectId(req.user.user_id)),
                     user : await dbops.user_find({_id : ObjectId(req.user.user_id)})
@@ -382,11 +381,9 @@ router.put('/user', async (req,res)=> {
     }
 
     dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
-
         console.log("[+] Updated user")
         req.flash("messageSuccess","User has been updated")
         res.redirect("/docs");
-
     })
     
     

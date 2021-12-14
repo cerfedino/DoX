@@ -20,7 +20,7 @@ module.exports.init = function (server) {
     // Maps every user to its list of connected sockets to server
     var connected_users = {}
 
-    console.log("Connected users: ", connected_users)
+    // console.log("Connected users: ", connected_users)
 
     io.use(function (socket, next) {
         app.sessionMid(socket.request, {}, next);
@@ -46,7 +46,7 @@ module.exports.init = function (server) {
         connected_users[userID].unshift(socket.id)
         //
 
-        console.log("Connected users: ", connected_users)
+        // console.log("Connected users: ", connected_users)
 
         // Adds the user to his own personal user room, this way we can relay messages to every socket associated to a specific user
         socket.join("user:" + userID)
@@ -57,7 +57,7 @@ module.exports.init = function (server) {
             if (connected_users[userID].length === 0) {
                 delete connected_users[userID]
             }
-            console.log("Connected users: ", connected_users)
+            // console.log("Connected users: ", connected_users)
         })
 
         // Makes the socket monitor all of the documents associated with the user
@@ -70,7 +70,7 @@ module.exports.init = function (server) {
         //  Satisfies the socket's request only if the user is allowed to access the document in the first place.
         socket.on('subscribe_to_doc_events', async function (msg) {
             if (await dbops.isValidDocument(msg._id) && await dbops.isValidUser(userID) && (await dbops.user_get_perms(ObjectId(userID), ObjectId(msg._id))).length > 0) {
-                console.log("Adding user to room ", "document:" + msg._id)
+                console.log("[+] Adding user to room ", "document:" + msg._id)
                 socket.join("document:" + msg._id)
             }
         })
@@ -99,7 +99,7 @@ module.exports.init = function (server) {
 
                 // Makes the socket monitor just the state of the document in the editor.
                 socket.join("document:" + msg._id)
-                console.info(`SOCKETS User with ID ${userID} opened the document ${documentID} with permission ${permission}`);
+                console.info(`[SOCKETS] User with ID ${userID} opened the document ${documentID} with permission ${permission}`);
 
                 // Check if the document is already in memory
                 if (!memoryDocs[documentID]) {
@@ -110,7 +110,7 @@ module.exports.init = function (server) {
                         stepClientIDs: [],
                         connected: {}
                     }
-                    console.info(`SOCKETS Document ${documentID} was loaded to memory`);
+                    // console.info(`[SOCKETS] Document ${documentID} was loaded to memory`);
                 }
                 memoryDocs[documentID].connected[socket.id] = {
                     userID,
@@ -150,10 +150,10 @@ module.exports.init = function (server) {
                         if (memoryDocs[documentID].steps.length % 75 === 0) {
                             try {
                                 await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
-                                console.info(`SOCKETS Document ${documentID} was successfully saved`);
+                                console.info(`[SOCKETS] Document ${documentID} was successfully saved`);
                                 io.to(`document:${msg._id}/editor/write`).emit('save-success');
                             } catch (e) {
-                                console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
+                                console.warn(`[SOCKETS] Document ${documentID} can't be saved: ` + e);
                                 io.to(`document:${msg._id}/editor/write`).emit('save-fail', {error: e})
                             }
                         }
@@ -168,10 +168,10 @@ module.exports.init = function (server) {
                     socket.on('save', async () => {
                         try {
                             await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
-                            console.info(`SOCKETS Document ${documentID} was successfully saved`);
+                            console.info(`[SOCKETS] Document ${documentID} was successfully saved`);
                             io.to(`document:${msg._id}/editor/write`).emit('save-success');
                         } catch (e) {
-                            console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
+                            console.warn(`[SOCKETS] Document ${documentID} can't be saved: ` + e);
                             io.to(`document:${msg._id}/editor/write`).emit('save-fail', {error: e})
                         }
                     })
@@ -212,12 +212,12 @@ module.exports.init = function (server) {
 
                     // Clean the memory, if no one is connected
                     if (Object.values(memoryDocs[documentID].connected).length === 0) {
-                        console.info(`SOCKETS Document with ID ${documentID} is not opened by anyone anymore, it will be removed from the memory`);
+                        // console.info(`[SOCKETS] Document with ID ${documentID} is not opened by anyone anymore, it will be removed from the memory`);
                         try {
                             await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
-                            console.info(`SOCKETS Document ${documentID} was successfully saved`);
+                            console.info(`[SOCKETS] Document ${documentID} was successfully saved`);
                         } catch (e) {
-                            console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
+                            console.warn(`[SOCKETS] Document ${documentID} can't be saved: ` + e);
                         }
                         delete memoryDocs[documentID];
                     }
@@ -235,7 +235,7 @@ module.exports.init = function (server) {
             if (ev.type === "add") {  // If a new document has been added, manually notifies every involved user.
                 await manually_relay_to_involved_users(ev.subject._id, ev)
             } else { // Otherwise updates every socket in the document's room.
-                console.log("Sending back to room ", "document:" + ev.subject._id)
+                // console.log("[+] Sending back to room ", "document:" + ev.subject._id)
                 io.to("document:" + ev.subject._id).emit(ev.event, ev)
             }
         } else if (ev.subject.type === "user") {
