@@ -49,7 +49,23 @@ function doc_find(filter={}, projection) {
     return model.docs.findOne(filter,projection?{projection}:undefined)
 }
 
+/**
+ * Counts the users in the database that meet a specific filter.
+ * @param filter the filter to count matching users with.
+ * @returns {number} the number of elements matching that filter.
+ */
+function user_count(filter={}) {
+    return model.users.countDocuments(filter)
+}
 
+/**
+ * Counts the documents in the database that meet a specific filter.
+ * @param filter the filter to count matching documents with.
+ * @returns {number} the number of elements matching that filter.
+ */
+function doc_count(filter={}) {
+    return model.docs.countDocuments(filter)
+}
 // ######################
 // ######################
 
@@ -185,11 +201,8 @@ function doc_delete(doc_id) {
  * @returns {Promise<boolean>} whether at least a user exists for the specified filter.
  */
 function user_exists(filter = {}) {
-    return new Promise((resolve, reject) => {
-        model.users.countDocuments(filter, (err, count) => {
-            if (err) reject(err)
-            resolve(count > 0)
-        })
+    return new Promise(async (resolve, reject) => {
+        resolve((await user_count(filter)) > 0)
     })
 }
 
@@ -458,7 +471,9 @@ function generate_event(name,type,subject,data={}) {
 }
 
 module.exports = {
+    model,
     events,
+
     generate_event,
 
     run_find,
@@ -468,6 +483,7 @@ module.exports = {
     user_create,
     user_exists,
     user_delete,
+    user_count,
     user_set,
 
     getValidObjectIds,
@@ -477,7 +493,9 @@ module.exports = {
     doc_create,
     doc_exists,
     doc_delete,
+    doc_count,
     doc_set,
+
     doc_set_content,
     doc_add_permissions,
     doc_remove_permissions,
