@@ -32,14 +32,14 @@ const settings = {
         rate : {
             login_register_limiter:
                 new rate_limit({
-                    windowMs: 1000, // 1 seconds
+                    windowMs: 1000, // 1 second
                     max: 1,         // max requests in 'windowMs' before blocking
                     message: "Too many auth submissions, slow down."
                 }),
             generic_limiter:
                 new rate_limit({
                     windowMs: 2000,
-                    max: 100,
+                    max: 1000,
                     message: "This IP is sending too many requests, slow down."
                 })
         }
@@ -47,7 +47,7 @@ const settings = {
 
     cookie : {
         name: "DoXCookie",
-        expires: new Date(Date.now() + 1000*60*60* 24*7 )     // Cookie expires after 7 days
+        expires: new Date(Date.now() + 1000*60*60* 24*7)   // Cookie expires after 7 days
     },
 
     database: {
@@ -60,7 +60,10 @@ const settings = {
 
     mailing: {
         user: 'noreply.mailserver.dox@gmail.com',   // Mailer address
-        pass: 'srcaszbhkohfmlnn'                    // Application token (prevents from logging in through browser)
+        pass: 'srcaszbhkohfmlnn',                    // Application token (prevents from logging in through browser)
+
+        verification_link_expiry : 1000*60*60*24,    // Confirmation links expire in 24 hours
+        verification_links_check : 1000*60*10        // Mailing checks for expired confirmation links every 10 minutes
     },
 
     ssl: {

@@ -46,7 +46,7 @@ const domain = webserver.domain
 
 app.use(webserver.rate.generic_limiter)
 app.use(logger('dev'));
-app.use(xss())
+app.use(xss()) // Parses req attributes to make sure they can't be considered part of an XSS attack
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({extended: false}));    // parse application/x-www-form-urlencoded
 app.use(express.json());    // parse application/json
@@ -66,6 +66,7 @@ app.sessionMid = session({
         expires: cookie.expires
     }
 })
+
 app.set('trust proxy', 1)
 app.use(app.sessionMid);
 

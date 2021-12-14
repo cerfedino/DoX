@@ -20,11 +20,12 @@ const events = new EventEmitter()
  * Runs a find on a collection and returns the resulting array.
  * @param {Collection<Document>} collection the collection to perform the find query on.
  * @param {object} filter the filter of the query.
+ * @param {object} projection specifies the fields to return. Do not specify to return the whole object.
  * @returns {Promise<[]>} returns the array resulting from the find query.
  */
-function run_find(collection, filter) {
+function run_find(collection, filter, projection) {
     return new Promise(async (resolve, reject) => {
-        resolve(await (collection.find(filter).toArray()))
+        resolve(await (collection.find(filter,projection?{projection}:undefined).toArray()))
     })
 }
 
@@ -98,6 +99,7 @@ function user_create(username, email, password, token = '', returnnew = true) {
             password: await auth.encrypt_pwd(password),
             token: token,
             email_verification_status : false,
+            joined_date: new Date()
         }
         model.users.insertOne(new_user).then(() => {
             console.log("[+] Inserted user:",new_user)
@@ -167,7 +169,7 @@ function doc_create(owner_id, title = "Untitled", returnnew = true) {
  */
 function user_delete(user_id) {
     return new Promise(async (resolve,reject) => {
-        await model.docs.deleteOne({_id:user_id})
+        await model.users.deleteOne({_id:user_id})
 
         send_event("notify-update","remove",{type:"user",_id:user_id.toHexString()})
 
@@ -213,11 +215,8 @@ function user_exists(filter = {}) {
  * @returns {Promise<boolean>} whether at least a document exists for the specified filter.
  */
 function doc_exists(filter = {}) {
-    return new Promise((resolve, reject) => {
-        model.docs.countDocuments(filter, (err, count) => {
-            if (err) reject(err)
-            resolve(count > 0)
-        })
+    return new Promise(async (resolve, reject) => {
+        resolve((await doc_count(filter)) > 0)
     })
 }
 
