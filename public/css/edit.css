@@ -104,3 +104,24 @@
 .ProseMirror {
     white-space: pre-wrap;
 }
+
+.cursor {
+    position: relative;
+    display: inline-block;
+    height: 1.2em
+}
+
+.cursor::before {
+    content: '';
+    display: block;
+    width: 2px;
+    height: 120%;
+    position: absolute;
+    top: 0.15em;
+    left: -1px;
+    z-index: 1;
+}
+
+.selection {
+    position: relative;
+}
