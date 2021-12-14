@@ -193,9 +193,12 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                     
                     <p class="owner"><%= doc.owner %></p>
                     <span class="info owner"></span>
-                    <a class="delete" id="docs/<%= doc._id %>">
-                        <img src="/media/svg/delete.svg" class="svgimgform"></img>
-                    </a>
+
+                    <% if (doc.owner == userid) { %>
+                        <a class="delete" id="docs/<%= doc._id %>">
+                            <img src="/media/svg/delete.svg" class="svgimgform"></img>
+                        </a>
+                    <% } %>
 
                     <% let doc_perms = []
                         doc_perms.push(`
