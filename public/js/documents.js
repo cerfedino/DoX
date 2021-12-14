@@ -155,7 +155,7 @@ function setSortListeners() {
     row.querySelectorAll('a').forEach(a=>a.addEventListener('click',function(event){
         event.preventDefault();
 
-        debugger
+
         let type;
         let action = a.getAttribute('rel');
         if (action.endsWith('-date')) {
@@ -173,7 +173,7 @@ function setSortListeners() {
                 item.classList.remove('active-sort-display');
             }
         })
-        debugger
+
         this.parentNode.parentNode.querySelector('.reverse-sort').classList.add('active-sort-display');
         
         // First, we take all the actual values
@@ -387,8 +387,8 @@ function setActiveFilter(checkbox){
     if (checkbox.type != 'checkbox') {
         return undefined;
     }
-    debugger
 
+    
     let rows = [];
     document.querySelectorAll('.card-element').forEach(el=>{
         if (!el.classList.contains('head')){
@@ -396,17 +396,17 @@ function setActiveFilter(checkbox){
         }
     })
     let type = checkbox.name.split('-')[1];
-    debugger
+
     if (type == 'owned'){
         rows.forEach(row=>{
-            debugger
+
             if (row.querySelector('.info.owner').innerHTML != '<i>me</i>'){
                 row.parentNode.removeChild(row);
             }
         })
     } else if (type == 'read' || type == 'edit'){
         rows.forEach(row=>{
-            debugger
+
             let articles = document.createElement('SECTION');
             articles.innerHTML = row.querySelector('a.perms').getAttribute('data-content');
             articles.querySelectorAll('.dropdown-item').forEach(item=>{
@@ -421,7 +421,7 @@ function setActiveFilter(checkbox){
         })
     } else {
         rows.forEach(row=>{
-            debugger
+
             let n = parseInt(row.querySelector('p.shared').innerHTML);
             if (n == 0) {
                 row.parentNode.removeChild(row);
