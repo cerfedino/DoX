@@ -39,7 +39,7 @@ const settings = {
             generic_limiter:
                 new rate_limit({
                     windowMs: 2000,
-                    max: 20,
+                    max: 100,
                     message: "This IP is sending too many requests, slow down."
                 })
         }
@@ -53,7 +53,9 @@ const settings = {
     database: {
         mongodb_uri: MONGODB_URI,
         db_name: "DoX_db",
-        collections: ["users", "docs"]
+        collections: ["users", "docs"],
+
+        max_users_per_email : 10
     },
 
     mailing: {
