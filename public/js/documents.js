@@ -166,7 +166,8 @@ function setSortListeners() {
 
         let activeSort = document.querySelector('button.active-sort');
         activeSort.setAttribute('data-toggle',action);
-        document.querySelector('div.sort > .btn-secondary.dropdown-toggle').innerHTML = action;
+        let item = document.querySelector('div.sort > .dropdown-menu').querySelector(`a[rel="${action}"]`);
+        document.querySelector('div.sort > .btn-secondary.dropdown-toggle').innerHTML = item.innerHTML;
         document.querySelectorAll('.reverse-sort').forEach(item=>{
             if (item.classList.contains('active-sort-display')) {
                 item.classList.remove('active-sort-display');
