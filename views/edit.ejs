@@ -30,7 +30,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 <%- include('includes/header', {'extra' : "editor"}) %>
 
 <div class="editor-tools">
-    <div id="actions" class="action-icons container d-flex flex-wrap justify-content-start align-items-center">
+    <div id="actions" class="action-icons px-0 container d-flex flex-wrap justify-content-start align-items-center">
         
         <div class="dropdown me-2">
             <button class="btn-sm btn-secondary dropdown-toggle" type="button" id="headingMenu"
@@ -105,7 +105,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
         <div class="ms-auto d-flex flex-wrap">
             <div class="text-end d-flex flex-wrap ms-3">
-                <div class="dropdown dropdown-menu-end me-2">
+                <div class="dropdown dropdown-menu-end me-1">
                     <button class="btn-sm btn-primary dropdown-toggle h-100" type="button" data-bs-toggle="dropdown"
                             aria-expanded="false" id="active-users-button">Active
                     </button>
@@ -113,17 +113,17 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                         style="width: 320px">
                     </ul>
                 </div>
-                <!-- <button type="button" class="btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#renameModal">
-                    Rename
-                </button> -->
-                <button id="button-share" type="button" class="btn btn-warning px-3 me-2">
+                <button id="button-share" type="button" class="btn btn-warning me-1">
                     <i class="bi-share"></i>
                 </button>
-                <button id="button-save" type="button" class="btn btn-success">
-                    <i class="bi-save"></i>
+                <button id="button-export" type="button" class="btn btn-primary me-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="Export as a PDF (Ctrl-E)">
+                    <i class="bi-cloud-download-fill"></i>
                 </button>
-                <p id="message-save"
-                   class="mt-auto mb-auto me-3"></p>
+                <button id="button-save" type="button" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="Save (Ctrl-S)">
+                    <i class="bi-cloud-upload-fill"></i>
+                </button>
             </div>
 
         </div>

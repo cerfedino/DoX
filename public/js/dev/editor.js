@@ -101,6 +101,9 @@ socket.on('disconnect', () => {
     activity.classList.remove('btn-primary');
     activity.classList.add('btn-warning');
     activity.innerText = 'You\'re offline!';
+    editor.dispatch(
+        editor.state.tr.setMeta('update-selections', true)
+    )
 })
 socket.on('init', (data) => {
     console.info('Received INIT event. Version: ' + data.version);
@@ -135,6 +138,9 @@ socket.on('client-connect', data => {
 socket.on('client-disconnect', id => {
     delete connectedClients[id];
     renderConnections();
+    editor.dispatch(
+        editor.state.tr.setMeta('update-selections', true)
+    )
 })
 socket.on('update', ({version, steps, stepClientIDs}) => {
     console.info(`Received UPDATE event. Version: ${version}. With data: `, steps, stepClientIDs);
@@ -148,25 +154,23 @@ socket.on('update', ({version, steps, stepClientIDs}) => {
 })
 socket.on('save-success', () => {
     console.info('Received SAVE-SUCCESS event');
-    //document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
-    let messageSave = document.getElementById('message-save');
-
-    messageSave.innerText = 'Saved successfully!';
-    messageSave.classList.remove('text-danger');
-    messageSave.classList.add('text-secondary');
+    let saveButton = document.getElementById('button-save');
+    saveButton.innerHTML = '<i class="bi-cloud-check-fill"></i>';
+    saveButton.classList.add('btn-success');
+    saveButton.classList.remove('btn-primary');
 
     setTimeout(() => {
-        messageSave.innerText = '';
+        saveButton.innerHTML = '<i class="bi-cloud-upload-fill"></i>';
+        saveButton.classList.add('btn-primary');
+        saveButton.classList.remove('btn-success');
     }, 5000)
 })
 socket.on('save-fail', ({error}) => {
     console.error('Received SAVE-FAIL event with data: ', error);
-    //document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
-    let messageSave = document.getElementById('message-save');
-
-    messageSave.classList.add('text-danger');
-    messageSave.classList.remove('text-secondary');
-    messageSave.innerText = 'Error occurred while saving!';
+    let saveButton = document.getElementById('button-save');
+    saveButton.innerHTML = '<i class="bi-x-circle-fill"></i>';
+    saveButton.classList.add('btn-error');
+    saveButton.classList.remove('btn-primary');
 })
 socket.on('notify-update', ({data}) => {
     console.info('Received NOTIFY-UPDATE event');
@@ -202,6 +206,14 @@ function SelectionUpdater() {
 
             },
             apply(tr, _, old) {
+                if (tr.getMeta('hide-selections') !== undefined) {
+                    if (tr.getMeta('hide-selections')) {
+                        return DecorationSet.create(tr.doc, []);
+                    } else {
+                        return generateSelectionDecorations(tr.doc);
+                    }
+                }
+
                 // Check if the selection has changed after the transaction
                 if (tr.selection.from !== old.tr.selection.from || tr.selection.to !== old.tr.selection.to) {
                     socket.emit('selection-changed', {
@@ -212,23 +224,7 @@ function SelectionUpdater() {
                 }
 
                 if (tr.getMeta('update-selections')) {
-                    let decos = [];
-                    for (let clientData of Object.entries(connectedClients)) {
-                        if (clientData[0] === socket.id) continue;
-
-                        // As we send anchor and head instead of from and to, we should perform an additional check
-                        let from = clientData[1].selection.from < clientData[1].selection.to ?
-                            clientData[1].selection.from : clientData[1].selection.to;
-                        let to = clientData[1].selection.from > clientData[1].selection.to ?
-                            clientData[1].selection.from : clientData[1].selection.to;
-                        decos.push(Decoration.inline(
-                            from,
-                            to,
-                            {style: `background-color: ${clientData[1].colors[0]}; color: ${clientData[1].colors[1]}`}
-                        ))
-                    }
-
-                    return DecorationSet.create(tr.doc, decos);
+                    return generateSelectionDecorations(tr.doc);
                 }
             }
         },
@@ -238,6 +234,26 @@ function SelectionUpdater() {
             }
         }
     });
+}
+
+function generateSelectionDecorations(doc) {
+    let decos = [];
+    for (let clientData of Object.entries(connectedClients)) {
+        if (clientData[0] === socket.id) continue;
+
+        // As we send anchor and head instead of from and to, we should perform an additional check
+        let from = clientData[1].selection.from < clientData[1].selection.to ?
+            clientData[1].selection.from : clientData[1].selection.to;
+        let to = clientData[1].selection.from > clientData[1].selection.to ?
+            clientData[1].selection.from : clientData[1].selection.to;
+        decos.push(Decoration.inline(
+            from,
+            to,
+            {style: `background-color: ${clientData[1].colors[0]}; color: ${clientData[1].colors[1]}`}
+        ))
+    }
+
+    return DecorationSet.create(doc, decos);
 }
 
 let colorIndex = -1;
@@ -342,16 +358,7 @@ document.getElementById('action-pick-color').addEventListener('change', (e) => {
 
 // Document operations
 document.getElementById('button-save').addEventListener('click', save);
-document.getElementById('button-export').addEventListener('click', async () => {
-    const title = document.getElementById('doc-title').innerText;
-    editor.focus();
-    html2pdf(document.querySelector('#editor > .ProseMirror'), {
-        margin: [12, 15],
-        filename: title + '.pdf',
-        pagebreak: {mode: ['avoid-all']},
-        image: {quality: 1}
-    });
-});
+document.getElementById('button-export').addEventListener('click', exportPDF);
 
 //endregion
 
@@ -499,6 +506,7 @@ function buildKeymap(schema) {
     }
 
     bind('Mod-s', save);
+    bind('Mod-e', exportPDF)
 
     bind('Mod-z', undo)
     bind('Mod-Shift-z', redo)
@@ -533,6 +541,24 @@ function menuPlugin(items) {
  */
 async function save() {
     socket.emit('save');
+}
+
+async function exportPDF() {
+    const title = document.getElementById('doc-title').innerText;
+    editor.focus();
+
+    editor.dispatch(
+        editor.state.tr.setMeta('hide-selections', true)
+    )
+    await html2pdf(document.querySelector('#editor > .ProseMirror'), {
+        margin: [12, 15],
+        filename: title + '.pdf',
+        pagebreak: {mode: ['avoid-all']},
+        image: {quality: 1}
+    });
+    editor.dispatch(
+        editor.state.tr.setMeta('hide-selections', false)
+    )
 }
 
 /**
