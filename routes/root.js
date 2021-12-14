@@ -15,9 +15,6 @@ const auth = require('../modules/auth.js');
 
 const fs = require('fs-extra');
 const path = require('path');
-const { use } = require('bcrypt/promises');
-
-
 
 module.exports = router;
 

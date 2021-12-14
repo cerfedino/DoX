@@ -21,6 +21,4 @@ function check_pwd(pwd,hash) {
     return bcrypt.compareSync(pwd,hash)
 }
 
-
-
 module.exports = {encrypt_pwd, check_pwd}

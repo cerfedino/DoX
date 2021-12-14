@@ -23,6 +23,7 @@
     "express-fileupload": "^1.2.1",
     "express-session": "^1.17.2",
     "express-set-domain": "^1.0.2",
+    "express-xss-sanitizer": "^1.1.1",
     "flash": "^1.1.0",
     "fs-extra": "^10.0.0",
     "greenlock-express": "^4.0.3",

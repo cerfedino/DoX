@@ -16,6 +16,7 @@ const fileUpload = require('express-fileupload');
 // Application config import
 const {webserver, cookie} = require('./config/config.js')
 const crypto = require("crypto");
+const { xss } = require('express-xss-sanitizer');
 
 var setDomain = require('express-set-domain');
 
@@ -44,6 +45,7 @@ const domain = webserver.domain
 // app.use(setDomain(domain));
 
 app.use(logger('dev'));
+app.use(xss())
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({extended: false}));    // parse application/x-www-form-urlencoded
 app.use(express.json());    // parse application/json
