@@ -246,26 +246,52 @@ function generateSelectionDecorations(doc) {
             clientData[1].selection.from : clientData[1].selection.to;
         let to = clientData[1].selection.from > clientData[1].selection.to ?
             clientData[1].selection.from : clientData[1].selection.to;
-        decos.push(Decoration.inline(
-            from,
-            to,
-            {style: `background-color: ${clientData[1].colors[0]}; color: ${clientData[1].colors[1]}`}
-        ))
+
+        const span = document.createElement('span');
+        span.className = `cursor client-${clientData[0]}`;
+        decos.push(Decoration.widget(clientData[1].selection.to, span));
+        if (from !== to) {
+            decos.push(Decoration.inline(
+                from,
+                to,
+                {nodeName: 'span', class: `selection client-${clientData[0]}`}
+                //{style: `background-color: ${clientData[1].colors[0]}; color: ${clientData[1].colors[1]}`}
+            ))
+        }
     }
 
+    makeColorStyles();
     return DecorationSet.create(doc, decos);
+}
+
+function makeColorStyles() {
+    let colorStyles = document.getElementById('client-colors');
+    if (colorStyles) colorStyles.remove();
+
+    colorStyles = document.createElement('style');
+    colorStyles.id = 'client-colors';
+
+    for (let clientData of Object.entries(connectedClients)) {
+        let id = clientData[0];
+        let color = clientData[1].colors;
+
+        colorStyles.innerHTML += `.cursor.client-${id}::before { background-color: ${color} }\n`;
+        colorStyles.innerHTML += `.selection.client-${id} { background-color: ${color}20 }\n`;
+    }
+
+    document.querySelector('head').appendChild(colorStyles);
 }
 
 let colorIndex = -1;
 
 function pickColor() {
     let palette = [
-        ['#ff7070', '#6b0000'], // Red
-        ['#70ff70', '#006b00'], // Green
-        ['#7070ff', '#00006b'], // Blue
-        ['#ffff70', '#6b6b00'], // Yellow
-        ['#ff70ff', '#6b006b'], // Purple
-        ['#70ffff', '#006b6b'], // Cyan
+        '#ff0000', // Red
+        '#00ff00', // Green
+        '#0000ff', // Blue
+        '#ffff00', // Yellow
+        '#ff00ff', // Pink
+        '#00ffff', // Cyan
     ]
     colorIndex += 1;
     if (colorIndex >= palette.length || colorIndex < 0) colorIndex = 0;
@@ -277,7 +303,7 @@ function renderConnections() {
     let newHTML = '';
     for (let client of Object.values(connectedClients)) {
         newHTML +=
-            `<li><span style="color: ${client.colors[1]}" class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
+            `<li><span style="color: ${client.colors}" class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
         newHTML +=
             '<li class="dropdown-divider"></li>';
     }

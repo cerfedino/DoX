@@ -97,6 +97,10 @@
 }
 
 .editor-tools #actions {
-    min-width:60%;
+    min-width: 60%;
     max-width: 60%;
+}
+
+.ProseMirror {
+    white-space: pre-wrap;
 }
