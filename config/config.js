@@ -3,8 +3,9 @@
  * Contains all the application settings and/or parameters.
  * 
 */
-const fs = require('fs-extra')
-const path = require('path')
+// const fs = require('fs-extra')
+// const path = require('path')
+
 // CL argument. Expected to be "local" or "remote" or undefined
 const arg = process.argv[2]
 
@@ -26,6 +27,11 @@ const settings = {
         https_enabled: HTTPS_ENABLED,
         domain: HOST,
         port: PORT
+    },
+
+    cookie : {
+        name: "DoXCookie",
+        expires: new Date(Date.now() + 1000*60*60* 24*7 )     // Cookie expires after 7 days
     },
 
     database: {

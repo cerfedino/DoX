@@ -14,7 +14,8 @@ const methodOverride = require('method-override');
 const fileUpload = require('express-fileupload');
 
 // Application config import
-const {webserver} = require('./config/config.js')
+const {webserver, cookie} = require('./config/config.js')
+const crypto = require("crypto");
 
 var setDomain = require('express-set-domain');
 
@@ -53,10 +54,16 @@ app.set('view engine', 'ejs');
 
 // INIT session
 app.sessionMid = session({
-    secret: "secret",
+    secret: crypto.randomBytes(20).toString('hex'), // Regenerates the secret key everytime and therefore invalidates the previous stored cookies
+    name:   cookie.name,
     resave: false,
     saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: cookie.expires
+    }
 })
+app.set('trust proxy', 1)
 app.use(app.sessionMid);
 
 // INIT passport on every route call.
