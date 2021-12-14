@@ -105,13 +105,13 @@
     white-space: pre-wrap;
 }
 
-.cursor {
+.ProseMirror .cursor {
     position: relative;
     display: inline-block;
     height: 1.2em
 }
 
-.cursor::before {
+.ProseMirror .cursor::before {
     content: '';
     display: block;
     width: 2px;
@@ -122,6 +122,6 @@
     z-index: 1;
 }
 
-.selection {
+.ProseMirror .selection {
     position: relative;
 }

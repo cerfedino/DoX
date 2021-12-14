@@ -275,8 +275,8 @@ function makeColorStyles() {
         let id = clientData[0];
         let color = clientData[1].colors;
 
-        colorStyles.innerHTML += `.cursor.client-${id}::before { background-color: ${color} }\n`;
-        colorStyles.innerHTML += `.selection.client-${id} { background-color: ${color}20 }\n`;
+        colorStyles.innerHTML += `.ProseMirror .cursor.client-${id}::before { background-color: ${color} }\n`;
+        colorStyles.innerHTML += `.ProseMirror .selection.client-${id} { background-color: ${color}20 }\n`;
     }
 
     document.querySelector('head').appendChild(colorStyles);
