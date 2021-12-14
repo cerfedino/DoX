@@ -106,9 +106,10 @@ socket.on('disconnect', () => {
     )
 })
 socket.on('init', (data) => {
-    console.info('Received INIT event. Version: ' + data.version);
+    console.info(`Received INIT event. Version: ${data.version}. Permission: ${data.permission}`);
     console.info(data.document);
-    editor = initEditor(schema.nodeFromJSON(data.document), data.version);
+
+    editor = initEditor(schema.nodeFromJSON(data.document), data.version, data.permission === 'READ');
 
     for (let client of Object.entries(data.connected)) {
         connectedClients[client[0]] = {
@@ -216,6 +217,7 @@ function SelectionUpdater() {
 
                 // Check if the selection has changed after the transaction
                 if (tr.selection.from !== old.tr.selection.from || tr.selection.to !== old.tr.selection.to) {
+                    if (!editor.editable) return;
                     socket.emit('selection-changed', {
                         from: tr.selection.anchor,
                         to: tr.selection.head
@@ -224,6 +226,7 @@ function SelectionUpdater() {
                 }
 
                 if (tr.getMeta('update-selections')) {
+                    if (!editor.editable) return;
                     return generateSelectionDecorations(tr.doc);
                 }
             }
@@ -395,7 +398,7 @@ document.getElementById('button-export').addEventListener('click', exportPDF);
  * @param {Object} doc Document node
  * @param version
  */
-function initEditor(doc, version) {
+function initEditor(doc, version, readonly = false) {
     // Menu setup
     let menu = menuPlugin([
         {
@@ -505,6 +508,9 @@ function initEditor(doc, version) {
     let editorView = new EditorView(document.getElementById("editor"),
         {
             state,
+            editable() {
+                return !readonly;
+            },
             dispatchTransaction(transaction) {
                 // This function overwrites default transaction behaviour
                 let newState = editorView.state.apply(transaction);

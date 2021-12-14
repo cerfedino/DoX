@@ -120,6 +120,7 @@ module.exports.init = function (server) {
                 // Send document data to the client
                 socket.emit("init", {
                     document: memoryDocs[documentID].doc.toJSON(),
+                    permission,
                     version: memoryDocs[documentID].steps.length,
                     connected: memoryDocs[documentID].connected,
                 });
