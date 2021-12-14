@@ -1,15 +1,3 @@
-<!-- trying to fix white flashes when opening a page using dark mode-->
-<script>
-    if (localStorage.getItem("dark_mode") == 'true') {
-        document.body.classList.add("dark-theme")
-        document.querySelector("#dark-mode-toggle").checked = true
-    } else {
-        document.body.classList.remove('dark-theme')
-        document.querySelector("#dark-mode-toggle").checked = false
-    }
-</script>
-
-
 
 <%
 if(!docs) {
@@ -37,8 +25,18 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </style>
 </head>
 <body>
-<script src="/socket.io/socket.io.js"></script>
-<script  onload="init_socket()" src="/js/socket.js"></script>
+    <!-- trying to fix white flashes when opening a page using dark mode-->
+    <script>
+        if (localStorage.getItem("dark_mode") == 'true') {
+            document.body.classList.add("dark-theme")
+            document.querySelector("#dark-mode-toggle").checked = true
+        } else if (document.body.classList.contains('dark-theme')) {
+            document.body.classList.remove('dark-theme')
+            document.querySelector("#dark-mode-toggle").checked = false
+        }
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script  onload="init_socket()" src="/js/socket.js"></script>
 
     <%- include('includes/header', {'extra' : 'search'}) %>
 
