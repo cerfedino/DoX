@@ -21,8 +21,10 @@
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
+    "express-rate-limit": "^5.5.1",
     "express-session": "^1.17.2",
     "express-set-domain": "^1.0.2",
+    "express-xss-sanitizer": "^1.1.1",
     "flash": "^1.1.0",
     "fs-extra": "^10.0.0",
     "greenlock-express": "^4.0.3",
@@ -55,6 +57,7 @@
   },
   "devDependencies": {
     "browserify": "^17.0.0",
-    "minify": "^8.0.3"
+    "minify": "^8.0.3",
+    "snyk": "^1.790.0"
   }
 }

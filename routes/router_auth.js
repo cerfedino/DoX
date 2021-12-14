@@ -15,7 +15,8 @@
  const {ObjectId} = require("mongodb");
  
  const passport = require('passport');
- 
+
+ const {webserver} = require("../config/config.js")
  
  module.exports = router;
 
@@ -80,7 +81,7 @@ router.get('/verify/:id/:token', async function(req, res) {
     POST /auth/login
     Authenticates a user with credentials
  */
-router.post("/login", function(req, res, next) {
+router.post("/login", webserver.rate.login_register_limiter, function(req, res, next) {
     passport.authenticate('local-login', function(err, user, info ) {
         if (err) { return next(err); }
         
@@ -98,7 +99,7 @@ router.post("/login", function(req, res, next) {
     POST /auth/register
     Registers a new user
 */
-router.post("/register",  function(req, res, next) {
+router.post("/register",  webserver.rate.login_register_limiter, function(req, res, next) {
     passport.authenticate('local-signup', function(err, user, info ) {
         if (err) { return next(err); }
         

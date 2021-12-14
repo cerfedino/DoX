@@ -20,11 +20,12 @@ const events = new EventEmitter()
  * Runs a find on a collection and returns the resulting array.
  * @param {Collection<Document>} collection the collection to perform the find query on.
  * @param {object} filter the filter of the query.
+ * @param {object} projection specifies the fields to return. Do not specify to return the whole object.
  * @returns {Promise<[]>} returns the array resulting from the find query.
  */
-function run_find(collection, filter) {
+function run_find(collection, filter, projection) {
     return new Promise(async (resolve, reject) => {
-        resolve(await (collection.find(filter).toArray()))
+        resolve(await (collection.find(filter,projection?{projection}:undefined).toArray()))
     })
 }
 
@@ -49,7 +50,23 @@ function doc_find(filter={}, projection) {
     return model.docs.findOne(filter,projection?{projection}:undefined)
 }
 
+/**
+ * Counts the users in the database that meet a specific filter.
+ * @param filter the filter to count matching users with.
+ * @returns {number} the number of elements matching that filter.
+ */
+function user_count(filter={}) {
+    return model.users.countDocuments(filter)
+}
 
+/**
+ * Counts the documents in the database that meet a specific filter.
+ * @param filter the filter to count matching documents with.
+ * @returns {number} the number of elements matching that filter.
+ */
+function doc_count(filter={}) {
+    return model.docs.countDocuments(filter)
+}
 // ######################
 // ######################
 
@@ -82,6 +99,7 @@ function user_create(username, email, password, token = '', returnnew = true) {
             password: await auth.encrypt_pwd(password),
             token: token,
             email_verification_status : false,
+            joined_date: new Date()
         }
         model.users.insertOne(new_user).then(() => {
             console.log("[+] Inserted user:",new_user)
@@ -151,7 +169,7 @@ function doc_create(owner_id, title = "Untitled", returnnew = true) {
  */
 function user_delete(user_id) {
     return new Promise(async (resolve,reject) => {
-        await model.docs.deleteOne({_id:user_id})
+        await model.users.deleteOne({_id:user_id})
 
         send_event("notify-update","remove",{type:"user",_id:user_id.toHexString()})
 
@@ -185,11 +203,8 @@ function doc_delete(doc_id) {
  * @returns {Promise<boolean>} whether at least a user exists for the specified filter.
  */
 function user_exists(filter = {}) {
-    return new Promise((resolve, reject) => {
-        model.users.countDocuments(filter, (err, count) => {
-            if (err) reject(err)
-            resolve(count > 0)
-        })
+    return new Promise(async (resolve, reject) => {
+        resolve((await user_count(filter)) > 0)
     })
 }
 
@@ -200,11 +215,8 @@ function user_exists(filter = {}) {
  * @returns {Promise<boolean>} whether at least a document exists for the specified filter.
  */
 function doc_exists(filter = {}) {
-    return new Promise((resolve, reject) => {
-        model.docs.countDocuments(filter, (err, count) => {
-            if (err) reject(err)
-            resolve(count > 0)
-        })
+    return new Promise(async (resolve, reject) => {
+        resolve((await doc_count(filter)) > 0)
     })
 }
 
@@ -458,7 +470,9 @@ function generate_event(name,type,subject,data={}) {
 }
 
 module.exports = {
+    model,
     events,
+
     generate_event,
 
     run_find,
@@ -468,6 +482,7 @@ module.exports = {
     user_create,
     user_exists,
     user_delete,
+    user_count,
     user_set,
 
     getValidObjectIds,
@@ -477,7 +492,9 @@ module.exports = {
     doc_create,
     doc_exists,
     doc_delete,
+    doc_count,
     doc_set,
+
     doc_set_content,
     doc_add_permissions,
     doc_remove_permissions,

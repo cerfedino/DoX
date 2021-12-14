@@ -77,6 +77,16 @@ async function registerUser(req, user, password, done) {
                 message: 'Username already taken'
             });
     }
+
+    const n_accounts = await dbops.user_count({email:req.body.email})
+    if(n_accounts >= config.database.max_users_per_email) {
+        return done(null,
+            false,
+            {
+                status: 'fail',
+                message: `You have exceeded the maximum number of accounts for this email.`
+            });
+    }
     // Create new user and return the user
 
     let user_token = generate_random_token();
