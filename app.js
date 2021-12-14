@@ -1,7 +1,7 @@
 /**
  * Web Atelier 2021  Final Project : DoX
  *
- * Main Server Aplication
+ * Main Server Application
  *
  */
 
@@ -44,6 +44,7 @@ const app = express();
 const domain = webserver.domain
 // app.use(setDomain(domain));
 
+app.use(webserver.rate.generic_limiter)
 app.use(logger('dev'));
 app.use(xss())
 app.use(express.static(path.join(__dirname, 'public')));

@@ -5,6 +5,7 @@
 */
 // const fs = require('fs-extra')
 // const path = require('path')
+const rate_limit = require("express-rate-limit");
 
 // CL argument. Expected to be "local" or "remote" or undefined
 const arg = process.argv[2]
@@ -26,7 +27,22 @@ const settings = {
         remote: (arg === "remote"),
         https_enabled: HTTPS_ENABLED,
         domain: HOST,
-        port: PORT
+        port: PORT,
+
+        rate : {
+            login_register_limiter:
+                new rate_limit({
+                    windowMs: 1000, // 1 seconds
+                    max: 1,         // max requests in 'windowMs' before blocking
+                    message: "Too many auth submissions, slow down."
+                }),
+            generic_limiter:
+                new rate_limit({
+                    windowMs: 2000,
+                    max: 20,
+                    message: "This IP is sending too many requests, slow down."
+                })
+        }
     },
 
     cookie : {
