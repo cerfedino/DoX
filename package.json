@@ -55,6 +55,7 @@
   },
   "devDependencies": {
     "browserify": "^17.0.0",
-    "minify": "^8.0.3"
+    "minify": "^8.0.3",
+    "snyk": "^1.790.0"
   }
 }
