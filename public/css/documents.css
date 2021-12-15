@@ -353,13 +353,11 @@ a {
 
 ##############################*/
 
-.list {
-    margin: 10px;
-
+#table-of-documents.list {
     flex-direction: column;
 }
 
-.list .list-element.head {
+#table-of-documents.list .list-element.head {
     display: grid;
     margin: 10px -10px;
     margin-top: -20px;
