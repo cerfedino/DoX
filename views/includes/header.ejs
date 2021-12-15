@@ -13,7 +13,8 @@
                 <h1>
                     <a class="text-decoration-none text-black" href="" data-bs-toggle="modal"
                        data-bs-target="#renameModal">
-                        <i data-bs-toggle="tooltip" data-bs-placement="top" title="Rename document" class="bi-pencil-square"></i></a>
+                        <i data-bs-toggle="tooltip" data-bs-placement="top" title="Rename document"
+                           class="bi-pencil-square"></i></a>
                     <span id="doc-title"><%= doc.title %></span>
                 </h1>
 
@@ -27,9 +28,16 @@
                         </button>
                     </div>
                 </div> -->
+                <div class="dropstart">
+                    <button type="button" class="btn btn-primary p-4" data-bs-offset="0, 7"
+                            id="active-users-button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-people-fill"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="active-users-button" id="active-users"
+                        style="width: 300px">
 
-                <button type="button-share" class="btn btn-warning px-3"><i class="bi bi-people"></i></button>
-
+                    </ul>
+                </div>
             <% } %>
         </div>
     <% } %>

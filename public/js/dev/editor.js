@@ -105,15 +105,25 @@ socket.on('disconnect', () => {
         editor.state.tr.setMeta('update-selections', true)
     )
 })
-socket.on('init', (data) => {
+socket.on('init', async (data) => {
     console.info(`Received INIT event. Version: ${data.version}. Permission: ${data.permission}`);
     console.info(data.document);
 
     editor = initEditor(schema.nodeFromJSON(data.document), data.version, data.permission === 'READ');
 
     for (let client of Object.entries(data.connected)) {
+        let usernameRes = await fetch('/users/' + client[1].userID, {
+            method: 'GET'
+        })
+        let username = "Unknown user";
+        if (usernameRes.ok) {
+            let data = await usernameRes.json();
+            username = data.username;
+        }
+
         connectedClients[client[0]] = {
             userID: client[1].userID,
+            username,
             permission: client[1].permission,
             selection: client[1].selection ? client[1].selection : {
                 from: 1,
@@ -306,14 +316,14 @@ function renderConnections() {
     let newHTML = '';
     for (let client of Object.values(connectedClients)) {
         newHTML +=
-            `<li><span style="color: ${client.colors}" class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
+            `<li><span style="color: ${client.colors}" class="dropdown-item-text"><b>${client.username}</b></span></li>`;
         newHTML +=
             '<li class="dropdown-divider"></li>';
     }
     newHTML += `<li class="dropdown-item-text"><b>Connected: ${Object.values(connectedClients).length}</b></li>`
     active.innerHTML = newHTML;
 
-    document.getElementById('active-users-button').innerText = 'Active: ' + Object.values(connectedClients).length;
+    //document.getElementById('active-users-button').innerText = 'Active: ' + Object.values(connectedClients).length;
 }
 
 // Modals
