@@ -23,7 +23,7 @@
 /* TODO: Agree on site color palette */
 
 /* Default */
-body,body * {
+body, body * {
     --accent: #E63946;
     --accent-darker: #ad2933;
     --bg: #ffffff;
@@ -33,7 +33,7 @@ body,body * {
     --text: #333333;
     --contrast-text: #000000;
     --shadow: #c9c9c9;
-    
+
     --logo-minimal: url('../media/svg/logo_minimal.svg');
     --logo-composed: url('../media/svg/logo_composed.svg');
     --logo-notebook: url('../media/svg/notebook_icon_LIGHT.svg');
@@ -51,7 +51,7 @@ body.dark-theme, body.dark-theme * {
     --text: #cccccc;
     --contrast-text: #ffffff;
     --shadow: #000000;
-    
+
     --logo-minimal: url('../media/svg/logo_minimal_LIGHT.svg');
     --logo-composed: url('../media/svg/logo_composed_LIGHT.svg');
     --logo-notebook: url('../media/svg/notebook_icon.svg');
@@ -88,6 +88,7 @@ header #logo {
     min-width: 200px;
     max-width: 200px;
 }
+
 @media only screen and (max-width: 800px) {
     header #logo {
         background-image: url('../media/svg/notebook_icon_LIGHT.svg');
@@ -99,7 +100,7 @@ header div#extra {
     justify-content: space-between;
     /* align-items: center; */
     width: 60vw;
-    margin-left:-140px;
+    margin-left: -140px;
 }
 
 header div#extra h1 {
@@ -107,7 +108,7 @@ header div#extra h1 {
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 1; /* number of lines to show */
-            line-clamp: 1; 
+    line-clamp: 1;
     -webkit-box-orient: vertical;
     line-height: 50px;
     min-height: 50px;
@@ -128,13 +129,12 @@ header #profile_pic {
 }
 
 
-
 svg#logo {
     fill: var(--accent);
 }
 
 /* Sets the text color for every kind of text */
-p,input,textarea,select, label,span,h1,h2,h3,h4,h5,h6 {
+p, input, textarea, select, label, span, h1, h2, h3, h4, h5, h6, h1 i {
     color: var(--text)
 }
 
@@ -143,15 +143,16 @@ p,input,textarea,select, label,span,h1,h2,h3,h4,h5,h6 {
 }
 
 #alerts {
-    position : fixed;
+    position: fixed;
 
     width: 20%;
 
-    right : 1vh;
+    right: 1vh;
     bottom: 1vh;
 }
-#alerts *{
-    position : block;
+
+#alerts * {
+    position: block;
     display: flex;
     justify-content: space-between;
 }
@@ -160,7 +161,7 @@ p,input,textarea,select, label,span,h1,h2,h3,h4,h5,h6 {
     border-radius: 10px;
     justify-content: space-between;
     align-items: center;
-    display:flex;
+    display: flex;
 }
 
 .alert .close {
@@ -179,25 +180,22 @@ button.close span {
 }
 
 
-
-
-
 #renameModal {
     border-radius: 20px;
 }
 
 .modal-user {
-    display: none; 
-    position: fixed; 
+    display: none;
+    position: fixed;
     z-index: 99999;
     padding-top: 100px;
     left: 0;
     top: 0;
-    width: 100%; 
-    height: 100%; 
+    width: 100%;
+    height: 100%;
     overflow: auto;
     /* background-color: rgb(0,0,0); */
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-user .modal-content {
@@ -211,8 +209,8 @@ button.close span {
     border-radius: 20px;
     width: 20%;
     /* box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19); */
-    box-shadow: -6px 6px 16px 10px rgba(0,0,0,0.2);
-    
+    box-shadow: -6px 6px 16px 10px rgba(0, 0, 0, 0.2);
+
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
@@ -234,13 +232,23 @@ button.close span {
 
 /* Add Animation */
 @-webkit-keyframes animatetop {
-    from { opacity:0} 
-    to {right:0; opacity:1}
+    from {
+        opacity: 0
+    }
+    to {
+        right: 0;
+        opacity: 1
+    }
 }
-  
+
 @keyframes animatetop {
-    from { opacity:0}
-    to {right:0; opacity:1}
+    from {
+        opacity: 0
+    }
+    to {
+        right: 0;
+        opacity: 1
+    }
 }
 
 
@@ -249,7 +257,7 @@ button.close span {
     margin-bottom: 10px;
 }
 
-.modal-user .modal-body input#username, .modal .modal-body input#password{
+.modal-user .modal-body input#username, .modal .modal-body input#password {
     margin-bottom: 10px;
     border-radius: 10pt;
     border: 1px solid var(--bg-contrast);
@@ -268,8 +276,9 @@ button.close span {
 
 
 input[type=file]::-webkit-file-upload-button {
-    display: none; 
+    display: none;
 }
+
 input[type=file] {
     cursor: pointer;
     font-size: 10pt;

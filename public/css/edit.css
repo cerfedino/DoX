@@ -35,7 +35,7 @@
 }
 
 .action-icons i.action:hover {
-    
+
     background-color: var(--bg-hover);
     transition: all 0.1s;
 }
@@ -83,9 +83,9 @@
 .editor-tools {
     position: -webkit-sticky;
     position: sticky;
-    margin-top:-20px;
+    margin-top: -20px;
     top: 80px;
-    justify-content:center;
+    justify-content: center;
     padding-top: 10px;
     padding-bottom: 10px;
     /* border-radius: 0  0 20px 20px; */
@@ -103,6 +103,10 @@
 
 .ProseMirror {
     white-space: pre-wrap;
+}
+
+.ProseMirror * {
+    color: black;
 }
 
 .ProseMirror .cursor {
