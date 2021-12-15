@@ -97,7 +97,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         </section>
     </section>
 
-    <main >
+    <main>
         <% if(docs.length == 0) { %>
             <div id="no-documents">No documents</div>
         <% } %>
@@ -188,9 +188,8 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                     <p class="actual-creation-date"><%= doc.created_date %></p>
                     <span class="info creation-date"><%= doc.created_date %></span>
                     <p class="actual-edit-date"><%= doc.edit_date %></p>
-                    <span class="info edit-date"><%= doc.edit_date %></span>
+                    <span class="info edit-date" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-content="<%= doc.created_date.toLocaleString() %>"><%= doc.edit_date %></span>
                     <span class="info"></span>
-                    
                     <p class="owner"><%= doc.owner %></p>
                     <span class="info owner"></span>
 
@@ -248,8 +247,11 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
                     <a class="options" id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title='<div class="popovertitle">Document Information</div>'
                         data-content="<span>Created on: <%= doc.created_date.toDateString() %></span><br>
-                        <span>Owner: <%= doc.owner %></span><br>
-                        <span>Size: <%= doc.size %></span>
+                        <span>Last edit: <%= doc.edit_date.toDateString() %></span><br>
+                        <span class='owner'>Owner: <%= doc.owner %></span>
+                        <!-- <br>
+                        <span>words: doc.word-count </span><br>
+                        <span>characters: doc.char-count </span> -->
                         "><img id="threedots" src="/media/svg/options.svg" alt="Options"></a>
 
                 </article>
@@ -262,7 +264,6 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     
 
 </div>
-<p>test</p>
 <!-- <form id="send_put">
    <input type="submit" value="Submit"> </form>
 </form> -->
