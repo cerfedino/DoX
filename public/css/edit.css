@@ -1,3 +1,7 @@
+html {
+    overflow: scroll;
+}
+
 .document-view {
     margin-right: 20%;
     margin-left: 20%;
@@ -35,7 +39,6 @@
 }
 
 .action-icons i.action:hover {
-
     background-color: var(--bg-hover);
     transition: all 0.1s;
 }
@@ -107,6 +110,10 @@
 
 .ProseMirror * {
     color: black;
+}
+
+.ProseMirror p * {
+    font-size: 16px;
 }
 
 .ProseMirror .cursor {
