@@ -92,20 +92,18 @@ function setSwitchButtonListener(){
 
 // Set both edit and delete listeners buttons
 function setDeleteListeners() {
-
-    document.querySelectorAll(".svgimgform").forEach(btn => {
-        btn.addEventListener("click", deletecard)
-    })
-
-    function deletecard(e) {
-        let id = e.target.parentNode.id;
-        fetch(id, {
-            method: "DELETE"
-        }).then(res => {
-            console.log(res.status);
-            e.target.parentNode.parentNode.remove();
+    let modal = document.querySelector("#confirm-deletion-modal")
+    document.querySelectorAll(".card-element .delete").forEach(btn => {
+        btn.addEventListener('click', function() {
+            modal.querySelector("#deletion-modal-doc-title").innerHTML = this.parentNode.querySelector(".title").innerHTML
+            modal.querySelector("#deletion-modal-confirm").dataset.delete_action =  this.dataset.delete_action
         })
-    }
+    })
+    modal.querySelector("#deletion-modal-confirm").addEventListener("click", function(){
+        fetch(this.dataset.delete_action, {
+            method: "DELETE"
+        })
+    })
 }
 
 // Set list edit links for each document and sort links for the header buttons

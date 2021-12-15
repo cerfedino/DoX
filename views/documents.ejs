@@ -197,7 +197,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                     
                     <p class="owner"><%= doc.owner %></p>
                     <span class="info owner"></span>
-                    <a class="delete" id="docs/<%= doc._id %>">
+                    <a class="delete" data-delete_action="docs/<%= doc._id %>" type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm-deletion-modal" >
                         <img src="/media/svg/delete.svg" class="svgimgform"></img>
                     </a>
 
@@ -257,6 +257,26 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             <% }); %>
         </section>
 
+        <!-- Modal for document deletion confirm -->
+        <div class="modal fade" id="confirm-deletion-modal" tabindex="-1" role="dialog" aria-labelledby="confirm-deletion-modalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header text-center">
+                        <h5 class="modal-title" id="confirm-deletion-modalLabel">Are you sure ?</h5>
+                    </div>
+                    <div class="modal-body">
+                        <span class="col-form-label">Are you sure you want to delete document '</span><span id='deletion-modal-doc-title'> </span><span>'?<br> <b>This action cannot be undone</b></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button data-delete_action="" id="deletion-modal-confirm" type="button" class="btn btn-danger" data-dismiss="modal">Delete document</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!--##################-->
     </main>
 
 <div id="alerts">
