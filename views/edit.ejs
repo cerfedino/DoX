@@ -31,7 +31,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
 <div class="editor-tools">
     <div id="actions" class="action-icons px-0 container d-flex flex-wrap justify-content-start align-items-center">
-        
+
         <div class="dropdown me-2">
             <button class="btn-sm btn-secondary dropdown-toggle" type="button" id="headingMenu"
                     data-bs-toggle="dropdown" aria-expanded="false">Normal text
@@ -64,7 +64,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 </li>
             </ul>
         </div>
- 
+
 
         <i id="action-bold" class="action bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
            title="Bold (Ctrl-B)"></i>
@@ -101,8 +101,6 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
            title="Redo (Ctrl-Shift-Z)"></i>
 
 
-
-
         <div class="ms-auto d-flex flex-wrap">
             <div class="text-end d-flex flex-wrap ms-3">
                 <!--<div class="dropdown dropdown-menu-end me-1">
@@ -116,11 +114,13 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <button id="button-share" type="button" class="btn btn-primary me-1">
                     <i class="bi-share"></i>
                 </button>
-                <button id="button-export" type="button" class="btn btn-primary me-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                <button id="button-export" type="button" class="btn btn-primary me-1" data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         title="Export as a PDF (Ctrl-E)">
                     <i class="bi-cloud-download-fill"></i>
                 </button>
-                <button id="button-save" type="button" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                <button id="button-save" type="button" class="btn btn-primary" data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         title="Save (Ctrl-S)">
                     <i class="bi-cloud-upload-fill"></i>
                 </button>
@@ -214,6 +214,20 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 <input type="submit" class="btn btn-primary" id="action-insert-link" value="Insert">
             </div>
         </form>
+    </div>
+</div>
+
+<div id="toasts" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="save-toast" class="toast align-items-center text-white bg-success border-0" role="alert"
+         aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi-check-circle-fill me-1"></i>
+                Saved successfully!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
     </div>
 </div>
 

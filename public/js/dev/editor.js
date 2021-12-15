@@ -170,6 +170,9 @@ socket.on('save-success', () => {
     saveButton.classList.add('btn-success');
     saveButton.classList.remove('btn-primary');
 
+    const toast = new bootstrap.Toast(document.getElementById('save-toast'));
+    toast.show();
+
     setTimeout(() => {
         saveButton.innerHTML = '<i class="bi-cloud-upload-fill"></i>';
         saveButton.classList.add('btn-primary');
