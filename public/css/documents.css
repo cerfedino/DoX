@@ -189,6 +189,7 @@ svg#logo {
 }
 
 input[name="filter-submit"] {
+    /* display: none; */
     border-radius: 5px;
     background-color: var(--bg-tool-bar-button);
     color: var(--text-tool-bar-button);

@@ -151,10 +151,10 @@ function setToolBarSortListeners() {
 function setSortListeners() {
 
     let row = document.querySelector('.list-element.head');
+    debugger
 
-    row.querySelectorAll('a').forEach(a=>a.addEventListener('click',function(event){
+    row.querySelectorAll('.info > b > a').forEach(a=>a.addEventListener('click',function(event){
         event.preventDefault();
-
 
         let type;
         let action = a.getAttribute('rel');
@@ -163,18 +163,15 @@ function setSortListeners() {
         } else {
             type = '.' + action;
         }
-
+        debugger
         let activeSort = document.querySelector('button.active-sort');
         activeSort.setAttribute('data-toggle',action);
         let item = document.querySelector('div.sort > .dropdown-menu').querySelector(`a[rel="${action}"]`);
         document.querySelector('div.sort > .btn-secondary.dropdown-toggle').innerHTML = item.innerHTML;
-        document.querySelectorAll('.reverse-sort').forEach(item=>{
-            if (item.classList.contains('active-sort-display')) {
-                item.classList.remove('active-sort-display');
-            }
-        })
-
-        this.parentNode.parentNode.querySelector('.reverse-sort').classList.add('active-sort-display');
+        document.querySelectorAll('.active-sort-display').forEach(item=>{
+            item.classList.remove('active-sort-display');
+        });
+        a.parentNode.parentNode.querySelector('.reverse-sort').classList.add('active-sort-display');
         
         // First, we take all the actual values
         let values = [];
@@ -315,6 +312,8 @@ function setFilterRowClick() {
         // Set checkbox click so that it works even on itself
         checkbox.addEventListener('change',function(event){
             checkbox.checked = !checkbox.checked;
+            debugger
+            document.querySelector('input[name="filter-submit"]').click();
         })
     })
 }
@@ -331,28 +330,14 @@ function setSaveListeners() {
             call = false;
         }
 
-
         // First reset the whole page so that the filters are all reapplied
-        let toBeReseted = [];
-        let list = document.getElementById('table-of-documents');
-        list.childNodes.forEach(child=>{
-            if (child.classList != undefined && !child.classList.contains('head')) {
-                toBeReseted.push(child);
-            }
-        })
         let actualList = document.querySelectorAll('.card-element');
 
-        toBeReseted.forEach(doc=>{
-            list.removeChild(doc);
-        })
-
         actualList.forEach(doc=>{
-            list.innerHTML += doc.outerHTML;
+            doc.style.display = 'grid';
         })
 
-        setDocumentListeners();
-        setSortListeners();
-
+        // Then set all the filters only if they're checked
         document.getElementById('filters').querySelectorAll('input[type="checkbox"]').forEach(checkbox=>{
             let active = document.querySelector('.active-filters');
             let item = checkbox.parentNode.querySelector('label[for="' + checkbox.name + '"]');
@@ -399,9 +384,8 @@ function setActiveFilter(checkbox){
 
     if (type == 'owned'){
         rows.forEach(row=>{
-
             if (row.querySelector('.info.owner').innerHTML != '<i>me</i>'){
-                row.parentNode.removeChild(row);
+                row.style.display = 'none';
             }
         })
     } else if (type == 'read' || type == 'edit'){
@@ -414,7 +398,7 @@ function setActiveFilter(checkbox){
                     let role = item.querySelector('.role').innerHTML;
                     let user = item.querySelector('.user').innerHTML;
                     if (role != type || user != '<i>me</i>'){
-                        row.parentNode.removeChild(row);
+                        row.style.display = 'none';
                     }
                 }
             })
@@ -424,7 +408,7 @@ function setActiveFilter(checkbox){
 
             let n = parseInt(row.querySelector('p.shared').innerHTML);
             if (n == 0) {
-                row.parentNode.removeChild(row);
+                row.style.display = 'none';
             }
         })
     }
