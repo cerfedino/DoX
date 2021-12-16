@@ -379,7 +379,7 @@ a {
     align-items: center;
 }
 
-.reverse-sort, .rev {
+.reverse-sort, .not-display {
     display: none;
 }
 

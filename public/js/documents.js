@@ -26,6 +26,8 @@ function init_documents() {
 
     setSortListeners();
 
+    setToolBarSortListeners();
+
     formatDates();
 }
 
@@ -153,7 +155,6 @@ function setSortListeners() {
                 item.classList.remove('active-sort-display');
             }
         });
-        debugger
 
         a.parentNode.parentNode.querySelector('.reverse-sort').classList.add('active-sort-display');
         
@@ -183,6 +184,9 @@ function setSortListeners() {
 
         // Finally we sort the array of values and for each of them place in the section the first node matching the value
         nonCaseSensitiveValues.sort();
+        if (reverse == true) {
+            nonCaseSensitiveValues.reverse();
+        }
         let sortedValues = [];
         nonCaseSensitiveValues.forEach(val=>{
             values.forEach(el=>{
@@ -192,14 +196,20 @@ function setSortListeners() {
                 }
             })
         })
-        
+
         if (type.endsWith('-date')) {
             values.sort(function(d1,d2){
                 return new Date(d1) - new Date(d2);
             });
+            if (reverse == true) {
+                values.reverse();
+            }
             sortedValues = values;
         } else if (type == '.shared') {
             insertionSort(values);
+            if (reverse == true) {
+                values.reverse();
+            }
             sortedValues = values;
         }
 
@@ -214,7 +224,40 @@ function setSortListeners() {
             })
         });
 
-    }))
+    }));
+
+    setReverseToolSort();
+    row.querySelectorAll('.reverse-sort').forEach(rev=>{
+        rev.addEventListener('click',(event)=>{
+            event.preventDefault();
+            let icon = rev.querySelector('.not-display');
+            if (icon.classList.contains('rev')){
+                reverse = true;
+                rev.parentNode.querySelector('b > a').click();
+                reverse = false;
+                rev.firstElementChild.classList.add('not-display');
+            } else{
+                rev.parentNode.querySelector('b > a').click();
+                rev.childNodes[3].classList.add('not-display');
+            }
+            icon.classList.remove('not-display');
+        });
+    });
+}
+
+function setReverseToolSort(){
+    let rev = document.querySelector('.reverse-sort.tool');
+    rev.addEventListener('click',(event)=>{
+        event.preventDefault();
+        let icon = rev.querySelector('.not-display');
+        if (icon.classList.contains('rev')){
+            rev.firstElementChild.classList.add('not-display');
+        } else{
+            rev.childNodes[3].classList.add('not-display');
+        }
+        icon.classList.remove('not-display');
+        document.querySelector('.active-sort-display').click();
+    });
 }
 
 // Returns the username matching the given User's Id
