@@ -1,14 +1,3 @@
-<!-- trying to fix white flashes when opening a page using dark mode-->
-<script>
-    if (localStorage.getItem("dark_mode") == 'true') {
-        document.body.classList.add("dark-theme")
-        document.querySelector("#dark-mode-toggle").checked = true
-    } else {
-        document.body.classList.remove('dark-theme')
-        document.querySelector("#dark-mode-toggle").checked = false
-    }
-</script>
-
 
 <% 
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
@@ -31,59 +20,69 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </style>
 </head>
 <body class="text-center">
-<script src="/socket.io/socket.io.js"></script>
-<script  onload="init_socket()" src="/js/socket.js"></script>
+    <!-- trying to fix white flashes when opening a page using dark mode-->
+    <script>
+        if (localStorage.getItem("dark_mode") == 'true') {
+            document.body.classList.add("dark-theme")
+            document.querySelector("#dark-mode-toggle").checked = true
+        } else if (document.body.classList.contains('dark-theme')) {
+            document.body.classList.remove('dark-theme')
+            document.querySelector("#dark-mode-toggle").checked = false
+        }
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script  onload="init_socket()" src="/js/socket.js"></script>
 
 
-<main class="login-form">
-    <div id="logo"></div>
+    <main class="login-form">
+        <div id="logo"></div>
 
-    <form method="POST" action="/auth/register">
-        <h1 class="h3 mb-3 fw-normal">Please register</h1>
+        <form method="POST" action="/auth/register">
+            <h1 class="h3 mb-3 fw-normal">Please register</h1>
 
-        <div class="form-floating">
-            <input required class="form-control" type="text" id="username" name="username" placeholder="Username">
-            <label for="username">Username</label>
+            <div class="form-floating">
+                <input required class="form-control" type="text" id="username" name="username" placeholder="Username">
+                <label for="username">Username</label>
+            </div>
+            <div class="form-floating">
+                <input required id="newPassword" class="form-control" type="password" name="password" placeholder="Password">
+                <label for="newPassword">Password</label>
+            </div>
+            <div class="form-floating">
+                <input required id="confirmPassword" class="form-control" type="password" name="confirmPassword" placeholder="Confirm password">
+                <label for="confirmPassword">Confirm password</label>
+            </div>
+            <div class="form-floating">
+                <input required class="form-control" type="text" id="email" name="email" placeholder="email">
+                <label for="email">Email</label>
+            </div>
+
+            <input type="submit" class="btn btn-primary w-100 btn-lg" value="Sign up">
+            <p>Already registered? <a href="/login">Sign in</a></p>
+        </form>
+
         </div>
-        <div class="form-floating">
-            <input required id="newPassword" class="form-control" type="password" name="password" placeholder="Password">
-            <label for="newPassword">Password</label>
-        </div>
-        <div class="form-floating">
-            <input required id="confirmPassword" class="form-control" type="password" name="confirmPassword" placeholder="Confirm password">
-            <label for="confirmPassword">Confirm password</label>
-        </div>
-        <div class="form-floating">
-            <input required class="form-control" type="text" id="email" name="email" placeholder="email">
-            <label for="email">Email</label>
-        </div>
 
-        <input type="submit" class="btn btn-primary w-100 btn-lg" value="Sign up">
-        <p>Already registered? <a href="/login">Sign in</a></p>
     </form>
 
+    </main>
+    <div id="alerts">
+        
     </div>
 
-</form>
+    <div class="dark-mode">
+        <input id="dark-mode-toggle" type="checkbox" name="dark-mode">
+        <label for="dark-mode">Dark mode</label>
+    </div>
 
-</main>
-<div id="alerts">
-    
-</div>
+    <script src="/js/common.mjs"></script>
+    <script onload="init_register()" src="/js/register.js"></script>
 
-<div class="dark-mode">
-    <input id="dark-mode-toggle" type="checkbox" name="dark-mode">
-    <label for="dark-mode">Dark mode</label>
-</div>
+    <%- messagesuccess %>
+    <%- messagefailure %>
 
-<script src="/js/common.mjs"></script>
-<script onload="init_register()" src="/js/register.js"></script>
-
-<%- messagesuccess %>
-<%- messagefailure %>
-
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
 </html>

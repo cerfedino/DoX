@@ -1,15 +1,3 @@
-<!-- trying to fix white flashes when opening a page using dark mode-->
-<script>
-    if (localStorage.getItem("dark_mode") == 'true') {
-        document.body.classList.add("dark-theme")
-        document.querySelector("#dark-mode-toggle").checked = true
-    } else {
-        document.body.classList.remove('dark-theme')
-        document.querySelector("#dark-mode-toggle").checked = false
-    }
-</script>
-
-
 
 <%
 if(!docs) {
@@ -37,8 +25,18 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </style>
 </head>
 <body>
-<script src="/socket.io/socket.io.js"></script>
-<script  onload="init_socket()" src="/js/socket.js"></script>
+    <!-- trying to fix white flashes when opening a page using dark mode-->
+    <script>
+        if (localStorage.getItem("dark_mode") == 'true') {
+            document.body.classList.add("dark-theme")
+            document.querySelector("#dark-mode-toggle").checked = true
+        } else if (document.body.classList.contains('dark-theme')) {
+            document.body.classList.remove('dark-theme')
+            document.querySelector("#dark-mode-toggle").checked = false
+        }
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script  onload="init_socket()" src="/js/socket.js"></script>
 
     <%- include('includes/header', {'extra' : 'search'}) %>
 
@@ -99,7 +97,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         </section>
     </section>
 
-    <main >
+    <main>
         <% if(docs.length == 0) { %>
             <div id="no-documents">No documents</div>
         <% } %>
@@ -190,14 +188,16 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                     <p class="actual-creation-date"><%= doc.created_date %></p>
                     <span class="info creation-date"><%= doc.created_date %></span>
                     <p class="actual-edit-date"><%= doc.edit_date %></p>
-                    <span class="info edit-date"><%= doc.edit_date %></span>
+                    <span class="info edit-date" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-content="<%= doc.created_date.toLocaleString() %>"><%= doc.edit_date %></span>
                     <span class="info"></span>
-                    
                     <p class="owner"><%= doc.owner %></p>
                     <span class="info owner"></span>
-                    <a class="delete" id="docs/<%= doc._id %>">
-                        <img src="/media/svg/delete.svg" class="svgimgform"></img>
-                    </a>
+
+                    <% if (doc.owner == userid) { %>
+                        <a class="delete" id="docs/<%= doc._id %>">
+                            <img src="/media/svg/delete.svg" class="svgimgform"></img>
+                        </a>
+                    <% } %>
 
                     <% let doc_perms = []
                         doc_perms.push(`
@@ -247,8 +247,11 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
                     <a class="options" id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title='<div class="popovertitle">Document Information</div>'
                         data-content="<span>Created on: <%= doc.created_date.toDateString() %></span><br>
-                        <span>Owner: <%= doc.owner %></span><br>
-                        <span>Size: <%= doc.size %></span>
+                        <span>Last edit: <%= doc.edit_date.toDateString() %></span><br>
+                        <span class='owner'>Owner: <%= doc.owner %></span>
+                        <!-- <br>
+                        <span>words: doc.word-count </span><br>
+                        <span>characters: doc.char-count </span> -->
                         "><img id="threedots" src="/media/svg/options.svg" alt="Options"></a>
 
                 </article>
