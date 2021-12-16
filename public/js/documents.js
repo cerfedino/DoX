@@ -34,23 +34,20 @@ function setSearchListener() {
     let search = document.getElementById('search');
     search.oninput = function(){
         
-        // First we clean the section
+        // First we redisplay the section
         let list = document.querySelector('section#table-of-documents');
         document.querySelectorAll('.card-element').forEach(doc=>{
-            list.removeChild(doc);
+            doc.style.display = 'grid';
         })
 
-        // Then we add back every actual row
-        /* filteredDocuments */base_documents.forEach(row=>{
-            list.innerHTML += row.outerHTML;
-        })
+        // And then hide what doesn't match the search
 
         let text = search.value;
         document.querySelectorAll('.card-element').forEach((row)=>{
             let owner = row.querySelector('.info.owner').innerHTML;
             let title = row.querySelector('.title').innerHTML;
             if (!title.toLowerCase().includes(text.toLowerCase()) && !owner.toLowerCase().includes(text.toLowerCase())) {
-                row.remove();
+                row.style.display = 'none';
             }
         });
 
@@ -85,21 +82,6 @@ function setSwitchButtonListener(){
         document.querySelector(".switch-list-grid a.grid-view").style = "background-color: var(--bg); color: var(--text)";
 
     })
-    
-    
-    // querySelectorAll('a').forEach(x=>x.addEventListener('click',function(event){
-    //     event.preventDefault();
-
-
-    //     if (!this.classList.contains('active')){
-    //         let deactivate = document.querySelector('a.active').classList.contains('list-view') ? ".list" : ".card";
-    //         let activate = document.querySelector('a.active').classList.contains('list-view') ? ".card" : ".list";
-    //         document.querySelector("section"+deactivate).style.display = 'none';
-    //         document.querySelector('a.active').classList.remove('active');
-    //         document.querySelector("section"+activate).style.display = 'flex';
-    //         this.classList.add('active');
-    //     }
-    // }))
 }
 
 // Set both edit and delete listeners buttons
@@ -143,6 +125,7 @@ function setToolBarSortListeners() {
             event.preventDefault();
             let className = item.getAttribute('rel');
             row.querySelector(`a[rel="${className}"]`).click();
+            elements.parentElement.querySelector('.reverse-sort').style.display = 'block';
         });
     })
 }
@@ -166,10 +149,14 @@ function setSortListeners() {
         let activeSort = document.querySelector('button.active-sort');
         activeSort.setAttribute('data-toggle',action);
         let item = document.querySelector('div.sort > .dropdown-menu').querySelector(`a[rel="${action}"]`);
-        document.querySelector('div.sort > .btn-secondary.dropdown-toggle').innerHTML = item.innerHTML;
+        document.querySelector('.sort > .btn-secondary.dropdown-toggle').innerHTML = item.innerHTML;
         document.querySelectorAll('.active-sort-display').forEach(item=>{
-            item.classList.remove('active-sort-display');
+            if (a.parentNode.parentNode.querySelector('.reverse-sort') != item) {
+                item.classList.remove('active-sort-display');
+            }
         });
+        debugger
+
         a.parentNode.parentNode.querySelector('.reverse-sort').classList.add('active-sort-display');
         
         // First, we take all the actual values
@@ -221,18 +208,18 @@ function setSortListeners() {
             let done = false;
             documents_rows.forEach(doc=>{
                 if (!done && doc != undefined && doc.querySelector(type).innerHTML == String(val)){
-                    list.innerHTML += doc.outerHTML;
+                    list.appendChild(doc);
                     documents_rows = documents_rows.filter(x=>(x != doc));
                     done = true;
                 }
             })
         });
         
-        setEditListeners();
-        setSortListeners();
-        $('[data-toggle="popover"]').popover({
-            html:true
-        });
+        // setEditListeners();
+        // setSortListeners();
+        // $('[data-toggle="popover"]').popover({
+        //     html:true
+        // });
         // setDocumentListeners();
     }))
 }
@@ -332,20 +319,6 @@ function setSaveListeners() {
             call = false;
         }
 
-        // First reset the whole page so that the filters are all reapplied
-        let actualList = document.querySelectorAll('.card-element');
-
-        actualList.forEach(doc=>{
-            if (doc.style.display == 'none') {
-                doc.style.display = 'grid';
-            }
-        })
-        setEditListeners();
-
-        $('[data-toggle="popover"]').popover({
-            html:true
-        });
-
         // Then set all the filters only if they're checked
         document.getElementById('filters').querySelectorAll('input[type="checkbox"]').forEach(checkbox=>{
             let active = document.querySelector('.active-filters');
@@ -398,7 +371,6 @@ function setActiveFilter(checkbox){
                 articles.innerHTML = row.querySelector('a.perms').getAttribute('data-content');
                 let found = false;
                 articles.querySelectorAll('.dropdown-item').forEach(item=>{
-                    debugger
                     if (!item.innerHTML.includes('Document not shared')) {
                         let role = item.querySelector('.role').innerHTML;
                         let user = item.querySelector('.user').innerHTML;
