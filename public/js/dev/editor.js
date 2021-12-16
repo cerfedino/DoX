@@ -585,7 +585,8 @@ function menuPlugin(items) {
  * Saves the document
  */
 async function save() {
-    socket.emit('save');
+    let doc = document.querySelector("#editor").innerHTML;
+    socket.emit('save', {doc : doc});
 }
 
 async function exportPDF() {

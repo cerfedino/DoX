@@ -117,7 +117,7 @@ module.exports.init = function (server) {
                     permission
                 };
 
-                async function save() {
+                async function save(doc) {
                     try {
                         const text = memoryDocs[documentID].doc.textContent;
                         const chars = text.length;
@@ -133,6 +133,7 @@ module.exports.init = function (server) {
                             word_count: words,
                             content: memoryDocs[documentID].doc.toJSON()
                         })
+                        console.log("AAAAAAAAAAAAAAA" + doc)
                         console.info(`SOCKETS Document ${documentID} was successfully saved`);
                         io.to(`document:${msg._id}/editor/write`).emit('save-success');
                     } catch (e) {
@@ -183,8 +184,8 @@ module.exports.init = function (server) {
                             stepClientIDs: memoryDocs[documentID].stepClientIDs
                         });
                     })
-                    socket.on('save', async () => {
-                        await save();
+                    socket.on('save', async (html) => {
+                        await save(html);
                     })
 
                     socket.on('rename', async (newName) => {
