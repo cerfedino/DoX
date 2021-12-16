@@ -98,16 +98,14 @@ router.get('/docs/new', checkAuthenticated, async function (req, res) {
 })
 
 /*
-    GET /docs/:id
+    GET /docs/:id?
     Renders the document edit view for the specified document.
     IF the user only has read access to it, renders accordingly.
         IF the user has NO access to it, denies access to it.
  */
-const documents_js = require("../public/js/documents.js")
 router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
     // Check first if ObjectID is valid
     if (req.params.id && !ObjectId.isValid(req.params.id)) {
-        
         if(req.accepts("text/html")) {
             res.status(404).render('../views/error.ejs', {s: 404, m: `Invalid document ID. Check if there is a typo in: ${req.url}`});
         } else {
@@ -144,8 +142,7 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
             res.status(200).render('../views/documents.ejs',
                 {
                     docs: await dbops.docs_available(ObjectId(req.user.user_id)),
-                    user : await dbops.user_find({_id : ObjectId(req.user.user_id)}),
-                    documents_js : documents_js,
+                    user : await dbops.user_find({_id : ObjectId(req.user.user_id)})
                 })
         } else {
             res.status(406).send("Accepts: text/html").end();
@@ -336,7 +333,7 @@ function get_editable_doc_fields(obj={}) {
 
     Updates user only if the request is coming from the user himself.
 */
-router.put('/user', async (req,res)=> {
+router.put('/user', checkAuthenticated, async (req,res)=> {
     if (!ObjectId.isValid(req.user.user_id)) {
         res.status(400).send(`Invalid user ID.`);
         return
@@ -403,7 +400,7 @@ router.put('/user', async (req,res)=> {
     DELETE /docs/:id
     Deletes a document.
  */
-router.delete("/docs/:id", async (req, res) => {
+router.delete("/docs/:id", checkAuthenticated, async (req, res) => {
     
     // Check first if ObjectID is valid
     if (!ObjectId.isValid(req.params.id)) {
