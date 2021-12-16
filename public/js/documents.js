@@ -151,7 +151,6 @@ function setToolBarSortListeners() {
 function setSortListeners() {
 
     let row = document.querySelector('.list-element.head');
-    debugger
 
     row.querySelectorAll('.info > b > a').forEach(a=>a.addEventListener('click',function(event){
         event.preventDefault();
@@ -163,7 +162,7 @@ function setSortListeners() {
         } else {
             type = '.' + action;
         }
-        debugger
+
         let activeSort = document.querySelector('button.active-sort');
         activeSort.setAttribute('data-toggle',action);
         let item = document.querySelector('div.sort > .dropdown-menu').querySelector(`a[rel="${action}"]`);
@@ -231,6 +230,9 @@ function setSortListeners() {
         
         setEditListeners();
         setSortListeners();
+        $('[data-toggle="popover"]').popover({
+            html:true
+        });
         // setDocumentListeners();
     }))
 }
@@ -307,12 +309,12 @@ function setFilterRowClick() {
         let checkbox = item.querySelector('input');
         item.addEventListener('click',function(event){
             checkbox.checked = !checkbox.checked;
+            document.querySelector('input[name="filter-submit"]').click();
         })
 
         // Set checkbox click so that it works even on itself
         checkbox.addEventListener('change',function(event){
             checkbox.checked = !checkbox.checked;
-            debugger
             document.querySelector('input[name="filter-submit"]').click();
         })
     })
@@ -334,8 +336,15 @@ function setSaveListeners() {
         let actualList = document.querySelectorAll('.card-element');
 
         actualList.forEach(doc=>{
-            doc.style.display = 'grid';
+            if (doc.style.display == 'none') {
+                doc.style.display = 'grid';
+            }
         })
+        setEditListeners();
+
+        $('[data-toggle="popover"]').popover({
+            html:true
+        });
 
         // Then set all the filters only if they're checked
         document.getElementById('filters').querySelectorAll('input[type="checkbox"]').forEach(checkbox=>{
@@ -372,15 +381,37 @@ function setActiveFilter(checkbox){
     if (checkbox.type != 'checkbox') {
         return undefined;
     }
-
     
     let rows = [];
     document.querySelectorAll('.card-element').forEach(el=>{
-        if (!el.classList.contains('head')){
-            rows.push(el);
-        }
-    })
+        rows.push(el);
+    });
     let type = checkbox.name.split('-')[1];
+
+    /**
+     * removeRow checks on the row if check is never true, then it hides the row, otherwise leaves it there 
+     * @param {HTMLElement} row the row to be removed
+     * @param {Function} check the function to check for the element
+     */
+    function removeRow(row, check = true) {
+        let articles = document.createElement('SECTION');
+                articles.innerHTML = row.querySelector('a.perms').getAttribute('data-content');
+                let found = false;
+                articles.querySelectorAll('.dropdown-item').forEach(item=>{
+                    debugger
+                    if (!item.innerHTML.includes('Document not shared')) {
+                        let role = item.querySelector('.role').innerHTML;
+                        let user = item.querySelector('.user').innerHTML;
+                        if (check(role, user)){
+                            found = true;
+                        }
+                    }
+                })
+                if (found == false) {
+                    row.style.display = 'none';
+                }
+    }
+
 
     if (type == 'owned'){
         rows.forEach(row=>{
@@ -388,24 +419,28 @@ function setActiveFilter(checkbox){
                 row.style.display = 'none';
             }
         })
-    } else if (type == 'read' || type == 'edit'){
+    } else if (type == 'read'){
         rows.forEach(row=>{
-
-            let articles = document.createElement('SECTION');
-            articles.innerHTML = row.querySelector('a.perms').getAttribute('data-content');
-            articles.querySelectorAll('.dropdown-item').forEach(item=>{
-                if (!item.innerHTML.includes('Document not shared')) {
-                    let role = item.querySelector('.role').innerHTML;
-                    let user = item.querySelector('.user').innerHTML;
-                    if (role != type || user != '<i>me</i>'){
-                        row.style.display = 'none';
-                    }
-                }
+            removeRow(row,(role,user)=>{
+                return role == type && user == '<i>me</i>';
+            })
+        })
+    } else if (type == 'edit') {
+        rows.forEach(row=>{
+            if (row.querySelector('.info.owner').innerHTML != '<i>me</i>'){
+                removeRow(row,(role,user)=>{
+                    return role == type && user == '<i>me</i>';
+                });
+            }
+        })
+    } else if (type == 'notmine') {
+        rows.forEach(row=>{
+            removeRow(row,(role,user)=>{
+                return role != 'owner' && user == '<i>me</i>';
             })
         })
     } else {
         rows.forEach(row=>{
-
             let n = parseInt(row.querySelector('p.shared').innerHTML);
             if (n == 0) {
                 row.style.display = 'none';

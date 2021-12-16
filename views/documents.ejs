@@ -79,11 +79,15 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                         <input name="filter-owned" type="checkbox">
                     </article>
                     <article class="dropdown-item filter">
-                        <label for="filter-read">Reading Permissions</label>
+                        <label for="filter-notmine">Shared with me</label>
+                        <input name="filter-notmine" type="checkbox">
+                    </article>
+                    <article class="dropdown-item filter">
+                        <label for="filter-read">Read only Perms</label>
                         <input name="filter-read" type="checkbox">
                     </article>
                     <article class="dropdown-item filter">
-                        <label for="filter-edit">Writing Permissions</label>
+                        <label for="filter-edit">Writing Perms</label>
                         <input name="filter-edit" type="checkbox">
                     </article>
                     <article class="dropdown-item filter">
@@ -280,9 +284,9 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     $(document).ready(function(){
         $('[data-toggle="popover"]').popover({
             html:true
-        });   
+        });
     });
-    </script>
+</script>
 
 </body>
 </html>
