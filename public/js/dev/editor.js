@@ -183,7 +183,7 @@ socket.on('save-fail', ({error}) => {
     console.error('Received SAVE-FAIL event with data: ', error);
     let saveButton = document.getElementById('button-save');
     saveButton.innerHTML = '<i class="bi-x-circle-fill"></i>';
-    saveButton.classList.add('btn-error');
+    saveButton.classList.add('btn-danger');
     saveButton.classList.remove('btn-primary');
 })
 socket.on('notify-update', ({data}) => {
