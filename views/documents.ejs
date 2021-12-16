@@ -181,7 +181,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             
             <% docs.forEach((doc)=>{ %>
                 <article id="<%= doc._id %>" class="card-element">
-                    <a id="icon" href="docs/<%= doc._id %>">
+                    <a id="preview" href="docs/<%= doc._id %>" >
+                        <img src='<%= doc.doc_preview %>'>
+                    </a>
+                    <a id="icon" href="docs/<%= doc._id %>" >
                         <img src="/media/svg/notebook_icon_LIGHT.svg" alt="Card image cap">
                     </a>
                     <span class="title"><%= doc.title %></span>
@@ -248,13 +251,13 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                     <a class="options" id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title='<div class="popovertitle">Document Information</div>'
                         data-content="<span>Created on: <%= doc.created_date.toDateString() %></span><br>
                         <span>Last edit: <%= doc.edit_date.toDateString() %></span><br>
-                        <span class='owner'>Owner: <%= doc.owner %></span>
-                        <!-- <br>
-                        <span>words: doc.word-count </span><br>
-                        <span>characters: doc.char-count </span> -->
+                        <span class='owner'>Owner: <%= doc.owner %></span> <br>
+                        <span>words: <%= doc.word_count %> </span><br>
+                        <span>characters: <%= doc.char_count %> </span>
                         "><img id="threedots" src="/media/svg/options.svg" alt="Options"></a>
 
                 </article>
+                
             <% }); %>
         </section>
 

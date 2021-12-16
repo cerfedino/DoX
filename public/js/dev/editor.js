@@ -8,6 +8,7 @@ const collab = require('prosemirror-collab');
 const io = require('socket.io-client')
 const schema = require('../../../modules/schema');
 const {Step} = require("prosemirror-transform");
+var htmlToImage = require('html-to-image');
 
 /**
  * Menu component
@@ -585,8 +586,13 @@ function menuPlugin(items) {
  * Saves the document
  */
 async function save() {
-    let doc = document.querySelector("#editor").innerHTML;
-    socket.emit('save', {doc : doc});
+    function filter (node) {
+        return (node.tagName !== 'i');
+    }
+    htmlToImage.toSvg(document.querySelector('#editor'), { filter: filter })
+    .then(function (dataUrl) {
+        socket.emit('save', dataUrl);
+    });
 }
 
 async function exportPDF() {

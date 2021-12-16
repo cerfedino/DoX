@@ -116,69 +116,9 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             </div>
     
 
-            <i id="action-bold" class="action bi-type-bold" data-bs-toggle="tooltip" data-bs-placement="top"
-            title="Bold (Ctrl-B)"></i>
-            <i id="action-italic" class="action bi-type-italic" data-bs-toggle="tooltip" data-bs-placement="top"
-            title="Italic (Ctrl-I)"></i>
-            <i id="action-underline" class="action bi-type-underline" data-bs-toggle="tooltip" data-bs-placement="top"
-            title="Underline (Ctrl-U)"></i>
-
-            <input class="me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Text color"
-                id="action-pick-color"
-                type="color" value="#000000"
-                aria-label="Text color">
-
-            <i id="action-lift-item" class="action bi-text-indent-left" data-bs-toggle="tooltip" data-bs-placement="top"
-            title="Lift list item"></i>
-            <i id="action-bullet-list" class="action bi-list-ul" data-bs-toggle="tooltip" data-bs-placement="top"
-            title="Bulleted list (Ctrl-Shift-8)"></i>
-            <i id="action-ordered-list" class="action bi-list-ol" data-bs-toggle="tooltip" data-bs-placement="top"
-            title="Ordered list (Ctrl-Shift-7)"></i>
-
-            <a data-bs-toggle="modal" data-bs-target="#insertImageModal">
-                <i class="action bi-image" data-bs-toggle="tooltip" data-bs-placement="top"
-                title="Insert image"></i>
-            </a>
-
-            <a data-bs-toggle="modal" data-bs-target="#insertLinkModal">
-                <i class="action bi-link" data-bs-toggle="tooltip" data-bs-placement="top"
-                title="Insert link"></i>
-            </a>
-
-            <i id="action-undo" class="action bi-arrow-counterclockwise" data-bs-toggle="tooltip" data-bs-placement="top"
-            title="Undo (Ctrl-Z)"></i>
-            <i id="action-redo" class="action bi-arrow-clockwise" data-bs-toggle="tooltip" data-bs-placement="top"
-            title="Redo (Ctrl-Shift-Z)"></i>
-
-
-
-
-            <div class="ms-auto d-flex flex-wrap">
-                <div class="text-end d-flex flex-wrap ms-3">
-                    <div class="dropdown dropdown-menu-end me-2">
-                        <button class="btn-sm btn-primary dropdown-toggle h-100" type="button" data-bs-toggle="dropdown"
-                                aria-expanded="false" id="active-users-button">Active
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="active-users-button" id="active-users"
-                            style="width: 320px">
-                        </ul>
-                    </div>
-                    <!-- <button type="button" class="btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#renameModal">
-                        Rename
-                    </button> -->
-                    <button id="button-share" type="button" class="btn btn-warning px-3 me-2">
-                        <i class="bi-share"></i>
-                    </button>
-                    <button id="button-save" type="button" class="btn btn-success">
-                        <i class="bi-save"></i>
-                    </button>
-                    <p id="message-save"
-                    class="mt-auto mb-auto me-3"></p>
-                </div>
-
-            </div>
         </div>
     </div>
+</div>
 
     <main class="document-view">
         <div id="editor" class="p-5">

@@ -127,13 +127,14 @@ module.exports.init = function (server) {
                             .replace(/\s+/g, " ")
                             .split(" ").length;
 
-                        await doc_set(new ObjectId(documentID), {
+                        let doc_tags_to_update = {
                             char_count: chars,
                             char_count_noSpaces: charsNoSpaces,
                             word_count: words,
-                            content: memoryDocs[documentID].doc.toJSON()
-                        })
-                        console.log("AAAAAAAAAAAAAAA" + doc)
+                            content: memoryDocs[documentID].doc.toJSON(),
+                        }
+                        if (doc) {doc_tags_to_update.doc_preview = doc}
+                        await doc_set(new ObjectId(documentID), doc_tags_to_update)
                         console.info(`SOCKETS Document ${documentID} was successfully saved`);
                         io.to(`document:${msg._id}/editor/write`).emit('save-success');
                     } catch (e) {
@@ -184,8 +185,8 @@ module.exports.init = function (server) {
                             stepClientIDs: memoryDocs[documentID].stepClientIDs
                         });
                     })
-                    socket.on('save', async (html) => {
-                        await save(html);
+                    socket.on('save', async (svg_icon) => {
+                        await save(svg_icon);
                     })
 
                     socket.on('rename', async (newName) => {
