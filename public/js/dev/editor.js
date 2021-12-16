@@ -101,15 +101,29 @@ socket.on('disconnect', () => {
     activity.classList.remove('btn-primary');
     activity.classList.add('btn-warning');
     activity.innerText = 'You\'re offline!';
+    editor.dispatch(
+        editor.state.tr.setMeta('update-selections', true)
+    )
 })
-socket.on('init', (data) => {
-    console.info('Received INIT event. Version: ' + data.version);
+socket.on('init', async (data) => {
+    console.info(`Received INIT event. Version: ${data.version}. Permission: ${data.permission}`);
     console.info(data.document);
-    editor = initEditor(schema.nodeFromJSON(data.document), data.version);
+
+    editor = initEditor(schema.nodeFromJSON(data.document), data.version, data.permission === 'READ');
 
     for (let client of Object.entries(data.connected)) {
+        let usernameRes = await fetch('/users/' + client[1].userID, {
+            method: 'GET'
+        })
+        let username = "Unknown user";
+        if (usernameRes.ok) {
+            let data = await usernameRes.json();
+            username = data.username;
+        }
+
         connectedClients[client[0]] = {
             userID: client[1].userID,
+            username,
             permission: client[1].permission,
             selection: client[1].selection ? client[1].selection : {
                 from: 1,
@@ -135,6 +149,9 @@ socket.on('client-connect', data => {
 socket.on('client-disconnect', id => {
     delete connectedClients[id];
     renderConnections();
+    editor.dispatch(
+        editor.state.tr.setMeta('update-selections', true)
+    )
 })
 socket.on('update', ({version, steps, stepClientIDs}) => {
     console.info(`Received UPDATE event. Version: ${version}. With data: `, steps, stepClientIDs);
@@ -148,25 +165,26 @@ socket.on('update', ({version, steps, stepClientIDs}) => {
 })
 socket.on('save-success', () => {
     console.info('Received SAVE-SUCCESS event');
-    //document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
-    let messageSave = document.getElementById('message-save');
+    let saveButton = document.getElementById('button-save');
+    saveButton.innerHTML = '<i class="bi-cloud-check-fill"></i>';
+    saveButton.classList.add('btn-success');
+    saveButton.classList.remove('btn-primary');
 
-    messageSave.innerText = 'Saved successfully!';
-    messageSave.classList.remove('text-danger');
-    messageSave.classList.add('text-secondary');
+    const toast = new bootstrap.Toast(document.getElementById('save-toast'));
+    toast.show();
 
     setTimeout(() => {
-        messageSave.innerText = '';
+        saveButton.innerHTML = '<i class="bi-cloud-upload-fill"></i>';
+        saveButton.classList.add('btn-primary');
+        saveButton.classList.remove('btn-success');
     }, 5000)
 })
 socket.on('save-fail', ({error}) => {
     console.error('Received SAVE-FAIL event with data: ', error);
-    //document.getElementById('button-save').innerHTML = '<i class="bi-save me-1"></i> Save';
-    let messageSave = document.getElementById('message-save');
-
-    messageSave.classList.add('text-danger');
-    messageSave.classList.remove('text-secondary');
-    messageSave.innerText = 'Error occurred while saving!';
+    let saveButton = document.getElementById('button-save');
+    saveButton.innerHTML = '<i class="bi-x-circle-fill"></i>';
+    saveButton.classList.add('btn-danger');
+    saveButton.classList.remove('btn-primary');
 })
 socket.on('notify-update', ({data}) => {
     console.info('Received NOTIFY-UPDATE event');
@@ -202,8 +220,17 @@ function SelectionUpdater() {
 
             },
             apply(tr, _, old) {
+                if (tr.getMeta('hide-selections') !== undefined) {
+                    if (tr.getMeta('hide-selections')) {
+                        return DecorationSet.create(tr.doc, []);
+                    } else {
+                        return generateSelectionDecorations(tr.doc);
+                    }
+                }
+
                 // Check if the selection has changed after the transaction
                 if (tr.selection.from !== old.tr.selection.from || tr.selection.to !== old.tr.selection.to) {
+                    if (!editor.editable) return;
                     socket.emit('selection-changed', {
                         from: tr.selection.anchor,
                         to: tr.selection.head
@@ -212,23 +239,8 @@ function SelectionUpdater() {
                 }
 
                 if (tr.getMeta('update-selections')) {
-                    let decos = [];
-                    for (let clientData of Object.entries(connectedClients)) {
-                        if (clientData[0] === socket.id) continue;
-
-                        // As we send anchor and head instead of from and to, we should perform an additional check
-                        let from = clientData[1].selection.from < clientData[1].selection.to ?
-                            clientData[1].selection.from : clientData[1].selection.to;
-                        let to = clientData[1].selection.from > clientData[1].selection.to ?
-                            clientData[1].selection.from : clientData[1].selection.to;
-                        decos.push(Decoration.inline(
-                            from,
-                            to,
-                            {style: `background-color: ${clientData[1].colors[0]}; color: ${clientData[1].colors[1]}`}
-                        ))
-                    }
-
-                    return DecorationSet.create(tr.doc, decos);
+                    if (!editor.editable) return;
+                    return generateSelectionDecorations(tr.doc);
                 }
             }
         },
@@ -240,16 +252,62 @@ function SelectionUpdater() {
     });
 }
 
+function generateSelectionDecorations(doc) {
+    let decos = [];
+    for (let clientData of Object.entries(connectedClients)) {
+        if (clientData[0] === socket.id) continue;
+
+        // As we send anchor and head instead of from and to, we should perform an additional check
+        let from = clientData[1].selection.from < clientData[1].selection.to ?
+            clientData[1].selection.from : clientData[1].selection.to;
+        let to = clientData[1].selection.from > clientData[1].selection.to ?
+            clientData[1].selection.from : clientData[1].selection.to;
+
+        const span = document.createElement('span');
+        span.className = `cursor client-${clientData[0]}`;
+        decos.push(Decoration.widget(clientData[1].selection.to, span));
+        if (from !== to) {
+            decos.push(Decoration.inline(
+                from,
+                to,
+                {nodeName: 'span', class: `selection client-${clientData[0]}`}
+                //{style: `background-color: ${clientData[1].colors[0]}; color: ${clientData[1].colors[1]}`}
+            ))
+        }
+    }
+
+    makeColorStyles();
+    return DecorationSet.create(doc, decos);
+}
+
+function makeColorStyles() {
+    let colorStyles = document.getElementById('client-colors');
+    if (colorStyles) colorStyles.remove();
+
+    colorStyles = document.createElement('style');
+    colorStyles.id = 'client-colors';
+
+    for (let clientData of Object.entries(connectedClients)) {
+        let id = clientData[0];
+        let color = clientData[1].colors;
+
+        colorStyles.innerHTML += `.ProseMirror .cursor.client-${id}::before { background-color: ${color} }\n`;
+        colorStyles.innerHTML += `.ProseMirror .selection.client-${id} { background-color: ${color}20 }\n`;
+    }
+
+    document.querySelector('head').appendChild(colorStyles);
+}
+
 let colorIndex = -1;
 
 function pickColor() {
     let palette = [
-        ['#ff7070', '#6b0000'], // Red
-        ['#70ff70', '#006b00'], // Green
-        ['#7070ff', '#00006b'], // Blue
-        ['#ffff70', '#6b6b00'], // Yellow
-        ['#ff70ff', '#6b006b'], // Purple
-        ['#70ffff', '#006b6b'], // Cyan
+        '#ff0000', // Red
+        '#00ff00', // Green
+        '#0000ff', // Blue
+        '#ffff00', // Yellow
+        '#ff00ff', // Pink
+        '#00ffff', // Cyan
     ]
     colorIndex += 1;
     if (colorIndex >= palette.length || colorIndex < 0) colorIndex = 0;
@@ -261,14 +319,14 @@ function renderConnections() {
     let newHTML = '';
     for (let client of Object.values(connectedClients)) {
         newHTML +=
-            `<li><span style="color: ${client.colors[1]}" class="dropdown-item-text"><b>${client.userID}</b> - ${client.permission}</span></li>`;
+            `<li><span style="color: ${client.colors}" class="dropdown-item-text"><b>${client.username}</b></span></li>`;
         newHTML +=
             '<li class="dropdown-divider"></li>';
     }
     newHTML += `<li class="dropdown-item-text"><b>Connected: ${Object.values(connectedClients).length}</b></li>`
     active.innerHTML = newHTML;
 
-    document.getElementById('active-users-button').innerText = 'Active: ' + Object.values(connectedClients).length;
+    //document.getElementById('active-users-button').innerText = 'Active: ' + Object.values(connectedClients).length;
 }
 
 // Modals
@@ -342,16 +400,7 @@ document.getElementById('action-pick-color').addEventListener('change', (e) => {
 
 // Document operations
 document.getElementById('button-save').addEventListener('click', save);
-document.getElementById('button-export').addEventListener('click', async () => {
-    const title = document.getElementById('doc-title').innerText;
-    editor.focus();
-    html2pdf(document.querySelector('#editor > .ProseMirror'), {
-        margin: [12, 15],
-        filename: title + '.pdf',
-        pagebreak: {mode: ['avoid-all']},
-        image: {quality: 1}
-    });
-});
+document.getElementById('button-export').addEventListener('click', exportPDF);
 
 //endregion
 
@@ -362,7 +411,7 @@ document.getElementById('button-export').addEventListener('click', async () => {
  * @param {Object} doc Document node
  * @param version
  */
-function initEditor(doc, version) {
+function initEditor(doc, version, readonly = false) {
     // Menu setup
     let menu = menuPlugin([
         {
@@ -472,6 +521,9 @@ function initEditor(doc, version) {
     let editorView = new EditorView(document.getElementById("editor"),
         {
             state,
+            editable() {
+                return !readonly;
+            },
             dispatchTransaction(transaction) {
                 // This function overwrites default transaction behaviour
                 let newState = editorView.state.apply(transaction);
@@ -499,6 +551,7 @@ function buildKeymap(schema) {
     }
 
     bind('Mod-s', save);
+    bind('Mod-e', exportPDF)
 
     bind('Mod-z', undo)
     bind('Mod-Shift-z', redo)
@@ -533,6 +586,24 @@ function menuPlugin(items) {
  */
 async function save() {
     socket.emit('save');
+}
+
+async function exportPDF() {
+    const title = document.getElementById('doc-title').innerText;
+    editor.focus();
+
+    editor.dispatch(
+        editor.state.tr.setMeta('hide-selections', true)
+    )
+    await html2pdf(document.querySelector('#editor > .ProseMirror'), {
+        margin: [12, 15],
+        filename: title + '.pdf',
+        pagebreak: {mode: ['avoid-all']},
+        image: {quality: 1}
+    });
+    editor.dispatch(
+        editor.state.tr.setMeta('hide-selections', false)
+    )
 }
 
 /**

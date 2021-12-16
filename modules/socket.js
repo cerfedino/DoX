@@ -117,9 +117,34 @@ module.exports.init = function (server) {
                     permission
                 };
 
+                async function save() {
+                    try {
+                        const text = memoryDocs[documentID].doc.textContent;
+                        const chars = text.length;
+                        const charsNoSpaces = text.replaceAll(' ', '').length;
+
+                        const words = text.replace(/[.,?!;()"'-]/g, " ")
+                            .replace(/\s+/g, " ")
+                            .split(" ").length;
+
+                        await doc_set(new ObjectId(documentID), {
+                            char_count: chars,
+                            char_count_noSpaces: charsNoSpaces,
+                            word_count: words,
+                            content: memoryDocs[documentID].doc.toJSON()
+                        })
+                        console.info(`SOCKETS Document ${documentID} was successfully saved`);
+                        io.to(`document:${msg._id}/editor/write`).emit('save-success');
+                    } catch (e) {
+                        console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
+                        io.to(`document:${msg._id}/editor/write`).emit('save-fail', {error: e})
+                    }
+                }
+
                 // Send document data to the client
                 socket.emit("init", {
                     document: memoryDocs[documentID].doc.toJSON(),
+                    permission,
                     version: memoryDocs[documentID].steps.length,
                     connected: memoryDocs[documentID].connected,
                 });
@@ -148,14 +173,7 @@ module.exports.init = function (server) {
 
                         // Save the document every 75 changes
                         if (memoryDocs[documentID].steps.length % 75 === 0) {
-                            try {
-                                await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
-                                console.info(`SOCKETS Document ${documentID} was successfully saved`);
-                                io.to(`document:${msg._id}/editor/write`).emit('save-success');
-                            } catch (e) {
-                                console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
-                                io.to(`document:${msg._id}/editor/write`).emit('save-fail', {error: e})
-                            }
+                            await save();
                         }
 
                         // Send changes
@@ -166,14 +184,7 @@ module.exports.init = function (server) {
                         });
                     })
                     socket.on('save', async () => {
-                        try {
-                            await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
-                            console.info(`SOCKETS Document ${documentID} was successfully saved`);
-                            io.to(`document:${msg._id}/editor/write`).emit('save-success');
-                        } catch (e) {
-                            console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
-                            io.to(`document:${msg._id}/editor/write`).emit('save-fail', {error: e})
-                        }
+                        await save();
                     })
 
                     socket.on('rename', async (newName) => {
@@ -213,12 +224,7 @@ module.exports.init = function (server) {
                     // Clean the memory, if no one is connected
                     if (Object.values(memoryDocs[documentID].connected).length === 0) {
                         console.info(`SOCKETS Document with ID ${documentID} is not opened by anyone anymore, it will be removed from the memory`);
-                        try {
-                            await doc_set_content(new ObjectId(documentID), memoryDocs[documentID].doc.toJSON(), false);
-                            console.info(`SOCKETS Document ${documentID} was successfully saved`);
-                        } catch (e) {
-                            console.warn(`SOCKETS Document ${documentID} can't be saved: ` + e);
-                        }
+                        await save();
                         delete memoryDocs[documentID];
                     }
                 })
