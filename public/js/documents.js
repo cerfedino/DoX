@@ -3,6 +3,7 @@ let call = false;
 let reverse = false;
 
 function init_documents() {
+    setNotifyUpdateListeners();
 
     setSearchListener();
 
@@ -29,10 +30,39 @@ function init_documents() {
     formatDates();
 }
 
+function setNotifyUpdateListeners() {
+    document.body.addEventListener("notify-update",ev=>{handleUpdateNotify(ev.msg)})
+
+
+    function handleUpdateNotify(ev) {
+        if(ev.subject.type == "document") {
+            switch(ev.type) {
+                case "add":
+                    break;
+                case "remove":
+
+                    break;
+                case "change":
+                    break;
+            }
+        } else if(ev.subject.type == "user") {
+            switch(ev.type) {
+                case "add":
+                    break;
+                case "remove":
+                    break;
+                case "change":
+                    break;
+            }
+        }
+
+    }
+}
+
 // Set search listener on any input to search between all the titles and owners
 function setSearchListener() {
     let search = document.getElementById('search');
-    search.oninput = function(){
+    search.oninput = function() {
         
         // First we clean the section
         let list = document.querySelector('section#table-of-documents');
@@ -506,9 +536,88 @@ function insertionSort(a){
 
 
 
+function generateDocumentCard(doc) {
+    var el = `<article id="${doc._id}" class="card-element">
+                    <a id="icon" href="docs/${doc._id}>">
+                        <img src="/media/svg/notebook_icon.svg" alt="Card image cap">
+                    </a>
+                    <span class="title">${doc.title}</span>
+                    
+                    <p class="actual-creation-date">${doc.created_date}</p>
+                    <span class="info creation-date">${doc.created_date}</span>
+                    
+                    <p class="actual-edit-date">${doc.edit_date}</p>
+                    <span class="info edit-date">${doc.edit_date}</span>
+                    <span class="info"></span>
+                    
+                    <p class="owner">${doc.owner}</p>
+                    <span class="info owner"></span>
+                    <a class="delete" data-delete_action="docs/${doc._id}" type="button" class="btn btn-primary"
+                       data-toggle="modal" data-target="#confirm-deletion-modal">
+                        <img src="/media/svg/delete.svg" class="svgimgform"></img>
+                    </a>`
 
+    let doc_perms = []
+    doc_perms.push(`
+        <a class="dropdown-item user" href="#">
+            <span class="user">${doc.owner}</span>
+            <span class="role">owner</span>
+        </a>`)
+    doc.perm_edit.forEach(u=>{
+        if (String(doc.owner) != String(u)) {
+            doc_perms.push(`
+            <a class="dropdown-item user" href="#">
+                <span class="user">${u}</span>
+                <span class="role">edit</span>
+            </a> `)
+        }
+    })
+    doc.perm_read.forEach(u=>{
+        if (String(doc.owner) != String(u)) {
+            let contained = false;
+            doc_perms.forEach(p=>{
+                if (p.includes(String(u))) {
+                    contained = true;
+                }
+            });
+            if (!contained) {
+                doc_perms.push(`
+                    <a class="dropdown-item user" href="#">
+                        <span class="user">${u}</span>
+                        <span class="role">read</span>
+                    </a>`);
+            }
+        }
+    })
+    el += `<p class="shared">
+            ${doc_perms.length - 1}</p>
+            <a class="perms" id="end" href="#" data-html="true" data-placement="top" data-toggle="popover"
+               data-trigger="hover" data-title='<div class="popovertitle">Shared with</div>'
+               data-content='`
 
+                doc_perms.forEach(usr=> {
+                    el += `${usr}`
+                })
+                if (doc_perms.length == 1) {
+                    el += `<a class="dropdown-item doc">Document not shared</a>`
+                }
+                el += `'>${doc_perms.length-1} <img id="shared" src="/media/svg/share.svg" alt="Options"></a>
+                                <a class="options" id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title='<div class="popovertitle">Document Information</div>'
+                                    data-content="<span>Created on: ${doc.created_date.toDateString()}</span><br>
+                                    <span>Owner: ${doc.owner} </span><br>
+                                    <span>Size: ${ doc.size}  </span>
+                                    "><img id="threedots" src="/media/svg/options.svg" alt="Options"></a>
+    </article>`
 
+    console.log(el)
+    return el
+}
+
+try {
+    module.exports = {generateDocumentCard}
+} catch(e) {
+
+}
 
 
 

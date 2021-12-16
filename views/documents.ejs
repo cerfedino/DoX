@@ -15,6 +15,8 @@
 if(!docs) {
     var docs = []
 }
+if(!documents_js)
+    throw "documents_js is not defined"
 
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
@@ -184,6 +186,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                 </article>
             
             <% docs.forEach((doc)=>{ %>
+
                 <article id="<%= doc._id %>" class="card-element">
                     <a id="icon" href="docs/<%= doc._id %>">
                         <img src="/media/svg/notebook_icon.svg" alt="Card image cap">
@@ -194,7 +197,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                     <p class="actual-edit-date"><%= doc.edit_date %></p>
                     <span class="info edit-date"><%= doc.edit_date %></span>
                     <span class="info"></span>
-                    
+
                     <p class="owner"><%= doc.owner %></p>
                     <span class="info owner"></span>
                     <a class="delete" data-delete_action="docs/<%= doc._id %>" type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm-deletion-modal" >
@@ -207,7 +210,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                                 <span class="user">${doc.owner}</span>
                                 <span class="role">owner</span>
                             </a>`)
-                        doc.perm_edit.forEach(u=>{ 
+                        doc.perm_edit.forEach(u=>{
                             if (String(doc.owner) != String(u)) {
                                 doc_perms.push(`
                                     <a class="dropdown-item user" href="#">
@@ -236,10 +239,10 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                     <p class="shared"><%= doc_perms.length - 1 %></p>
                     <a class="perms" id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title='<div class="popovertitle">Shared with</div>'
                         data-content='
-                        
+
                         <% doc_perms.forEach(u=>{ %>
                             <%- u %>
-                        <% }) 
+                        <% })
                         if (doc_perms.length == 1) { %>
                             <a class="dropdown-item doc">Document not shared</a>
                         <% } %>

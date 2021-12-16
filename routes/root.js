@@ -103,6 +103,7 @@ router.get('/docs/new', checkAuthenticated, async function (req, res) {
     IF the user only has read access to it, renders accordingly.
         IF the user has NO access to it, denies access to it.
  */
+const documents_js = require("../public/js/documents.js")
 router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
     // Check first if ObjectID is valid
     if (req.params.id && !ObjectId.isValid(req.params.id)) {
@@ -143,7 +144,8 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
             res.status(200).render('../views/documents.ejs',
                 {
                     docs: await dbops.docs_available(ObjectId(req.user.user_id)),
-                    user : await dbops.user_find({_id : ObjectId(req.user.user_id)})
+                    user : await dbops.user_find({_id : ObjectId(req.user.user_id)}),
+                    documents_js : documents_js,
                 })
         } else {
             res.status(406).send("Accepts: text/html").end();
