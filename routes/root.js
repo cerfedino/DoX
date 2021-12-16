@@ -336,9 +336,16 @@ function get_editable_doc_fields(obj={}) {
     Updates user only if the request is coming from the user himself.
 */
 router.put('/user', async (req,res)=> {
+    let check = 1;
+    let u = "";
     if (!ObjectId.isValid(req.user.user_id)) {
         res.status(400).send(`Invalid user ID.`);
         return
+    } else {
+        await dbops.user_find({_id : ObjectId(req.user.user_id)})
+        .then(user => {
+            u = user.username
+        })
     }
     if(!(await dbops.user_exists({_id:ObjectId(req.user.user_id)}))) {
         if(req.accepts("text/html")) {
@@ -350,11 +357,19 @@ router.put('/user', async (req,res)=> {
     }
     
     let tags = {}
-    
+
+    if(req.body.username == u && !req.body.password) {
+        check = 0;
+    }
+    if(req.body.username != u && (await (dbops.user_exists({username : req.body.username})))) {
+        check = -1;
+    }
     if (req.body.username && (!await (dbops.user_exists({username : req.body.username})))) {
+        check = 1;
         tags.username = req.body.username;
     }
-    if (req.body.password) {
+    if (req.body.password && check != -1) {
+        check = 1;
         tags.password = await auth.encrypt_pwd(req.body.password);
     }
 
@@ -381,13 +396,20 @@ router.put('/user', async (req,res)=> {
 
     }
 
-    dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
+    if(check == 1) { 
+        dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
 
-        console.log("[+] Updated user")
-        req.flash("messageSuccess","User has been updated")
-        res.redirect("/docs");
-
-    })
+            console.log("[+] Updated user")
+            console.log("NUS: "+ newuser.username)
+            req.flash("messageSuccess","User has been updated")
+            res.send(newuser);
+    
+    
+        })
+    } else {
+        res.send({error: check})
+    }
+    
     
     
 })

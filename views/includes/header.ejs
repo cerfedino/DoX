@@ -46,7 +46,7 @@
         <div class="modal-content">
             
             <div class="modal-header">
-                <img id="profile_pic" src='./media/profile_pics/img_avatar.png' onerror="if (this.src != './media/profile_pics/img_avatar.png') this.src = '../media/profile_pics/img_avatar.png';"alt="<%= user.username %>">
+                <img id="profile_pic" src='./media/profile_pics/<%= user._id %>.png' onerror="if (this.src != './media/profile_pics/img_avatar.png') this.src = '../media/profile_pics/img_avatar.png';"alt="<%= user.username %>">
                 <!-- <img id="profile_pic" src="<%= user.profile_pic %>" alt="<%= user.username %>"> -->
             </div>
             <div class="modal-body">

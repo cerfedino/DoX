@@ -63,29 +63,46 @@ let form = document.querySelector(".modal-body form")
   
 form.addEventListener("submit",function(e){
     
+    e.preventDefault();
 
     const mistakes = validateForm(this);
     if(mistakes) {
+        console.log("MISTAKE")
         return
+    } else{ 
+        console.log("NO MISTAKE")
+        fetch(this.action, {
+            method: this.method,
+            headers: {
+                "Content-Type" : "application/json",
+                "Accept" : "application/json"
+            },
+            body: JSON.stringify({
+                username: form.querySelector("input[name='username']").value, 
+                password: form.querySelector("input[name='password']").value
+            })
+        }).then(res => {
+            return res.json();
+        }).then(obj => {
+            if(obj.error == 0) {
+                showAlert(document.querySelector("#alerts"),"warning","Username is the same",true)
+            } else if (obj.error == -1) {
+                showAlert(document.querySelector("#alerts"),"warning","Username is taken",true)
+            } else {
+                console.log(obj.username)
+                location.reload();
+            }
+            
+        })
     }
 
-    fetch(this.action, {
-        method: this.method,
-        headers: {
-            "Content-Type" : "application/json",
-        },
-        body: JSON.stringify({
-            username: form.querySelector("input[name='username']").value, 
-            password: form.querySelector("input[name='password']").value
-        })
-    })
+    
 })
 
 function validateForm(form) {
     var mistakes = false
 
     const username = form.querySelector("#username").value.trim()
-    console.log("USERNAME :" + username)
     const pwd = form.querySelector("#password").value
     const confirm_pwd = form.querySelector("#cpassword").value
 
