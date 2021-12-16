@@ -35,13 +35,11 @@ function setSearchListener() {
     search.oninput = function(){
         
         // First we redisplay the section
-        let list = document.querySelector('section#table-of-documents');
         document.querySelectorAll('.card-element').forEach(doc=>{
             doc.style.display = 'grid';
         })
 
         // And then hide what doesn't match the search
-
         let text = search.value;
         document.querySelectorAll('.card-element').forEach((row)=>{
             let owner = row.querySelector('.info.owner').innerHTML;
@@ -194,6 +192,7 @@ function setSortListeners() {
                 }
             })
         })
+        
         if (type.endsWith('-date')) {
             values.sort(function(d1,d2){
                 return new Date(d1) - new Date(d2);
@@ -214,13 +213,7 @@ function setSortListeners() {
                 }
             })
         });
-        
-        // setEditListeners();
-        // setSortListeners();
-        // $('[data-toggle="popover"]').popover({
-        //     html:true
-        // });
-        // setDocumentListeners();
+
     }))
 }
 
