@@ -31,6 +31,12 @@ function init_documents() {
     setSortListeners();
 
     formatDates();
+
+    setModalDeleteListener();
+
+
+    checkAmountOfDocuments();
+
 }
 
 
@@ -60,6 +66,7 @@ function setNotifyUpdateListeners() {
             }
         }
 
+        checkAmountOfDocuments()
     }
 }
 
@@ -72,7 +79,7 @@ function setSearchListener() {
         
         // First we redisplay the section
         document.querySelectorAll('.card-element').forEach(doc=>{
-            doc.style.display = 'grid';
+            doc.hidden = false;
         })
 
         // And then hide what doesn't match the search
@@ -81,11 +88,12 @@ function setSearchListener() {
             let owner = row.querySelector('.info.owner').innerHTML;
             let title = row.querySelector('.title').innerHTML;
             if (!title.toLowerCase().includes(text.toLowerCase()) && !owner.toLowerCase().includes(text.toLowerCase())) {
-                row.style.display = 'none';
+                row.hidden = true;
             }
         });
 
         document.querySelector('input[name="filter-submit"]').click();
+        checkAmountOfDocuments()
     };
 
 }
@@ -115,15 +123,16 @@ function setSwitchButtonListener(){
 function setDeleteListener(card) {
     let modal = document.querySelector("#confirm-deletion-modal")
     
-    card.querySelector(".card-element .delete").addEventListener("click", function() {
+    card.querySelector(".delete").addEventListener("click", function() {
         modal.querySelector("#deletion-modal-doc-title").innerHTML = this.parentNode.querySelector(".title").innerHTML
         modal.querySelector("#deletion-modal-confirm").dataset.delete_action =  this.dataset.delete_action
     });
   
 }
 // Set listener on delete modal
-function setDeleteListeners() {
-    modal.querySelector("#deletion-modal-confirm").addEventListener("click", function(){
+function setModalDeleteListener() {
+    document.querySelector("#confirm-deletion-modal #deletion-modal-confirm")
+        .addEventListener("click", function() {
         fetch(this.dataset.delete_action, {
             method: "DELETE"
         })
@@ -496,7 +505,7 @@ function setActiveFilter(checkbox) {
             }
         })
         if (found == false) {
-            row.style.display = 'none';
+            row.hidden = true;
         }
     }
 
@@ -504,7 +513,7 @@ function setActiveFilter(checkbox) {
     if (type == 'owned') {
         rows.forEach(row=>{
             if (row.querySelector('.info.owner').innerHTML != '<i>me</i>') {
-                row.style.display = 'none';
+                row.hidden = true;
             }
         })
     } else if (type == 'read') {
@@ -531,7 +540,7 @@ function setActiveFilter(checkbox) {
         rows.forEach(row=>{
             let n = parseInt(row.querySelector('p.shared').innerHTML);
             if (n == 0) {
-                row.style.display = 'none';
+                row.hidden = true;
             }
         })
     }
@@ -697,10 +706,12 @@ function generateDocumentCard(doc) {
     return el
 }
 
-try {
-    module.exports = {generateDocumentCard}
-} catch(e) {
+function checkAmountOfDocuments() {
+    var n = document.body.querySelectorAll("#table-of-documents article.card-element:not([hidden=true])").length
 
+    console.log(document.body.querySelectorAll("#table-of-documents article.card-element"))
+
+    document.querySelector("#no-documents").hidden = n<1?false:true;
 }
 
 
