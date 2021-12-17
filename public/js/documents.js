@@ -200,6 +200,52 @@ function set_Doc_OwnerUsername(card) {
     setUsernameById(x,x.getAttribute('data-toggle'));
 }
 
+
+/**
+ * getUsernameById returns the username matching the given User's Id
+ * @param {String} id  the username Id to be matched
+ * @returns {Promise<String>}  the username matching the given id 
+ * if present in the db, otherwise rejects and returns "invalid user"
+ */
+ function getUsernameById(id) {
+    return new Promise((resolve,reject)=>{
+        fetch('/users/' + id)
+        .then(res=>res.json())
+        .then(user=>{
+            if (user.username == document.querySelector('#info > h2').innerHTML) {
+                resolve("<i>me</i>");
+            } else {
+                resolve(user.username);
+            }
+        })
+        .catch(err=>{
+            reject(err);
+        });
+        
+    })
+}
+
+/**
+ * setUsernameById sets the username matching the given User's Id in the given DOM element
+ * @param {HTMLElement} dom  the element whose innerHTML is replace with the username
+ * @param {String} id  the User's Id whose matching username will fill the
+ * @returns {Promise<HTMLElement>}  the modified element in any case
+ */
+function setUsernameById(dom, id) {
+    return new Promise((resolve,reject)=>{
+        getUsernameById(id)
+        .then(username=>{
+            dom.innerHTML = username;
+            resolve(dom);
+        })
+        .catch(username=>{
+            dom.innerHTML = username;
+            resolve(dom);
+        })
+    })
+}
+
+
 // Set listener on delete modal
 function setModalDeleteListener() {
     document.querySelector("#confirm-deletion-modal #deletion-modal-confirm")
@@ -234,7 +280,7 @@ function setSortListeners() {
 
     let row = document.querySelector('.list-element.head');
 
-    row.querySelectorAll('.info > b > a').forEach(a=>a.addEventListener('click',function(event) {
+    row.querySelectorAll('.info > a').forEach(a=>a.addEventListener('click',function(event) {
         event.preventDefault();
 
         let type;
@@ -387,51 +433,6 @@ function setReverseToolSort() {
         document.querySelector('.active-sort-display').click();
     });
 }
-
-/**
- * getUsernameById returns the username matching the given User's Id
- * @param {String} id  the username Id to be matched
- * @returns {Promise<String>}  the username matching the given id 
- * if present in the db, otherwise rejects and returns "invalid user"
- */
-function getUsernameById(id) {
-    return new Promise((resolve,reject)=>{
-        fetch('/users/' + id)
-        .then(res=>res.json())
-        .then(user=>{
-            if (user.username == document.querySelector('#info > h2').innerHTML) {
-                resolve("<i>me</i>");
-            } else {
-                resolve(user.username);
-            }
-        })
-        .catch(err=>{
-            reject(err);
-        });
-        
-    })
-}
-
-/**
- * setUsernameById sets the username matching the given User's Id in the given DOM element
- * @param {HTMLElement} dom  the element whose innerHTML is replace with the username
- * @param {String} id  the User's Id whose matching username will fill the
- * @returns {Promise<HTMLElement>}  the modified element in any case
- */
-function setUsernameById(dom, id) {
-    return new Promise((resolve,reject)=>{
-        getUsernameById(id)
-        .then(username=>{
-            dom.innerHTML = username;
-            resolve(dom);
-        })
-        .catch(username=>{
-            dom.innerHTML = username;
-            resolve(dom);
-        })
-    })
-}
-
 
 /**
  * setFilterRowClick sets selection for filters so that you can select a filter without having to go on the checkbox
