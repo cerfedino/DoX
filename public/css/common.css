@@ -5,13 +5,13 @@
 /*########################
     FONTS
 ########################*/
-@font-face {
-    font-family: 'jumper_XBdIt';
-    src: url('../media/font/Jumper/jumper-extra-bolditalic-webfont.woff2') format('woff2'),
-    url('../media/font/Jumper/jumper-extra-bolditalic-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
+/*@font-face {*/
+/*    font-family: 'jumper_XBdIt';*/
+/*    src: url('../media/font/Jumper/jumper-extra-bolditalic-webfont.woff2') format('woff2'),*/
+/*    url('../media/font/Jumper/jumper-extra-bolditalic-webfont.woff') format('woff');*/
+/*    font-weight: normal;*/
+/*    font-style: normal;*/
+/*}*/
 
 
 /*
@@ -36,7 +36,7 @@ body, body * {
 
     --logo-minimal: url('../media/svg/logo_minimal.svg');
     --logo-composed: url('../media/svg/logo_composed.svg');
-    --logo-notebook: url('../media/svg/notebook_icon_LIGHT.svg');
+    --logo-notebook: url('../media/svg/notebook_icon.svg');
 
 }
 
@@ -48,13 +48,13 @@ body.dark-theme, body.dark-theme * {
     --bg-hover: #333333;
     --bg-contrast: #565656;
     --bg-contrastt: #cbcbcb;
-    --text: #cccccc;
+    --text: #d5d5d5;
     --contrast-text: #ffffff;
     --shadow: #000000;
 
     --logo-minimal: url('../media/svg/logo_minimal_LIGHT.svg');
     --logo-composed: url('../media/svg/logo_composed_LIGHT.svg');
-    --logo-notebook: url('../media/svg/notebook_icon.svg');
+    --logo-notebook: url('../media/svg/notebook_icon_LIGHT.svg');
 
 }
 

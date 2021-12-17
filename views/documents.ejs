@@ -35,8 +35,13 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             document.querySelector("#dark-mode-toggle").checked = false
         }
     </script>
+    
     <script src="/socket.io/socket.io.js"></script>
     <script  onload="init_socket()" src="/js/socket.js"></script>
+    
+    <script src="/js/ejs.min.js"></script>
+    <script src="/js/views.js"  ></script>
+
 
     <%- include('includes/header', {'extra' : 'search'}) %>
 
@@ -45,7 +50,9 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
         <!-- Card/Grid view buttons -->
         <div class="switch-list-grid">
-            <a class="grid-view" href=""><i class="fa fa-th"></i></a>
+            <a class="grid-view" href="">
+                <svg class="svg-inline--fa fa-th fa-w-16" aria-hidden="true" focusable="false" data-prefix="fa" data-icon="th" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"></path></svg>
+            </a>
             <a class="list-view" href=""><i class="fa fa-list"></i></a>
         </div>
 
@@ -291,9 +298,31 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
                 </article>
                 
+            <% docs.forEach((doc)=>{%>
+                <%- include('includes/doc_card.ejs',{doc}) %>
             <% }); %>
         </section>
 
+        <!-- Modal for document deletion confirm -->
+        <div class="modal fade" id="confirm-deletion-modal" tabindex="-1" role="dialog" aria-labelledby="confirm-deletion-modalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header text-center">
+                        <h5 class="modal-title" id="confirm-deletion-modalLabel"><span>Are you sure ?</span></h5>
+                    </div>
+                    <div class="modal-body">
+                        <span class="col-form-label">Are you sure you want to delete document '</span><span id='deletion-modal-doc-title'> </span><span>'?<br> <b>This action cannot be undone</b></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button data-delete_action="" id="deletion-modal-confirm" type="button" class="btn btn-danger" data-dismiss="modal">Delete document</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!--##################-->
     </main>
 
 <div id="alerts">

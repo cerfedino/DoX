@@ -106,11 +106,24 @@ svg#logo {
 
 }
 
-.switch-list-grid {
+.switch-list-grid:hover .list-view, .switch-list-grid:hover .grid-view {
+    color: var(--bg);
+    background: var(--accent);
+}
+.list-view, .grid-view {
+    background-color: var(--bg-contrast);
     border-radius: 10px;
-    min-width: 80px;
-    display: flex;
-    flex-direction: row;
+    padding: 10px;
+    transition: color 0.3s, background 0.3s;
+}
+.list-view *, .grid-view *{
+    width: 20px;
+}
+.switch-list-grid .list-view, .switch-list-grid.list .grid-view {
+    display: none;
+}
+.switch-list-grid.list .list-view {
+    display: inline-block;
 }
 
 .sort {
@@ -137,29 +150,9 @@ svg#logo {
     letter-spacing: 1px;
     transition: letter-spacing 0.5s;
 }
-
 .tools-bar a.new-doc:hover {
     letter-spacing: 3px;
     transition: all 0.5s;
-}
-
-.list-view, .grid-view {
-    color: var(--text);
-    border-radius: 10px;
-    border:none;
-    padding: 10px;
-    flex: 1;
-    transition: color 0.5s;
-    transition: background-color 0.5s;
-}
-
-.grid-view {
-    color: var(--accent);
-    background-color: var(--bg-contrast);
-}
-
-.grid-view:hover {
-    color: var(--accent);
 }
 
 .active {
@@ -371,13 +364,11 @@ a {
 
 ##############################*/
 
-.list {
-    margin: 10px;
-
+#table-of-documents.list {
     flex-direction: column;
 }
 
-.list .list-element.head {
+#table-of-documents.list .list-element.head {
     display: grid;
     margin: 10px -10px;
     margin-top: -20px;
@@ -560,4 +551,12 @@ a {
 
 body.dark-theme .delete img, body.dark-theme img#threedots, body.dark-theme img#shared, body.dark-theme #preview img {
     filter: invert(1);
+}
+
+
+#confirm-deletion-modal .modal-content{
+    background: var(--bg);
+}
+#confirm-deletion-modal span {
+    color: var(--contrast-text);
 }

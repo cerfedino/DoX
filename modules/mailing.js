@@ -119,7 +119,7 @@ function send_mail(user, address, verification_link) {
 		if (error) {
 			return console.log(error.message);
 		}
-		console.log('Sent verification email to:', address);
+		console.log('[+] Sent verification email to:', address);
 	});
 
 }
