@@ -120,7 +120,6 @@ function setSwitchButtonListener(){
 function setActiveTools(){
     let actualSort = document.querySelector('.sort > .active-sort');
     let filter = actualSort.getAttribute('data-toggle');
-    debugger
     actualSort.setAttribute('data-toggle','');
     if (filter != null) {
         document.querySelector(`.sort > .dropdown [rel="${filter}"]`).click();
@@ -219,7 +218,7 @@ function set_Doc_OwnerUsername(card) {
             }
         })
         .catch(err=>{
-            reject(err);
+            reject("invalid user");
         });
         
     })
@@ -280,7 +279,7 @@ function setSortListeners() {
 
     let row = document.querySelector('.list-element.head');
 
-    row.querySelectorAll('.info > a').forEach(a=>a.addEventListener('click',function(event) {
+    row.querySelectorAll('.info > b > a').forEach(a=>a.addEventListener('click',function(event) {
         event.preventDefault();
 
         let type;
