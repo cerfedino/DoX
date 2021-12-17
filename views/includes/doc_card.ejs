@@ -25,7 +25,7 @@
     <span class="info owner" data-toggle="<%= doc.owner %>"></span>
 
     <% if (doc.owner == userid) { %>
-        <a data-delete_action="docs/<%= doc._id %>" type="button" class="delete" data-toggle="modal" data-target="#confirm-deletion-modal" >
+        <a data-delete_action="docs/<%=doc._id%>" type="button" class="delete" data-toggle="modal" data-target="#confirm-deletion-modal" >
             <img src="/media/svg/delete.svg" class="svgimgform"></img>
         </a>
     <% } %>

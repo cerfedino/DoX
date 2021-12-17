@@ -14,14 +14,7 @@ function init_documents() {
     setSwitchButtonListener();
     
     document.querySelectorAll('.card-element').forEach(card=>{
-
-        setDeleteListener(card);
-
-        setEditListener(card);
-
-        setEditReadUsername(card);
-
-        setOwnerUsername(card);
+        setup_Doc(card)
     })
 
     setFilterRowClick();
@@ -97,15 +90,6 @@ function setSearchListener() {
     };
 
 }
-/**
- * setDocumentListener sets all the listeners for a given documents (row in list view or card in grid view)
- * @param card  the card element to add the listener on
- */
-function setDocumentListeners(card) {
-    setEditListener(card);
-    setDeleteListener(card);
-}
-
 
 /**
  * setSwitchButtonListener sets switch button between the list and grid view
@@ -119,8 +103,18 @@ function setSwitchButtonListener(){
     })
 }
 
+/**
+ * Sets all the listeners for a given document (row in list view or card in grid view)
+ * @param card  the card element to add the listener on
+ */
+function setup_Doc(card) {
+    set_Doc_EditListener(card);
+    set_Doc_DeleteListener(card);
+    set_Doc_ReadUsername(card);
+    set_Doc_OwnerUsername(card);
+}
 
-function setDeleteListener(card) {
+function set_Doc_DeleteListener(card) {
     let modal = document.querySelector("#confirm-deletion-modal")
     let btn = card.querySelector(".delete");
     if (btn != null) {
@@ -128,23 +122,14 @@ function setDeleteListener(card) {
             modal.querySelector("#deletion-modal-doc-title").innerHTML = this.parentNode.querySelector(".title").innerHTML
             modal.querySelector("#deletion-modal-confirm").dataset.delete_action =  this.dataset.delete_action
         });
-    }  
-}
-// Set listener on delete modal
-function setModalDeleteListener() {
-    document.querySelector("#confirm-deletion-modal #deletion-modal-confirm")
-        .addEventListener("click", function() {
-        fetch(this.dataset.delete_action, {
-            method: "DELETE"
-        })
-    })
+    }
 }
 
 /**
- * setEditListener sets list edit link for the given document
+ * set_Doc_EditListener sets list edit link for the given document
  * @param card  the card element to add the listener on
  */
-function setEditListener(card) {
+function set_Doc_EditListener(card) {
     card.childNodes.forEach(el=>{
         if ((el.classList != undefined && !el.classList.contains('delete'))) {
             el.addEventListener('click',function(event) {
@@ -152,6 +137,51 @@ function setEditListener(card) {
             })
         }
     })
+}
+
+/**
+ * setEditReadUsername sets the username instead of the Id in the permissions section of the document
+ * @param card  the card element to add the listener on
+ */
+function set_Doc_ReadUsername(card) {
+    let el = card.querySelector('a.perms#end');
+
+    let articles = document.createElement('SECTION');
+    articles.innerHTML = el.getAttribute('data-content');
+    let promises = [];
+    articles.querySelectorAll('.dropdown-item.user').forEach(item=>{
+        let user = item.querySelector(".user").innerHTML;
+
+        promises.push(new Promise((resolve,reject)=>{
+            setUsernameById(item.querySelector(".user"), user)
+                .then((dom)=>{
+                    resolve();
+                })
+        }))
+    })
+    Promise.all(promises)
+        .then(()=>{
+            el.setAttribute('data-content',articles.innerHTML);
+        })
+}
+
+/**
+ * setOwnerUsername sets usernames instead of Ids in the owner section of the document
+ * @param card  the card element to add the listener on
+ */
+function set_Doc_OwnerUsername(card) {
+    let x = card.querySelector('span.owner');
+    setUsernameById(x,x.getAttribute('data-toggle'));
+}
+
+// Set listener on delete modal
+function setModalDeleteListener() {
+    document.querySelector("#confirm-deletion-modal #deletion-modal-confirm")
+        .addEventListener("click", function() {
+            fetch(this.dataset.delete_action, {
+                method: "DELETE"
+            })
+        })
 }
 
 /**
@@ -376,40 +406,6 @@ function setUsernameById(dom, id) {
     })
 }
 
-/**
- * setEditReadUsername sets the username instead of the Id in the permissions section of the document
- * @param card  the card element to add the listener on
- */
-function setEditReadUsername(card) {
-    let el = card.querySelector('a.perms#end');
-
-    let articles = document.createElement('SECTION');
-    articles.innerHTML = el.getAttribute('data-content');
-    let promises = [];
-    articles.querySelectorAll('.dropdown-item.user').forEach(item=>{
-        let user = item.querySelector(".user").innerHTML;
-
-        promises.push(new Promise((resolve,reject)=>{
-            setUsernameById(item.querySelector(".user"), user)
-            .then((dom)=>{
-                resolve();
-            })
-        }))
-    })
-    Promise.all(promises)
-    .then(()=>{  
-        el.setAttribute('data-content',articles.innerHTML);
-    })
-}
-
-/**
- * setOwnerUsername sets usernames instead of Ids in the owner section of the document
- * @param card  the card element to add the listener on
- */
-function setOwnerUsername(card) {
-    let x = card.querySelector('span.owner');
-    setUsernameById(x,x.getAttribute('data-toggle'));
-}
 
 /**
  * setFilterRowClick sets selection for filters so that you can select a filter without having to go on the checkbox
@@ -701,16 +697,11 @@ function generateDocumentCard(doc) {
                                     <span>Size: ${ doc.size}  </span>
                                     "><img id="threedots" src="/media/svg/options.svg" alt="Options"></a>
     </article>`
-
-    console.log(el)
     return el
 }
 
 function checkAmountOfDocuments() {
     var n = document.body.querySelectorAll("#table-of-documents article.card-element:not([hidden=true])").length
-
-    console.log(document.body.querySelectorAll("#table-of-documents article.card-element"))
-
     document.querySelector("#no-documents").hidden = n<1?false:true;
 }
 
