@@ -131,6 +131,10 @@ function doc_create(owner_id, title = "Untitled", returnnew = true) {
         const new_doc = {
             title : title,
 
+            char_count: 0,
+            char_count_noSpaces: 0,
+            word_count: 0,
+
             content: {
                 "type": "doc",
                 "content": [
