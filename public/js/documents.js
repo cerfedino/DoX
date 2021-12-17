@@ -27,9 +27,7 @@ function init_documents() {
 
     setModalDeleteListener();
 
-
     checkAmountOfDocuments();
-
 }
 
 
@@ -464,6 +462,7 @@ function setSaveListeners() {
                 }
             }
         })
+        checkAmountOfDocuments();
     })
 }
 
@@ -701,7 +700,8 @@ function generateDocumentCard(doc) {
 }
 
 function checkAmountOfDocuments() {
-    var n = document.body.querySelectorAll("#table-of-documents article.card-element:not([hidden=true])").length
+    debugger
+    var n = document.body.querySelectorAll("#table-of-documents article.card-element:not([hidden])").length
     document.querySelector("#no-documents").hidden = n<1?false:true;
 }
 
