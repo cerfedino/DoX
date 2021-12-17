@@ -38,12 +38,29 @@ function setNotifyUpdateListeners() {
     function handleUpdateNotify(ev) {
         if(ev.subject.type == "document") {
             switch(ev.type) {
+                // TODO: Handle proper change instead of fetching whole doc everytime. Temporary solution because of time crunch.
+                case "change":
+                    document.querySelectorAll(`.card-element[id="${ev.subject._id}"]`).forEach(doc=>doc.remove())
                 case "add":
+                    fetch(`/docs/${ev.subject._id}`,
+                        {
+                            headers: {Accept:"application/json"}
+                        }).then(res=>res.json())
+                        .then(doc=>ejs.views_includes_doc_card({doc: doc.doc}))
+                        .then((html)=>{
+                            const el = document.createElement("div")
+                            el.insertAdjacentHTML("afterbegin", html)
+                            setup_Doc(el.firstElementChild)
+                            document.querySelector("#table-of-documents").appendChild(el.firstElementChild)
+                        })
+                        .catch((e)=>{
+                            console.log(e)
+                        })
+                        .finally(checkAmountOfDocuments)
                     break;
                 case "remove":
-
-                    break;
-                case "change":
+                    document.querySelectorAll(`.card-element[id="${ev.subject._id}"]`).forEach(doc=>doc.remove())
+                    checkAmountOfDocuments()
                     break;
             }
         } else if(ev.subject.type == "user") {
@@ -56,8 +73,6 @@ function setNotifyUpdateListeners() {
                     break;
             }
         }
-
-        checkAmountOfDocuments()
     }
 }
 
@@ -704,20 +719,6 @@ function checkAmountOfDocuments() {
     var n = document.body.querySelectorAll("#table-of-documents article.card-element:not([hidden])").length
     document.querySelector("#no-documents").hidden = n<1?false:true;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ///////////////////////////////// TESTING

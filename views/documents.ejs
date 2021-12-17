@@ -3,6 +3,9 @@
 if(!docs) {
     var docs = []
 }
+if(!user) {
+    throw "user is not defined"
+}
 
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
@@ -34,6 +37,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             document.body.classList.remove('dark-theme')
             document.querySelector("#dark-mode-toggle").checked = false
         }
+        const userid = "<%-user._id.toHexString()%>"
     </script>
     
     <script src="/socket.io/socket.io.js"></script>
@@ -134,7 +138,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
     <main>
         <div id="no-documents" hidden>No documents</div>
-    
+
         
         <section class="cards" id="table-of-documents">
                 <article class="list-element head">
