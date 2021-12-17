@@ -120,8 +120,8 @@ function setSwitchButtonListener(){
 function setActiveTools(){
     let actualSort = document.querySelector('.sort > .active-sort');
     let filter = actualSort.getAttribute('data-toggle');
-    actualSort.setAttribute('data-toggle','');
     if (filter != null) {
+        document.querySelector(`.sort > .dropdown [rel="${filter}"]`).click();
         document.querySelector(`.sort > .dropdown [rel="${filter}"]`).click();
     }
     document.querySelector('input[name="filter-submit"]').click();
@@ -259,15 +259,37 @@ function setModalDeleteListener() {
  * setToolBarSortListeners sets the tool bar sort listeners so that they act as the headline's buttons of the table
  */
 function setToolBarSortListeners() {
-    let row = document.querySelector('.list-element.head');
+    let head = document.querySelector('.list-element.head');
 
     let elements = document.querySelector('.sort').querySelector('.dropdown');
     elements.querySelectorAll('.dropdown-item').forEach(item=>{
         item.addEventListener('click',function(event) {
             event.preventDefault();
             let className = item.getAttribute('rel');
-            row.querySelector(`a[rel="${className}"]`).click();
+            head.querySelector(`a[rel="${className}"]`).click();
             elements.parentElement.querySelector('.reverse-sort').classList.add('active-sort-display');
+        });
+    })
+    setReverseToolSortListener();
+}
+
+/**
+ * setReverseToolSort sets the tool bar Reverse icon to
+ * change the displayed icon and make reverse song on click
+ */
+ function setReverseToolSortListener() {
+    
+    // For both Letter and Number icons, we set the click to go clicking in the matching head button.
+    // In that button, we implement the complete sort, so here we just invoke that event
+
+    document.querySelectorAll('.tools-bar > .sort > .tool').forEach(btn=>{
+        btn.addEventListener('click',(event)=>{
+            event.preventDefault();
+            let head = document.querySelector('.list-element.head');
+            let actualSort = document.querySelector('.sort > .active-sort').getAttribute('data-toggle');
+            if (actualSort != null && actualSort != undefined && actualSort != '') {
+                head.querySelector(`.info > a[rel="${actualSort}`).click();
+            }
         });
     })
 }
@@ -279,9 +301,10 @@ function setSortListeners() {
 
     let row = document.querySelector('.list-element.head');
 
-    row.querySelectorAll('.info > b > a').forEach(a=>a.addEventListener('click',function(event) {
+    row.querySelectorAll('.info > a.sort-element').forEach(a=>a.addEventListener('click',function(event) {
         event.preventDefault();
 
+        // First, we get the class type of the element to search for (Understanding whichi sort we want to do).
         let type;
         let action = a.getAttribute('rel');
         if (action.endsWith('-date')) {
@@ -290,22 +313,25 @@ function setSortListeners() {
             type = '.' + action;
         }
 
-
-        document.querySelectorAll('.active-sort-display').forEach(item=>{
+        // Then we hide all the displayed sort because we don't want any other to be displayed
+        row.querySelectorAll('.active-sort-display').forEach(item=>{
             item.classList.remove('active-sort-display');
         });
+        a.parentNode.querySelector('.reverse-sort').classList.add('active-sort-display');
 
-        a.parentNode.parentNode.querySelector('.reverse-sort').classList.add('active-sort-display');
-
+        // Then we set the active Sort in the hidden element and as the selected one
         let activeSort = document.querySelector('button.active-sort');
         let precRel = activeSort.getAttribute('data-toggle');
         activeSort.setAttribute('data-toggle',action);
-        let item = document.querySelector('.sort > .dropdown > .dropdown-menu').querySelector(`a[rel="${action}"]`);
+        let item = document.querySelector(`.sort > .dropdown > .dropdown-menu a[rel="${action}"]`);
         document.querySelector('.sort > .dropdown > .btn-secondary.dropdown-toggle').innerHTML = item.innerHTML;
 
-        let rev = document.querySelector('.reverse-sort.tool');
-        if (precRel != action) {
-            if (action == 'shared' || precRel == 'shared') {
+        let barSortSection = document.querySelector('.tools-bar > .sort'); // Section sort in the tool bar
+        let rev = barSortSection.querySelector('.reverse-sort.tool'); // The active sort
+        
+        if (precRel != action) { // When the selected sort changes
+            if (action == 'shared' || precRel == 'shared') { // When we click or had clicked shared we swap the icons
+                                                             // between numbers and letters pairs
                 rev.classList.remove('reverse-sort');
                 rev.classList.remove('active-sort-display');
                 if (rev.classList.contains('letters')) {
@@ -316,23 +342,28 @@ function setSortListeners() {
                 rev.classList.add('active-sort-display');
                 rev.classList.add('reverse-sort');
             }
+            // Since it's a new selection we reset the displayed icon to be the normal sort (default)
             rev.querySelector('.not-display').classList.remove('not-display');
             rev.querySelector('.rev').classList.add('not-display');
-        } else {
 
-            if (rev.classList.contains('not-display')) {
-                rev.classList.remove('not-display');
+        } else { // When the sort selection is the same as before we either reverse or not based on the displayed icon
+            let prev = rev.querySelector('.not-display');
+            prev.classList.remove('not-display');
+            if (prev.classList.contains('rev')) {
+                reverse = true;
+                rev.firstElementChild.classList.add('not-display');
             } else {
-                let icon = rev.querySelector('.not-display');
-                if (icon.classList.contains('rev')) {
-                    rev.firstElementChild.classList.add('not-display');
-                } else {
-                    rev.childNodes[3].classList.add('not-display');
-                }
-                icon.classList.remove('not-display');
+                rev.childNodes[3].classList.add('not-display');
+            }
+
+            let prec = a.parentNode.querySelector('.not-display');
+            prec.classList.remove('not-display');
+            if (prec.classList.contains('rev')) {
+                a.parentNode.querySelector('.reverse-sort').firstElementChild.classList.add('not-display');
+            } else {
+                a.parentNode.querySelector('.reverse-sort').childNodes[3].classList.add('not-display');
             }
         }
-
         
         // First, we take all the actual values
         let values = [];
@@ -360,9 +391,6 @@ function setSortListeners() {
 
         // Finally we sort the array of values and for each of them place in the section the first node matching the value
         nonCaseSensitiveValues.sort();
-        if (reverse == true) {
-            nonCaseSensitiveValues.reverse();
-        }
         let sortedValues = [];
         nonCaseSensitiveValues.forEach(val=>{
             values.forEach(el=>{
@@ -373,20 +401,20 @@ function setSortListeners() {
             })
         })
 
+        // In this section we sort the values according to the specific cases (integer or dates)
         if (type.endsWith('-date')) {
             values.sort(function(d1,d2) {
                 return new Date(d1) - new Date(d2);
             });
-            if (reverse == true) {
-                values.reverse();
-            }
             sortedValues = values;
         } else if (type == '.shared') {
             insertionSort(values);
-            if (reverse == true) {
-                values.reverse();
-            }
             sortedValues = values;
+        }
+
+        if (reverse == true) {
+            sortedValues.reverse();
+            reverse = false;
         }
 
         sortedValues.forEach(val=>{
@@ -402,34 +430,11 @@ function setSortListeners() {
 
     }));
 
-    setReverseToolSort();
     row.querySelectorAll('.reverse-sort').forEach(rev=>{
         rev.addEventListener('click',(event)=>{
             event.preventDefault();
-            let icon = rev.querySelector('.not-display');
-            if (icon.classList.contains('rev')) {
-                reverse = true;
-                rev.parentNode.querySelector('b > a').click();
-                reverse = false;
-                rev.firstElementChild.classList.add('not-display');
-            } else {
-                rev.parentNode.querySelector('b > a').click();
-                rev.childNodes[3].classList.add('not-display');
-            }
-            icon.classList.remove('not-display');
+            rev.parentNode.querySelector('a.sort-element').click();
         });
-    });
-}
-
-/**
- * setReverseToolSort sets the tool bar Reverse icon to
- * change the displayed icon and make reverse song on click
- */
-function setReverseToolSort() {
-    let rev = document.querySelector('.reverse-sort.tool');
-    rev.addEventListener('click',(event)=>{
-        event.preventDefault();
-        document.querySelector('.active-sort-display').click();
     });
 }
 
