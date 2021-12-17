@@ -17,12 +17,12 @@
         <img src="/media/svg/notebook_icon.svg" alt="Card image cap">
     </a>
     <span class="title"><%= doc.title %></span>
-    <p class="actual-creation-date"><%= doc.created_date %>  </p>
-    <span class="info creation-date"><%= doc.created_date %> </span>
+    <p class="actual-creation-date"><%= doc.created_date %></p>
+    <span class="info creation-date"><%= doc.created_date %></span>
     <p class="actual-edit-date"><%= doc.edit_date %></p>
     <span class="info edit-date" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-content="<%= doc.created_date.toLocaleString() %>"><%= doc.edit_date %></span>
     <span class="info"></span>
-    <span class="info owner"> <%= doc.owner %> </span>
+    <span class="info owner" data-toggle="<%= doc.owner %>"></span>
 
     <% if (doc.owner == userid) { %>
         <a data-delete_action="docs/<%= doc._id %>" type="button" class="delete" data-toggle="modal" data-target="#confirm-deletion-modal" >

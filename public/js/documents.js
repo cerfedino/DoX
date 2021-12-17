@@ -122,12 +122,13 @@ function setSwitchButtonListener(){
 
 function setDeleteListener(card) {
     let modal = document.querySelector("#confirm-deletion-modal")
-    
-    card.querySelector(".delete").addEventListener("click", function() {
-        modal.querySelector("#deletion-modal-doc-title").innerHTML = this.parentNode.querySelector(".title").innerHTML
-        modal.querySelector("#deletion-modal-confirm").dataset.delete_action =  this.dataset.delete_action
-    });
-  
+    let btn = card.querySelector(".delete");
+    if (btn != null) {
+        btn.addEventListener("click", function() {
+            modal.querySelector("#deletion-modal-doc-title").innerHTML = this.parentNode.querySelector(".title").innerHTML
+            modal.querySelector("#deletion-modal-confirm").dataset.delete_action =  this.dataset.delete_action
+        });
+    }  
 }
 // Set listener on delete modal
 function setModalDeleteListener() {
@@ -407,7 +408,7 @@ function setEditReadUsername(card) {
  */
 function setOwnerUsername(card) {
     let x = card.querySelector('span.owner');
-    setUsernameById(x,x.innerHTML);
+    setUsernameById(x,x.getAttribute('data-toggle'));
 }
 
 /**
