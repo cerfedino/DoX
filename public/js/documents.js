@@ -204,7 +204,6 @@ function setSortListeners() {
         let rev = document.querySelector('.reverse-sort.tool');
         if (precRel != action) {
             if (action == 'shared' || precRel == 'shared') {
-                debugger
                 rev.classList.remove('reverse-sort');
                 rev.classList.remove('active-sort-display');
                 if (rev.classList.contains('letters')) {
