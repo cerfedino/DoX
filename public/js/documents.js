@@ -115,14 +115,15 @@ function setSwitchButtonListener(){
 }
 
 /**
- * Sets all the active tools (Sort, filter and search) 
+ * Sets all the active tools (Sort, filter and search)
  */
 function setActiveTools(){
     let actualSort = document.querySelector('.sort > .active-sort');
     let filter = actualSort.getAttribute('data-toggle');
+    debugger
     actualSort.setAttribute('data-toggle','');
     if (filter != null) {
-        document.querySelector(`.sort > .dropdown > [rel="${filter}"]`).click();
+        document.querySelector(`.sort > .dropdown [rel="${filter}"]`).click();
     }
     document.querySelector('input[name="filter-submit"]').click();
 }
