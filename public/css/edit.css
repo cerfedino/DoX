@@ -1,3 +1,7 @@
+html {
+    overflow: scroll;
+}
+
 .document-view {
     margin-right: 20%;
     margin-left: 20%;
@@ -35,7 +39,6 @@
 }
 
 .action-icons i.action:hover {
-    
     background-color: var(--bg-hover);
     transition: all 0.1s;
 }
@@ -83,9 +86,9 @@
 .editor-tools {
     position: -webkit-sticky;
     position: sticky;
-    margin-top:-20px;
+    margin-top: -20px;
     top: 80px;
-    justify-content:center;
+    justify-content: center;
     padding-top: 10px;
     padding-bottom: 10px;
     /* border-radius: 0  0 20px 20px; */
@@ -97,6 +100,39 @@
 }
 
 .editor-tools #actions {
-    min-width:60%;
+    min-width: 60%;
     max-width: 60%;
+}
+
+.ProseMirror {
+    white-space: pre-wrap;
+}
+
+.ProseMirror * {
+    color: black;
+}
+
+.ProseMirror p * {
+    font-size: 16px;
+}
+
+.ProseMirror .cursor {
+    position: relative;
+    display: inline-block;
+    height: 1.2em
+}
+
+.ProseMirror .cursor::before {
+    content: '';
+    display: block;
+    width: 2px;
+    height: 120%;
+    position: absolute;
+    top: 0.15em;
+    left: -1px;
+    z-index: 1;
+}
+
+.ProseMirror .selection {
+    position: relative;
 }
