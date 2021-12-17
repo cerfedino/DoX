@@ -102,6 +102,19 @@ function setSwitchButtonListener(){
 }
 
 /**
+ * Sets all the active tools (Sort, filter and search) 
+ */
+function setActiveTools(){
+    let actualSort = document.querySelector('.sort > .active-sort');
+    let filter = actualSort.getAttribute('data-toggle');
+    actualSort.setAttribute('data-toggle','');
+    if (filter != null) {
+        document.querySelector(`.sort > .dropdown > [rel="${filter}"]`).click();
+    }
+    document.querySelector('input[name="filter-submit"]').click();
+}
+
+/**
  * Sets all the listeners for a given document (row in list view or card in grid view)
  * @param card  the card element to add the listener on
  */
