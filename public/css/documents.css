@@ -302,6 +302,7 @@ a {
     margin-bottom: 5px;
     width: 100%;
     max-width: 230px;
+    height: 200px;
     overflow: hidden;
     /* box-shadow: -1px 1px 4px 1px var(--shadow); */
     border: none;
