@@ -90,7 +90,7 @@ header #logo {
     max-width: 200px;
 }
 
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 1000px) {
     header #logo {
         background-image: url('../media/svg/notebook_icon.svg');
     }
@@ -111,8 +111,8 @@ header div#extra h1 {
     -webkit-line-clamp: 1; /* number of lines to show */
     line-clamp: 1;
     -webkit-box-orient: vertical;
-    line-height: 50px;
-    min-height: 50px;
+    line-height: 60px;
+    min-height: 60px;
     font-size: 40px;
 }
 
