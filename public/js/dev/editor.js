@@ -589,8 +589,9 @@ async function save() {
     function filter (node) {
         return (node.tagName !== 'i');
     }
-    htmlToImage.toSvg(document.querySelector('#editor'), { filter: filter })
+    htmlToImage.toPng(document.querySelector('#editor'), { filter: filter })
     .then(function (dataUrl) {
+        console.log(dataUrl)
         socket.emit('save', dataUrl);
     });
 }
