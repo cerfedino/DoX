@@ -22,10 +22,10 @@
     <p class="actual-edit-date"><%= doc.edit_date %></p>
     <span class="info edit-date" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-content="<%= doc.created_date.toLocaleString() %>"><%= doc.edit_date %></span>
     <span class="info"></span>
-    <span class="info owner"> <%= doc.owner %> </span>
+    <span class="info owner"><%=doc.owner%></span>
 
     <% if (doc.owner == userid) { %>
-        <a data-delete_action="docs/<%= doc._id %>" type="button" class="delete" data-toggle="modal" data-target="#confirm-deletion-modal" >
+        <a data-delete_action="docs/<%=doc._id%>" type="button" class="delete" data-toggle="modal" data-target="#confirm-deletion-modal" >
             <img src="/media/svg/delete.svg" class="svgimgform"></img>
         </a>
     <% } %>
