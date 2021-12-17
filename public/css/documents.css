@@ -113,6 +113,16 @@ svg#logo {
     flex-direction: row;
 }
 
+.sort {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    align-items: center;
+}
+
+.tool {
+    display: none;
+}
+
 .tools-bar a.new-doc {
     background-color: var(--accent);
     width: 160px;
@@ -189,16 +199,7 @@ svg#logo {
 }
 
 input[name="filter-submit"] {
-    border-radius: 5px;
-    background-color: var(--bg-tool-bar-button);
-    color: var(--text-tool-bar-button);
-    width: 100%;
-    border: 0;
-    opacity: 1;
-}
-
-input[name="filter-submit"]:hover {
-    --bg-tool-bar-button: rgb(45, 84, 212);
+    display: none;
 }
 
 .active-filters {
@@ -388,13 +389,19 @@ a {
     align-items: center;
 }
 
-.reverse-sort, .rev {
+.list-element.head .info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.reverse-sort, .not-display {
     display: none;
 }
 
 .active-sort-display {
+    margin-left: 5px;
     display: inline-block;
-    margin-top: 4px;
 }
 
 .list .card-element {

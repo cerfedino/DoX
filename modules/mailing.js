@@ -5,6 +5,7 @@
  */
 
 const nodemailer = require('nodemailer');
+const dbops = require('./dbops.js')
 
 const email_credentials = require('../config/config.js').mailing;
 
@@ -16,7 +17,15 @@ var transporter = nodemailer.createTransport({
   	auth: email_credentials
 });
 
-
+// Periodically checks for expired verification links
+async function check_expired_verification_links() {
+	const users = (await dbops.run_find(dbops.model.users,{email_verification_status: false, joined_date: {"$lte": new Date(new Date().getTime() - email_credentials.verification_link_expiry)}},{_id:1}))
+	for(var i = 0; i<users.length; i++) {
+		await dbops.user_delete(users[i]._id)
+	}
+	setTimeout(check_expired_verification_links, email_credentials.verification_links_check)
+}
+setTimeout(check_expired_verification_links, 1000)
 
 /**
  * Generates a text message (for users who do not support html)
