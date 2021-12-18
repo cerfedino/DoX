@@ -13,6 +13,7 @@ const {ObjectId} = require("mongodb");
 
 const auth = require('../modules/auth.js');
 const mailing = require('../modules/mailing.js');
+const config = require('../config/config.js');
 
 const fs = require('fs-extra');
 const path = require('path');
@@ -459,10 +460,15 @@ router.put("/user/changepicture", async (req, res) => {
 })
 
 router.put("/user/changeemail", async (req, res) => {
-
+    let u = ""
     if (!ObjectId.isValid(req.user.user_id)) {
         res.status(400).send(`Invalid user ID.`);
         return
+    } else {
+        await dbops.user_find({_id : ObjectId(req.user.user_id)})
+        .then(user => {
+            u = user.username
+        })
     }
     if(!(await dbops.user_exists({_id:ObjectId(req.user.user_id)}))) {
         if(req.accepts("text/html")) {
@@ -476,7 +482,12 @@ router.put("/user/changeemail", async (req, res) => {
     let tags = {}
 
     if (req.body.email) {
-        mailing.send_email_change("Placeholder", req.body.email, "placeholder/route")
+        tags.tmp_email = req.body.email;
+    
+        let tkn = generate_random_token();
+        tags.token = tkn;
+        let verification_link = `${config.webserver.https_enabled ? 'https:' : 'http:'}//${config.webserver.domain}${config.webserver.https_enabled?":80":":"+config.webserver.port}/auth/changeemail/${req.user.user_id}/${tkn}`
+        mailing.send_email_change(u, req.body.email, verification_link)
     }
 
     dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
@@ -612,3 +623,9 @@ router.delete("/docs/:id", async (req, res) => {
     
     res.status(200).end()
 })
+
+function generate_random_token() {
+    const dateString = Date.now().toString(36);
+    const randomness = Math.random().toString(36).substr(2);
+    return dateString + randomness;
+};
