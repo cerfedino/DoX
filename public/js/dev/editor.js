@@ -339,7 +339,7 @@ document.getElementById('insertImageModal').addEventListener('hidden.bs.modal', 
     document.getElementById('image-src').value = '';
     document.getElementById('image-alt').value = '';
 
-    editor.focus();
+    //editor.focus();
 });
 document.getElementById('insert-image-form').addEventListener('submit', insertImage);
 // Rename
@@ -347,7 +347,7 @@ document.getElementById('renameModal').addEventListener('shown.bs.modal', () => 
     document.getElementById('new-name').focus();
 });
 document.getElementById('renameModal').addEventListener('hidden.bs.modal', () => {
-    editor.focus();
+    //editor.focus();
 });
 document.getElementById('rename-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -380,7 +380,7 @@ document.getElementById('insertLinkModal').addEventListener('shown.bs.modal', ()
 })
 document.getElementById('insertLinkModal').addEventListener('hidden.bs.modal', () => {
     document.getElementById('link-href').value = '';
-    editor.focus();
+    //editor.focus();
 })
 document.getElementById('insert-link-form').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -394,9 +394,45 @@ document.getElementById('insert-link-form').addEventListener('submit', (e) => {
 })
 // Change color
 document.getElementById('action-pick-color').addEventListener('change', (e) => {
-    toggleColor(e.target.value)(editor.state, editor.dispatch);
+    forceToggleMark(schema.marks.color, {color: e.target.value})(editor.state, editor.dispatch);
     editor.focus();
 })
+// Change font size
+document.getElementById('action-font-inc').addEventListener('click', (e) => {
+    const sizeEl = document.getElementById('font-size-picker');
+    let val = Number(sizeEl.value);
+
+    if (isNaN(val)) val = 16;
+    else val += 1;
+
+    sizeEl.value = val;
+    forceToggleMark(schema.marks.fontSize, {size: val + 'px'})(editor.state, editor.dispatch);
+});
+document.getElementById('action-font-dec').addEventListener('click', () => {
+    const sizeEl = document.getElementById('font-size-picker');
+    let val = Number(sizeEl.value);
+
+    if (isNaN(val)) val = 16;
+    else val -= 1;
+
+    if (val <= 0) val = 1;
+
+    sizeEl.value = val;
+    forceToggleMark(schema.marks.fontSize, {size: val + 'px'})(editor.state, editor.dispatch);
+})
+document.getElementById('font-size-picker').addEventListener('click', (e) => {
+    e.target.focus();
+})
+document.getElementById('font-size-picker').addEventListener('change', (e) => {const sizeEl = document.getElementById('font-size-picker');
+    let val = Number(sizeEl.value);
+
+    if (isNaN(val)) val = 16;
+    if (val <= 0) val = 1;
+
+    sizeEl.value = val;
+    forceToggleMark(schema.marks.fontSize, {size: val + 'px'})(editor.state, editor.dispatch);
+});
+
 
 // Document operations
 document.getElementById('button-save').addEventListener('click', save);
@@ -590,7 +626,7 @@ async function save() {
 
 async function exportPDF() {
     const title = document.getElementById('doc-title').innerText;
-    editor.focus();
+    //editor.focus();
 
     editor.dispatch(
         editor.state.tr.setMeta('hide-selections', true)
@@ -713,14 +749,9 @@ function markApplies(doc, ranges, type) {
     return false
 }
 
-/**
- * Toggles color mark on the current selection
- * @param color Color for the style attribute
- * @returns {(function(*, *): (boolean))|*} Command
- */
-function toggleColor(color) {
-    const markType = schema.marks.color;
-    const attrs = {color}
+function forceToggleMark(markType, attrs) {
+    //const markType = schema.marks.color;
+    //const attrs = {color}
     return function (state, dispatch) {
         let {empty, $cursor, ranges} = state.selection
         if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) return false

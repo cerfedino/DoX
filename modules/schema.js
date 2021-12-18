@@ -24,7 +24,7 @@ base.marks = base.marks.addToEnd('color', {
         }
     }]
 });
-base.marks = base.marks.addToEnd('font-size', {
+base.marks = base.marks.addToEnd('fontSize', {
     attrs: {
         size: {default: '16px'}
     },

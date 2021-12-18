@@ -3,9 +3,7 @@ html {
 }
 
 .document-view {
-    margin-right: 20%;
-    margin-left: 20%;
-    margin-bottom: 10%;
+    margin: 5% 20% 10%;
     border-radius: 5px;
     border: 1px solid #dddddd;
     box-shadow: -15px 10px 30px 15px var(--shadow);
@@ -69,6 +67,11 @@ html {
     cursor: pointer;
     width: 35px;
     height: 25px;
+}
+
+#font-size-picker {
+    width: 35px;
+    height: 15px;
 }
 
 .ProseMirror:focus {
