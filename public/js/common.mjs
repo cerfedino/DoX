@@ -59,62 +59,141 @@ document.querySelector("#dark-mode-toggle")?.addEventListener('change',
 
 // Edit user modal form
 
-let form = document.querySelector(".modal-body form")
-  
-form.addEventListener("submit",function(e){
-    
+let changeUsernameForm = document.getElementById("changeusernameform");
+
+changeUsernameForm.addEventListener("submit", function(e) {
     e.preventDefault();
 
-    const mistakes = validateForm(this);
+    const mistakes = validateUsernameForm(this);
     if(mistakes) {
-        console.log("MISTAKE")
         return
-    } else{ 
-        console.log("NO MISTAKE")
+    } else {
         fetch(this.action, {
             method: this.method,
             headers: {
-                "Content-Type" : "application/json",
-                "Accept" : "application/json"
-            },
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }, 
             body: JSON.stringify({
-                username: form.querySelector("input[name='username']").value, 
-                password: form.querySelector("input[name='password']").value
+                username: changeUsernameForm.querySelector("input[name='username']").value
             })
-        }).then(res => {
-            return res.json();
-        }).then(obj => {
+        })
+        .then(res => {return res.json()})
+        .then(obj => {
             if(obj.error == 0) {
-                showAlert(document.querySelector("#alerts"),"warning","Username is the same",true)
+                showAlert(document.querySelector("#useralertsmodal"),"warning","Username is the same",true)
             } else if (obj.error == -1) {
-                showAlert(document.querySelector("#alerts"),"warning","Username is taken",true)
+                showAlert(document.querySelector("#useralertsmodal"),"warning","Username is taken",true)
             } else {
-                console.log(obj.username)
                 location.reload();
             }
-            
         })
     }
-
-    
 })
 
-function validateForm(form) {
-    var mistakes = false
+let changePasswordForm = document.getElementById("changepasswordform");
 
-    const username = form.querySelector("#username").value.trim()
-    const pwd = form.querySelector("#password").value
-    const confirm_pwd = form.querySelector("#cpassword").value
+changePasswordForm.addEventListener("submit", function(e) {
+    e.preventDefault();
 
-    if(pwd !== confirm_pwd) {
-        showAlert(document.querySelector("#alerts"),"warning","Passwords are not matching",true)
-        mistakes = true;
+    const mistakes = validatePasswordForm(this);
+    if(mistakes) {
+        return
+    } else {
+        fetch(this.action, {
+            method: this.method,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }, 
+            body: JSON.stringify({
+                password: changePasswordForm.querySelector("input[name='password']").value
+            })
+        })
+        .then(res => {return res.json()})
+        .then(obj => {
+            location.reload();
+        })
     }
+})
+
+let changePictureForm = document.getElementById("changepictureform");
+
+changePictureForm.addEventListener("submit", function(e) {
+    fetch(this.action, {
+        method: this.method,
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
+})
+
+let changeEmailForm = document.getElementById("changeemailform");
+
+changeEmailForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const mistakes = validateEmailForm(this);
+    if(mistakes) {
+        return
+    } else {
+        fetch(this.action, {
+            method: this.method,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }, 
+            body: JSON.stringify({
+                email: changeEmailForm.querySelector("input[name='email']").value
+            })
+        })
+        .then(res => {return res.json()})
+        .then(obj => {
+            location.reload();
+        })
+    }
+})
+
+function validateUsernameForm(form) {
+    var mistakes = false;
+
+    const username = form.querySelector("#username").value.trim();
     if (username === "") {
-        showAlert(document.querySelector("#alerts"),"warning","Username cannot be empty",true)
+        showAlert(document.querySelector("#useralertsmodal"),"warning","Username cannot be empty",true)
         mistakes = true;
     }
-    
     return mistakes;
 }
 
+function validatePasswordForm(form) {
+    var mistakes = false;
+
+    const pwd = form.querySelector("#password").value
+    const confirm_pwd = form.querySelector("#cpassword").value
+    if(pwd !== confirm_pwd) {
+        showAlert(document.querySelector("#passwordalertsmodal"),"warning","Passwords are not matching",true)
+        mistakes = true;
+    }
+    if (pwd === "" || confirm_pwd === "") {
+        showAlert(document.querySelector("#passwordalertsmodal"),"warning","Password cannot be empty!", true);
+        mistakes = true;
+    }
+    return mistakes;
+}
+
+function validateEmailForm(form) {
+    var mistakes = false;
+
+    const email = form.querySelector("#email").value
+    const cemail = form.querySelector("#cemail").value
+    const mailformat = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!email.match(mailformat)) {
+        showAlert(document.querySelector("#emailalertsmodal"),"warning","Please insert a valid email",true)
+        mistakes = true;
+    } else if (email !== cemail) {
+        showAlert(document.querySelector("#emailalertsmodal"),"warning","Emails do not match",true)
+        mistakes = true;
+    }
+
+    return mistakes;
+}
