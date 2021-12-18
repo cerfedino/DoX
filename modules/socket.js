@@ -303,7 +303,7 @@ module.exports.init = function (server) {
         doc.perm_read = doc.perm_read.map(el => el.toHexString())
 
         perm_editors.push(doc.owner, ...doc.perm_edit)
-        perm_readers.push(perm_editors, ...doc.perm_read)
+        perm_readers.push(...perm_editors, ...doc.perm_read)
 
         perm_editors = perm_editors.filter((v, i, a) => a.indexOf(v) === i);
         perm_readers = perm_readers.filter((v, i, a) => a.indexOf(v) === i);
@@ -317,8 +317,11 @@ module.exports.init = function (server) {
             ...socket_editors,
             ...socket_editorwriters])
 
+        // Handles notify of users that have access to the document
+        // Manually notifies the sockets of the users that have at least read access, but are NOT in the document room.
         sockets.forEach(socket => {
-            let user_id = get_user_from_socket(socket)
+            var user_id = get_user_from_socket(socket)
+
             if (!user_id)
                 return
 
@@ -330,11 +333,12 @@ module.exports.init = function (server) {
                 socket_editors.delete(socket)
                 io.sockets.adapter.sids.get(socket).delete('document:' + doc_id + "/editor/write")
                 socket_editorwriters.delete(socket)
-
+                
                 io.to("user:" + user_id).emit('notify-update', generate_event("notify-update", "unavailable", {
                     type: "document",
                     _id: doc_id
                 }, {message: "no-read"}))
+
             } else if (!perm_editors.includes(user_id)) {
                 io.sockets.adapter.sids.get(socket).delete('document:' + doc_id + "/editor/write")
                 socket_editorwriters.delete(socket)
@@ -347,14 +351,27 @@ module.exports.init = function (server) {
         })
 
 
-        // TODO: Handle ADDITION of user permissions
+        // Handles notify of users that have access to the document
+        // Manually notifies the sockets of the users that have at least read access, but are NOT in the document room.
+        socket_docs = io.sockets.adapter.rooms.get('document:' + doc_id) || new Set([])
+        perm_readers.forEach((user) => {
+            connected_users[user]?.forEach(s=>{
+                if(!socket_docs.has(s)) {
+                    io.to(s).emit('notify-update', generate_event("notify-update", "add", {
+                        type: "document",
+                        _id: doc_id
+                    }))
+                }
+            })
+        })
 
     }
 
     function get_user_from_socket(socket_id) {
-        Object.keys(connected_users).forEach(usr => {
-            if (connected_users[usr].includes(socket_id))
+        for(usr in connected_users){
+            if (connected_users[usr].includes(socket_id)){
                 return usr
-        })
+            }
+        }
     }
 }

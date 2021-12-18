@@ -38,7 +38,6 @@ function setNotifyUpdateListeners() {
             switch(ev.type) {
                 // TODO: Handle proper change instead of fetching whole doc everytime. Temporary solution because of time crunch.
                 case "change":
-                    document.querySelectorAll(`.card-element[id="${ev.subject._id}"]`).forEach(doc=>doc.remove())
                 case "add":
                     fetch(`/docs/${ev.subject._id}`,
                         {
@@ -49,7 +48,11 @@ function setNotifyUpdateListeners() {
                             const el = document.createElement("div")
                             el.insertAdjacentHTML("afterbegin", html)
                             setup_Doc(el.firstElementChild)
-                            document.querySelector("#table-of-documents").appendChild(el.firstElementChild)
+                            if(doc_card = document.querySelector(`.card-element[id="${ev.subject._id}"]`)) {
+                                doc_card.replaceWith(el.firstElementChild)
+                            } else {
+                                document.querySelector("#table-of-documents").appendChild(el.firstElementChild)
+                            }
                         })
                         .catch((e)=>{
                             console.log(e)
@@ -57,6 +60,7 @@ function setNotifyUpdateListeners() {
                         .finally(checkAmountOfDocuments)
                     break;
                 case "remove":
+                case "unavailable":
                     document.querySelectorAll(`.card-element[id="${ev.subject._id}"]`).forEach(doc=>doc.remove())
                     checkAmountOfDocuments()
                     break;
