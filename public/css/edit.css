@@ -111,8 +111,9 @@ html {
     white-space: pre-wrap;
 }
 
-.ProseMirror *:not(u) {
-    color: black;
+.ProseMirror * {
+    color: inherit;
+    font-size: inherit;
 }
 
 .ProseMirror .cursor {

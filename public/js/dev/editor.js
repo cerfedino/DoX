@@ -69,13 +69,16 @@ class MenuView {
             }
         }
 
-        // Update color picker
+        // Update color picker and font size picker
         let pos = this.editorView.state.selection.$head;
         let color = '#000000'
+        let size = '16';
+        console.log(pos.marks());
         for (let mark of pos.marks()) {
             if (mark.type === schema.marks.color) {
                 color = mark.attrs.color;
-                break;
+            } else if (mark.type === schema.marks.fontSize) {
+                size = mark.attrs.size.split('px')[0];
             }
         }
         document.getElementById('action-pick-color').value = color;
