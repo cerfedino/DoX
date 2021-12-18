@@ -125,8 +125,9 @@ socket.on('init', async (data) => {
         }
 
         connectedClients[client[0]] = {
-            userID: client[1].userID,
             username,
+            isYou: socket.id === client[0],
+            userID: client[1].userID,
             permission: client[1].permission,
             selection: client[1].selection ? client[1].selection : {
                 from: 1,
@@ -333,10 +334,10 @@ function renderConnections() {
     for (let client of Object.values(connectedClients)) {
         newHTML +=
             //`<li><span style="color: ${client.colors}" class="dropdown-item-text"><b>${client.username}</b></span></li>`
-`<li><div class="dropdown-item-text d-flex flex-wrap align-items-center">
+            `<li><div class="dropdown-item-text d-flex flex-wrap align-items-center">
     <div style="border-radius: 50%; width: 25px; height: 25px; background: ${client.colors}d9;"></div>
     <span class="ms-2"><b>${client.username}</b></span>
-    <span class="ms-auto"><i>${client.permission}</i></span>
+    <span class="ms-auto"><i>${client.isYou ? client.permission + ' (you)' : client.permission}</i></span>
 </div></li>`;
         newHTML +=
             '<li class="dropdown-divider"></li>';
@@ -441,7 +442,8 @@ document.getElementById('action-font-dec').addEventListener('click', () => {
 document.getElementById('font-size-picker').addEventListener('click', (e) => {
     e.target.focus();
 })
-document.getElementById('font-size-picker').addEventListener('change', (e) => {const sizeEl = document.getElementById('font-size-picker');
+document.getElementById('font-size-picker').addEventListener('change', (e) => {
+    const sizeEl = document.getElementById('font-size-picker');
     let val = Number(sizeEl.value);
 
     if (isNaN(val)) val = 16;
