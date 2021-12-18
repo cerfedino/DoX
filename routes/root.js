@@ -476,12 +476,12 @@ router.put("/user/changeemail", async (req, res) => {
     let tags = {}
 
     if (req.body.email) {
-        mailing.send_mail("Bojan", req.body.email, "test.com")
+        mailing.send_email_change("Placeholder", req.body.email, "placeholder/route")
     }
 
     dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
 
-        req.flash("messageSuccess","Password successfully changed!")
+        req.flash("messageSuccess","Placeholder")
         res.send(newuser);
     
     })
