@@ -175,8 +175,28 @@ router.get('/users/:id', async function (req, res){
     }
 })
 
-// Gets user profile picture based on ID
+/* 
+    GET /users?username=""
+    Returns the username matching the given user ID
+*/
+router.get('/users', checkAuthenticated, async function (req, res){
+    if(!req.query.username) {
+        res.status(400).end()
+    }
+    const user = await dbops.user_find({username : req.query.username},{_id:1});
 
+    if (req.accepts("application/json")){
+        if (user == undefined || user == null) {
+            res.status(404).end();
+        } else {
+            res.json(user);
+        }
+    } else {
+        res.status(406).end();
+    }
+})
+
+// Gets user profile picture based on ID
 router.get("/pic/users/:id", async function (req, res){
     let id;
     try {

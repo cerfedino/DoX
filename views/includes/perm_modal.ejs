@@ -10,27 +10,32 @@ if(!doc)
 <!-- Share and manage perms modal -->
 <% let doc_share_perms = []
 doc_share_perms.push(`
-    <div class="user">
-        <span class="user" disabled>${doc.owner}</span>
-
-        <select name="membership" id="membership">
-            <option value="read">read</option>
-            <option value="write">write</option>
-            <option value="owner" selected>owner</option>
-        </select>
-    </div>`)
+    <tr class="user">
+        <td> <span class="user" data-id=${doc.owner}>${doc.owner}</span> </td>
+        
+        <td>
+            <select class="form-select" name="permission" disabled>
+                <option value="read">read</option>
+                <option value="write">write</option>
+                <option value="owner" selected>owner</option>
+            </select>
+        </td>
+    </tr>`)
 doc.perm_edit.forEach(u=>{
     if (String(doc.owner) != String(u)) {
         doc_share_perms.push(`
-            <div class="user">
-                <span class="user">${u}</span>
+            <tr class="user">
+                <td> <span class="user" data-id=${u}>${u}</span> </td>
 
-                <select name="membership" id="membership">
-                    <option value="reed">reed</option>
-                    <option value="write" selected>write</option>
-                    <option value="owner">owner</option>
-                </select>
-            </div>`)
+                <td>
+                    <select class="form-select" name="permission">
+                        <option value="read">read</option>
+                        <option value="write" selected>write</option>
+                        <!-- <option value="owner">owner</option> -->
+                        <option value="noperm">remove user</option>
+                    </select>
+                </td>
+            </tr>`)
     }
 })
 doc.perm_read.forEach(u=>{
@@ -43,15 +48,16 @@ doc.perm_read.forEach(u=>{
         });
         if (!contained) {
             doc_share_perms.push(`
-                <div class="user">
-                    <span class="user">${u}</span>
+                <tr class="user">
+                    <td> <span class="user" data-id=${u}>${u}</span> </td>
 
-                    <select name="membership" id="membership">
-                        <option value="reed" selected>reed</option>
+                    <td><select class="form-select" name="permission">
+                        <option value="read" selected>read</option>
                         <option value="write">write</option>
-                        <option value="owner">owner</option>
-                    </select>
-                </div>`);
+                        <option value="noperm">remove user</option>
+                        <!-- <option value="owner">owner</option> -->
+                        </select></td>
+                </tr>`);
         }
     }
 }) %>
@@ -60,25 +66,30 @@ doc.perm_read.forEach(u=>{
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><span>Share with people:</span></h5>
-                <form action="">
-                    <input type="text" required>
-                </form>
+                <h4 class="modal-title">Edit document permissions</h4>
             </div>
             <div class="modal-body">
-                <% doc_share_perms.forEach(u=>{ %>
-                    <%- u %>
-                <% }) %>  
-            </div>
-            <div class="modal-footer">
-                <h5 class="modal-title" id="confirm-deletion-modalLabel"><span>Generate public link:</span></h5>
-                read-only
-                edit
-
-                <form id="send_put">
-                    <input type="submit" value="Submit"> </form>
+                <form action="">
+                    <input id="perm_modal_search" name="perm_modal_search" type="text" class="form-control" idrequired placeholder="enter username">
                 </form>
+                <table class="table">
+                    <tbody>
+                            <% for(idx in doc_share_perms) { %>
+                                <%- doc_share_perms[idx] %>
+                            <% } %>
+                    </tbody>
+                </table>
             </div>
+            <!-- <div class="modal-footer"> -->
+                <!-- <h5 class="modal-title" id="confirm-deletion-modalLabel"><span>Generate public link:</span></h5>
+                read-only
+                edit -->
+
+                <!-- <form id="send_put">
+                    <input type="submit" value="Submit"> </form>
+                </form> -->
+            <!-- </div> -->
         </div>
     </div>
+    <script src="/js/perm_modal.js"  onload="init_perm_modal()"></script>
 </div>
