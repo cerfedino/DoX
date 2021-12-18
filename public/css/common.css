@@ -243,13 +243,22 @@ button.close span {
     to {right:0; opacity:1}
 }
 
-
-.modal-user .modal-body input {
+.modal-user .modal-body input#username {
+    margin-bottom: 10px;
+    border-radius: 10pt;
+    border: 1px solid var(--bg-contrast);
     width: 100%;
     margin-bottom: 10px;
+    background-color: var(--bg);
+    color: var(--text);
+    padding: 6px;
 }
 
-.modal-user .modal-body input#username, .modal .modal-body input#password{
+.modal-user .modal-body input#password, .modal-user .modal-body input#cpassword
+,.modal-user .modal-body input#email, .modal-user .modal-body input#cemail{
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
     margin-bottom: 10px;
     border-radius: 10pt;
     border: 1px solid var(--bg-contrast);
