@@ -306,12 +306,18 @@ input[type=file]:active::before {
     background-color: gray;
 }
 
-/* Added */
-/* a {
-    color: var(--text);
-    text-decoration: none;
+
+.modal-content{
+    background: var(--bg);
+    border-radius: 20px;
+    box-shadow: -6px 6px 16px 10px rgba(0, 0, 0, 0.2);
+}
+.modal-content span {
+    color: var(--contrast-text);
 }
 
-a:hover {
-    opacity: 70%;
-} */
+.modal-content input.form-control {
+    color: var(--contrast-text);
+    background-color: var(--bg);
+
+}

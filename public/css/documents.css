@@ -553,11 +553,3 @@ a {
 body.dark-theme .delete img, body.dark-theme img#threedots, body.dark-theme img#shared, body.dark-theme #preview img {
     filter: invert(1);
 }
-
-
-#confirm-deletion-modal .modal-content{
-    background: var(--bg);
-}
-#confirm-deletion-modal span {
-    color: var(--contrast-text);
-}
