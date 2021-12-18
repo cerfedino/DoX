@@ -108,7 +108,7 @@ html {
     white-space: pre-wrap;
 }
 
-.ProseMirror * {
+.ProseMirror *:not(u) {
     color: black;
 }
 
