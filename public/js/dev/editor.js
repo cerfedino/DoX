@@ -141,9 +141,19 @@ socket.on('init', async (data) => {
         editor.state.tr.setMeta('update-selections', true)
     )
 })
-socket.on('client-connect', data => {
+socket.on('client-connect', async data => {
+    let usernameRes = await fetch('/users/' + data.userID, {
+        method: 'GET'
+    })
+    let username = "Unknown user";
+    if (usernameRes.ok) {
+        let data = await usernameRes.json();
+        username = data.username;
+    }
+
     connectedClients[data.id] = {
         userID: data.userID,
+        username,
         permission: data.permission,
         colors: pickColor()
     }
@@ -322,7 +332,12 @@ function renderConnections() {
     let newHTML = '';
     for (let client of Object.values(connectedClients)) {
         newHTML +=
-            `<li><span style="color: ${client.colors}" class="dropdown-item-text"><b>${client.username}</b></span></li>`;
+            //`<li><span style="color: ${client.colors}" class="dropdown-item-text"><b>${client.username}</b></span></li>`
+`<li><div class="dropdown-item-text d-flex flex-wrap align-items-center">
+    <div style="border-radius: 50%; width: 25px; height: 25px; background: ${client.colors}d9;"></div>
+    <span class="ms-2"><b>${client.username}</b></span>
+    <span class="ms-auto"><i>${client.permission}</i></span>
+</div></li>`;
         newHTML +=
             '<li class="dropdown-divider"></li>';
     }
