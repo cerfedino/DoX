@@ -12,6 +12,7 @@ const dbops = require('../modules/dbops.js')
 const {ObjectId} = require("mongodb");
 
 const auth = require('../modules/auth.js');
+const mailing = require('../modules/mailing.js');
 
 const fs = require('fs-extra');
 const path = require('path');
@@ -328,6 +329,166 @@ function get_editable_doc_fields(obj={}) {
 }
 
 
+router.put("/user/changeusername", async (req, res) => {
+
+    let check = 0;
+
+    if (!ObjectId.isValid(req.user.user_id)) {
+        res.status(400).send(`Invalid user ID.`);
+        return
+    } else {
+        await dbops.user_find({_id : ObjectId(req.user.user_id)})
+        .then(user => {
+            u = user.username
+        })
+    }
+    if(!(await dbops.user_exists({_id:ObjectId(req.user.user_id)}))) {
+        if(req.accepts("text/html")) {
+            res.status(404).render('../views/error.ejs', {s: 404, m: "User does not exist"});
+        } else {
+            res.status(404).send("User does not exist").end();
+        }
+        return
+    }
+
+    let tags = {}
+
+    if (req.body.username === u) {
+        check = 0
+    }
+    if(req.body.username != u && (await (dbops.user_exists({username : req.body.username})))) {
+        check = -1;
+    }
+    if (req.body.username && (!await (dbops.user_exists({username : req.body.username})))) {
+        check = 1;
+        tags.username = req.body.username;
+    }
+
+    if(check == 1) { 
+        dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
+
+            console.log("[+] Updated user")
+            console.log("NUS: "+ newuser.username)
+            req.flash("messageSuccess","Username successfully changed!")
+            res.send(newuser);
+    
+        })
+    } else {
+        res.send({error: check})
+    }
+    
+})
+
+
+router.put("/user/changepassword", async (req, res) => {
+
+    if (!ObjectId.isValid(req.user.user_id)) {
+        res.status(400).send(`Invalid user ID.`);
+        return
+    }
+    if(!(await dbops.user_exists({_id:ObjectId(req.user.user_id)}))) {
+        if(req.accepts("text/html")) {
+            res.status(404).render('../views/error.ejs', {s: 404, m: "User does not exist"});
+        } else {
+            res.status(404).send("User does not exist").end();
+        }
+        return
+    }
+
+    let tags = {}
+
+    if (req.body.password) {
+        tags.password = await auth.encrypt_pwd(req.body.password);
+    }
+
+    dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
+
+        req.flash("messageSuccess","Password successfully changed!")
+        res.send(newuser);
+    
+    })
+    
+})
+
+router.put("/user/changepicture", async (req, res) => {
+
+
+    if (!ObjectId.isValid(req.user.user_id)) {
+        res.status(400).send(`Invalid user ID.`);
+        return
+    }
+    if(!(await dbops.user_exists({_id:ObjectId(req.user.user_id)}))) {
+        if(req.accepts("text/html")) {
+            res.status(404).render('../views/error.ejs', {s: 404, m: "User does not exist"});
+        } else {
+            res.status(404).send("User does not exist").end();
+        }
+        return
+    }
+
+    let tags = {}
+
+    if (req.files && Object.keys(req.files).length > 0) {
+        // new profile picture uploaded
+
+        let file = req.files["file"];
+        let ext = path.extname(file.name);
+
+        if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
+            return res.status(400).send("bad file type");
+        }
+
+        let file_url = "./public/media/profile_pics/" + req.user.user_id + ".png";
+
+        await file.mv(file_url, function(err) { 
+            if(err) throw err;
+            console.log("[+] File moved to folder")
+        })
+
+        tags.profile_pic = file_url;
+
+    }
+
+    dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
+
+        req.flash("messageSuccess","Picture successfully changed!")
+        res.redirect("/docs")
+    
+    })
+    
+})
+
+router.put("/user/changeemail", async (req, res) => {
+
+    if (!ObjectId.isValid(req.user.user_id)) {
+        res.status(400).send(`Invalid user ID.`);
+        return
+    }
+    if(!(await dbops.user_exists({_id:ObjectId(req.user.user_id)}))) {
+        if(req.accepts("text/html")) {
+            res.status(404).render('../views/error.ejs', {s: 404, m: "User does not exist"});
+        } else {
+            res.status(404).send("User does not exist").end();
+        }
+        return
+    }
+
+    let tags = {}
+
+    if (req.body.email) {
+        mailing.send_mail("Bojan", req.body.email, "test.com")
+    }
+
+    dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
+
+        req.flash("messageSuccess","Password successfully changed!")
+        res.send(newuser);
+    
+    })
+    
+})
+
+
 
 /*
     PUT /user
@@ -399,11 +560,8 @@ router.put('/user', async (req,res)=> {
     if(check == 1) { 
         dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
 
-            console.log("[+] Updated user")
-            console.log("NUS: "+ newuser.username)
-            req.flash("messageSuccess","User has been updated")
+            req.flash("messageSuccess","Username changed successfully!")
             res.send(newuser);
-    
     
         })
     } else {
