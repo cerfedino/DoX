@@ -197,6 +197,15 @@ function set_Doc_ReadUsername(card) {
 function set_Doc_OwnerUsername(card) {
     let x = card.querySelector('span.owner');
     setUsernameById(x,x.getAttribute('data-toggle'));
+
+    let content = card.querySelector('.options').getAttribute('data-content');
+    let el = document.createElement('SECTION');
+    el.innerHTML = content;
+    let owner = el.querySelector('.owner > .content');
+    setUsernameById(owner, owner.innerHTML)
+    .then(dom=>{
+        card.querySelector('.options').setAttribute('data-content',el.innerHTML);
+    })
 }
 
 
