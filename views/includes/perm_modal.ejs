@@ -1,0 +1,84 @@
+<% 
+if(!doc)
+    throw "doc is not defined"
+
+
+
+
+%> 
+
+<!-- Share and manage perms modal -->
+<% let doc_share_perms = []
+doc_share_perms.push(`
+    <div class="user">
+        <span class="user" disabled>${doc.owner}</span>
+
+        <select name="membership" id="membership">
+            <option value="read">read</option>
+            <option value="write">write</option>
+            <option value="owner" selected>owner</option>
+        </select>
+    </div>`)
+doc.perm_edit.forEach(u=>{
+    if (String(doc.owner) != String(u)) {
+        doc_share_perms.push(`
+            <div class="user">
+                <span class="user">${u}</span>
+
+                <select name="membership" id="membership">
+                    <option value="reed">reed</option>
+                    <option value="write" selected>write</option>
+                    <option value="owner">owner</option>
+                </select>
+            </div>`)
+    }
+})
+doc.perm_read.forEach(u=>{
+    if (String(doc.owner) != String(u)) {
+        let contained = false;
+        doc_share_perms.forEach(p=>{
+            if (p.includes(String(u))) {
+                contained = true;
+            }
+        });
+        if (!contained) {
+            doc_share_perms.push(`
+                <div class="user">
+                    <span class="user">${u}</span>
+
+                    <select name="membership" id="membership">
+                        <option value="reed" selected>reed</option>
+                        <option value="write">write</option>
+                        <option value="owner">owner</option>
+                    </select>
+                </div>`);
+        }
+    }
+}) %>
+
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="inserLinkLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><span>Share with people:</span></h5>
+                <form action="">
+                    <input type="text" required>
+                </form>
+            </div>
+            <div class="modal-body">
+                <% doc_share_perms.forEach(u=>{ %>
+                    <%- u %>
+                <% }) %>  
+            </div>
+            <div class="modal-footer">
+                <h5 class="modal-title" id="confirm-deletion-modalLabel"><span>Generate public link:</span></h5>
+                read-only
+                edit
+
+                <form id="send_put">
+                    <input type="submit" value="Submit"> </form>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

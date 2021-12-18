@@ -737,18 +737,3 @@ function checkAmountOfDocuments() {
 
 ///////////////////////////////// TESTING
 
-// document.querySelector("#send_put").addEventListener('submit',function(e) {
-//     e.preventDefault();
-    
-//     fetch(`/docs/61b5f0ea7c3c3522425dfb72`,{
-//         method: "PUT",
-//         headers: {  "Content-Type":"application/json"},
-//         body: JSON.stringify({tags: {
-//             title: "ALBERT",
-//             perm_edit_add: ['61b5f2947c3c3522425dfb73'],
-//             // perm_read: [],
-//             // owner: "61ace1efb83303c3053efa78" // Albert
-//             // owner: '61ace20fb83303c3053efa79' // Ale
-//         }})
-//     });
-// })
