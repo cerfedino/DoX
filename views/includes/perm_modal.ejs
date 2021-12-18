@@ -16,7 +16,7 @@ doc_share_perms.push(`
         <td>
             <select class="form-select" name="permission" disabled>
                 <option value="read">read</option>
-                <option value="write">write</option>
+                <option value="edit">write</option>
                 <option value="owner" selected>owner</option>
             </select>
         </td>
@@ -30,7 +30,7 @@ doc.perm_edit.forEach(u=>{
                 <td>
                     <select class="form-select" name="permission">
                         <option value="read">read</option>
-                        <option value="write" selected>write</option>
+                        <option value="edit" selected>write</option>
                         <!-- <option value="owner">owner</option> -->
                         <option value="noperm">remove user</option>
                     </select>
@@ -53,7 +53,7 @@ doc.perm_read.forEach(u=>{
 
                     <td><select class="form-select" name="permission">
                         <option value="read" selected>read</option>
-                        <option value="write">write</option>
+                        <option value="edit">write</option>
                         <option value="noperm">remove user</option>
                         <!-- <option value="owner">owner</option> -->
                         </select></td>
@@ -70,7 +70,9 @@ doc.perm_read.forEach(u=>{
             </div>
             <div class="modal-body">
                 <form action="">
-                    <input id="perm_modal_search" name="perm_modal_search" type="text" class="form-control" idrequired placeholder="enter username">
+                    <input id="perm_modal_search" name="perm_modal_search" type="text" class="form-control" required placeholder="enter username"
+                            data-toggle="tooltip" title="Username does not exists">
+                    <!-- <div class="invalid-tooltip">Username does not exists</div> -->
                 </form>
                 <table class="table">
                     <tbody>

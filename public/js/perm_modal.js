@@ -1,9 +1,8 @@
 function init_perm_modal() {
     const modal = document.querySelector("#shareModal")
     const search_Field = modal.querySelector("#perm_modal_search")
-
-
-    modal.querySelectorAll("tbody tr.user").forEach(row=>setup_perm_row_listeners(row))
+    
+    modal.querySelectorAll("tbody tr.user").forEach(row=>{setup_perm_row_listeners(row)})
 
     search_Field.parentNode.addEventListener('submit', function (e) {
         e.preventDefault()
@@ -24,25 +23,24 @@ function init_perm_modal() {
                 `<tr class="user">
                     <td> <span class="user" data-id=${user_id}>${user_id}</span></td>
 
-                    <td><select class="form-select" name="permission">
-                        <option value="read" selected>read</option>
-                        <option value="write">write</option>
-                        <option value="noperm">remove user</option>
-                            
-                        </select></td>
+                    <td>
+                        <select class="form-select" name="permission">
+                            <option value="read" selected>read</option>
+                            <option value="edit">write</option>
+                            <option value="noperm">remove user</option> 
+                        </select>
+                    </td>
                 </tr>`)
                 setup_perm_row_listeners(modal.querySelector("table.table tbody").lastChild)
                 let ev = new Event("change")
-                modal.querySelector("table.table tbody").querySelector("select.form-select").dispatchEvent(ev)
+                modal.querySelector("table.table tbody").lastChild.querySelector("select.form-select").dispatchEvent(ev)
             }).catch((e)=>{console.log(e)})
     })
 
 
 
     function setup_perm_row_listeners(tr) {
-        console.log(tr)
         tr.querySelector("select.form-select").addEventListener("change",function(e) {
-            console.log(this.value)
             const user_id = tr.querySelector("span.user").dataset.id;
             const doc_id = documentID;
             let tags = {}
@@ -56,16 +54,20 @@ function init_perm_modal() {
                     tags.perm_read_add = [user_id]
                     break;
                 case "edit":
-                    tags.perm_read_add = [user_id]
+                    tags.perm_edit_add = [user_id]
                     break;
             }
             console.log(tags)
 
             fetch(`/docs/${doc_id}`, {
                     method: "PUT",
-                    headers: {  "Content-Type":"application/json"},
+                    headers: { "Content-Type":"application/json"},
                     body: JSON.stringify({tags: tags})
-                });
+                }).then(res => {
+                    if (res.status == 200 && this.value == "noperm") {
+                        this.parentNode.parentNode.remove();
+                    }
+                })
         })
     }
 
