@@ -112,10 +112,6 @@ html {
     color: black;
 }
 
-.ProseMirror p * {
-    font-size: 16px;
-}
-
 .ProseMirror .cursor {
     position: relative;
     display: inline-block;

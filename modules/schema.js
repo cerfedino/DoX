@@ -24,6 +24,22 @@ base.marks = base.marks.addToEnd('color', {
         }
     }]
 });
+base.marks = base.marks.addToEnd('font-size', {
+    attrs: {
+        size: {default: '16px'}
+    },
+    toDOM(node) {
+        return ['span', {class: 'font-size', style: 'font-size: ' + node.attrs.size}]
+    },
+    parseDOM: [{
+        tag: 'span.font-size',
+        getAttrs(dom) {
+            return {
+                size: dom.style.split(': ')[1],
+            }
+        }
+    }]
+});
 base.marks = base.marks.addToEnd('underline', {
     toDOM() {
         return ['u', 0]
