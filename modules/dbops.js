@@ -361,9 +361,11 @@ function doc_add_permissions(doc_id, perms = {perm_read_add: [], perm_edit_add: 
 
         model.docs.findOneAndUpdate (
             {_id :doc_id},
-            { edit_date : new Date(), 
+            { $set: {edit_date : new Date()},
               $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
-                           perm_read: { $each: perms.perm_read_add || []} }})
+                           perm_read: { $each: perms.perm_read_add || []} 
+            }
+            })
 
         send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
         resolve(returnnew ? await doc_find({_id:doc_id}) : undefined)
@@ -389,7 +391,7 @@ function doc_remove_permissions(doc_id, perms = {perm_read_remove: [], perm_edit
 
         model.docs.findOneAndUpdate (
             {_id : doc_id},
-            {  edit_date : new Date(),
+            {  $set: {edit_date : new Date()},
                "$pullAll": { perm_edit: perms.perm_edit_remove || [],
                     perm_read: perms.perm_read_remove || [] }})
 
