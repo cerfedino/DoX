@@ -158,7 +158,7 @@ html {
 }
 
 .editor-tools #actions {
-    min-width: 60%;
+    min-width: 620px;
     max-width: 60%;
 }
 
@@ -186,4 +186,15 @@ html {
 
 .ProseMirror .selection {
     position: relative;
+}
+
+
+@media only screen and (max-width: 1000px) {
+    .document-view {
+        margin-right: 5%;
+        margin-left: 5%;
+    }
+    .editor-tools #actions {
+        max-width: 90%;
+    }
 }

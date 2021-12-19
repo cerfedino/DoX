@@ -5,13 +5,13 @@
 /*########################
     FONTS
 ########################*/
-@font-face {
-    font-family: 'jumper_XBdIt';
-    src: url('../media/font/Jumper/jumper-extra-bolditalic-webfont.woff2') format('woff2'),
-    url('../media/font/Jumper/jumper-extra-bolditalic-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
+/*@font-face {*/
+/*    font-family: 'jumper_XBdIt';*/
+/*    src: url('../media/font/Jumper/jumper-extra-bolditalic-webfont.woff2') format('woff2'),*/
+/*    url('../media/font/Jumper/jumper-extra-bolditalic-webfont.woff') format('woff');*/
+/*    font-weight: normal;*/
+/*    font-style: normal;*/
+/*}*/
 
 
 /*
@@ -36,7 +36,7 @@ body, body * {
 
     --logo-minimal: url('../media/svg/logo_minimal.svg');
     --logo-composed: url('../media/svg/logo_composed.svg');
-    --logo-notebook: url('../media/svg/notebook_icon_LIGHT.svg');
+    --logo-notebook: url('../media/svg/notebook_icon.svg');
 
 }
 
@@ -48,13 +48,13 @@ body.dark-theme, body.dark-theme * {
     --bg-hover: #333333;
     --bg-contrast: #565656;
     --bg-contrastt: #cbcbcb;
-    --text: #cccccc;
+    --text: #d5d5d5;
     --contrast-text: #ffffff;
     --shadow: #000000;
 
     --logo-minimal: url('../media/svg/logo_minimal_LIGHT.svg');
     --logo-composed: url('../media/svg/logo_composed_LIGHT.svg');
-    --logo-notebook: url('../media/svg/notebook_icon.svg');
+    --logo-notebook: url('../media/svg/notebook_icon_LIGHT.svg');
 
 }
 
@@ -81,6 +81,7 @@ header {
 }
 
 header #logo {
+    z-index: 1;
     cursor: pointer;
     background-image: url('../media/svg/logo_composed.svg');
     background-repeat: no-repeat;
@@ -89,9 +90,9 @@ header #logo {
     max-width: 200px;
 }
 
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 1000px) {
     header #logo {
-        background-image: url('../media/svg/notebook_icon_LIGHT.svg');
+        background-image: url('../media/svg/notebook_icon.svg');
     }
 }
 
@@ -110,8 +111,8 @@ header div#extra h1 {
     -webkit-line-clamp: 1; /* number of lines to show */
     line-clamp: 1;
     -webkit-box-orient: vertical;
-    line-height: 50px;
-    min-height: 50px;
+    line-height: 60px;
+    min-height: 60px;
     font-size: 40px;
 }
 
@@ -208,6 +209,7 @@ button.close span {
     border: none;
     border-radius: 20px;
     width: 20%;
+    min-width: 300px;
     /* box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19); */
     box-shadow: -6px 6px 16px 10px rgba(0, 0, 0, 0.2);
 

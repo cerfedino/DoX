@@ -23,11 +23,7 @@ async function populate_db() {
     await dbops.doc_create((await (dbops.user_find({username:"Username4"})))._id)
     await dbops.doc_create((await (dbops.user_find({username:"Username5"})))._id)
     await dbops.doc_create((await (dbops.user_find({username:"Username5"})))._id)
-    
-    // fs.emptyDir(dir, err =>{
-    //     if (err) return console.error(err);
-    //     console.log('All files have been deleted!')
-    // });
+
     exit();
 }
 
