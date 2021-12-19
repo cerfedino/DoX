@@ -1,13 +1,27 @@
 function init_perm_modal() {
     const modal = document.querySelector("#shareModal")
     const search_Field = modal.querySelector("#perm_modal_search")
-    
+
+    modal.querySelectorAll("tbody span.user").forEach(userDOM => {
+        let id = userDOM.innerHTML;
+        fetch('/users/' + id)
+        .then(res=>res.json())
+        .then(user=>{
+            userDOM.innerHTML = user.username;
+        })
+        .catch(err=>{
+            // invalid user;
+        });
+    })
+
     modal.querySelectorAll("tbody tr.user").forEach(row=>{setup_perm_row_listeners(row)})
 
     search_Field.parentNode.addEventListener('submit', function (e) {
         e.preventDefault()
 
-        fetch (`/users?username=${this.perm_modal_search.value}`, 
+        const username = this.perm_modal_search.value;
+
+        fetch (`/users?username=${username}`, 
             {
             method: "GET",
             headers: { Accept:"application/json" }
@@ -15,13 +29,14 @@ function init_perm_modal() {
             .then(json => {
                 const user_id = json._id;
                 if(modal.querySelector(`span.user[data-id="${user_id}"]`)) {
+                    show_error_message("already shared with")
                     return
                 }
                 var el = document.createElement('div')
                 
                 modal.querySelector("table.table tbody").insertAdjacentHTML("beforeend",
                 `<tr class="user">
-                    <td> <span class="user" data-id=${user_id}>${user_id}</span></td>
+                    <td> <span class="user" data-id=${user_id}>${username}</span></td>
 
                     <td>
                         <select class="form-select" name="permission">
@@ -31,13 +46,24 @@ function init_perm_modal() {
                         </select>
                     </td>
                 </tr>`)
+                this.perm_modal_search.value = '';
                 setup_perm_row_listeners(modal.querySelector("table.table tbody").lastChild)
                 let ev = new Event("change")
                 modal.querySelector("table.table tbody").lastChild.querySelector("select.form-select").dispatchEvent(ev)
-            }).catch((e)=>{console.log(e)})
+            }).catch((e)=>{
+                show_error_message();
+            })
     })
 
 
+    function show_error_message(msg = 'Username does not exists') {
+        const error_message = document.querySelector("#shareModal #no_user")
+        error_message.innerHTML = msg;
+        error_message.hidden = false;
+        setTimeout(() => {
+            error_message.hidden = true;
+        }, 5000);
+    }
 
     function setup_perm_row_listeners(tr) {
         tr.querySelector("select.form-select").addEventListener("change",function(e) {
@@ -57,7 +83,6 @@ function init_perm_modal() {
                     tags.perm_edit_add = [user_id]
                     break;
             }
-            console.log(tags)
 
             fetch(`/docs/${doc_id}`, {
                     method: "PUT",

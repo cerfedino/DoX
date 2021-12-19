@@ -1,10 +1,6 @@
 <% 
 if(!doc)
     throw "doc is not defined"
-
-
-
-
 %> 
 
 <!-- Share and manage perms modal -->
@@ -69,10 +65,10 @@ doc.perm_read.forEach(u=>{
                 <h4 class="modal-title">Edit document permissions</h4>
             </div>
             <div class="modal-body">
+                <div id="no_user" hidden>Username does not exists</div>
                 <form action="">
                     <input id="perm_modal_search" name="perm_modal_search" type="text" class="form-control" required placeholder="enter username"
-                            data-toggle="tooltip" title="Username does not exists">
-                    <!-- <div class="invalid-tooltip">Username does not exists</div> -->
+                            data-toggle="tooltip" data-placement="top" trigger="manual" title="Tooltip on top">
                 </form>
                 <table class="table">
                     <tbody>

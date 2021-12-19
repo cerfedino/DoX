@@ -137,6 +137,16 @@ html {
     position: relative;
 }
 
+#no_user {
+    width: 100%;
+    color: red;
+    text-align: right;
+    border-radius: 10px;
+    position: absolute;
+    z-index: 1;
+    padding-right: 40px;
+    padding-top: 6px;
+} 
 
 @media only screen and (max-width: 1000px) {
     .document-view {
