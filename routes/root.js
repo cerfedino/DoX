@@ -175,8 +175,28 @@ router.get('/users/:id', async function (req, res){
     }
 })
 
-// Gets user profile picture based on ID
+/* 
+    GET /users?username=""
+    Returns the username matching the given user ID
+*/
+router.get('/users', checkAuthenticated, async function (req, res){
+    if(!req.query.username) {
+        res.status(400).end()
+    }
+    const user = await dbops.user_find({username : req.query.username},{_id:1});
 
+    if (req.accepts("application/json")){
+        if (user == undefined || user == null) {
+            res.status(404).end();
+        } else {
+            res.json(user);
+        }
+    } else {
+        res.status(406).end();
+    }
+})
+
+// Gets user profile picture based on ID
 router.get("/pic/users/:id", async function (req, res){
     let id;
     try {
@@ -263,11 +283,9 @@ router.put('/docs/:id', checkAuthenticated, async (req,res)=> {
     if(tags.perm_read || tags.perm_edit) {
         var newperm = {}
         if(tags.perm_read)
-            newperm.perm_read = tags.perm_read
+            newperm.perm_read = await dbops.getValidObjectIds(tags.perm_read, dbops.isValidUser)
         if(tags.perm_edit)
-            newperm.perm_edit = tags.perm_edit
-
-        Object.keys(newperm).forEach(x=>newperm[x]=newperm[x].map(hex=>{return ObjectId(hex)}))
+            newperm.perm_edit = await dbops.getValidObjectIds(tags.perm_edit, dbops.isValidUser)
 
         await dbops.doc_set(ObjectId(req.params.id), newperm, false)
 
@@ -294,7 +312,8 @@ router.put('/docs/:id', checkAuthenticated, async (req,res)=> {
         delete tags.perm_read_remove; delete tags.perm_edit_remove
     }
     //
-    await dbops.doc_set(ObjectId(req.params.id), tags, false)
+    if(Object.keys(tags) > 0)
+        await dbops.doc_set(ObjectId(req.params.id), tags, false)
     console.log("[+] Updated document")
     req.flash("messageSuccess","Document has been updated")
     res.status(200).end()

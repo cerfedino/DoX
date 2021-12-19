@@ -1,7 +1,9 @@
-
 <%
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
 var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageFailure}", true)</script>` : '';
+ 
+if(!doc)
+    throw "doc is not defined"
 %>
 
 <!DOCTYPE html>
@@ -17,6 +19,12 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 </head>
 <body>
 <%- include('includes/header', {'extra' : "editor"}) %>
+
+
+
+
+
+
 
 <div class="editor-tools">
     <div id="actions" class="action-icons px-0 container d-flex flex-wrap justify-content-start align-items-center">
@@ -103,9 +111,22 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
 
         <div id="toolbar-buttons" class="ms-auto d-flex flex-wrap">
             <div class="text-end d-flex flex-wrap ms-3">
-                <button id="button-share" type="button" class="btn btn-primary me-1">
+<!-- TODO: Fix me-->
+                <!--<div class="dropdown dropdown-menu-end me-1">
+                    <button class="btn-sm btn-primary dropdown-toggle h-100" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false" id="active-users-button">Active
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="active-users-button" id="active-users"
+                        style="width: 320px">
+                    </ul>
+                </div>-->
+                <button type="button" class="btn btn-primary me-1 delete" data-bs-toggle="modal" data-bs-target="#shareModal" >
+
+<button id="button-share" type="button" class="btn btn-primary me-1">
+<!-- --------------- -->
                     <i class="bi-share"></i>
                 </button>
+
                 <button id="button-export" type="button" class="btn btn-primary me-1" data-bs-toggle="tooltip"
                         data-bs-placement="top"
                         title="Export as a PDF (Ctrl-E)">
@@ -208,6 +229,9 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
             </div>
         </form>
     </div>
+    
+    <%- include('includes/perm_modal.ejs') %>
+
 </div>
 
 <div id="toasts" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
