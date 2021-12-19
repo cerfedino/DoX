@@ -53,6 +53,7 @@ function setNotifyUpdateListeners() {
                             } else {
                                 document.querySelector("#table-of-documents").appendChild(el.firstElementChild)
                             }
+                            setActiveTools()
                         })
                         .catch((e)=>{
                             console.log(e)
