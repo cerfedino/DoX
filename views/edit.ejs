@@ -15,7 +15,7 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     <link href="/css/edit.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css" rel="stylesheet">
 </head>
-<body class="">
+<body>
 <%- include('includes/header', {'extra' : "editor"}) %>
 
 <div class="editor-tools">
@@ -62,10 +62,21 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
         <i id="action-underline" class="action bi-type-underline" data-bs-toggle="tooltip" data-bs-placement="top"
            title="Underline (Ctrl-U)"></i>
 
-        <input class="me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Text color"
+        <input data-bs-toggle="tooltip" data-bs-placement="top" title="Text color"
                id="action-pick-color"
                type="color" value="#000000"
                aria-label="Text color">
+
+        <div class="d-flex align-items-center justify-content-center">
+            <i id="action-font-dec" class="action bi-arrow-down-short" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Decrease font size"></i>
+            <input class="form-control-sm" id="font-size-picker" value="16" aria-label="Font size picker"
+                   data-bs-toggle="tooltip" data-bs-placement="top"
+                   title="Font size">
+            <i id="action-font-inc" class="action bi-arrow-up-short" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Increase font size"></i>
+        </div>
+
 
         <i id="action-lift-item" class="action bi-text-indent-left" data-bs-toggle="tooltip" data-bs-placement="top"
            title="Lift list item"></i>
@@ -90,16 +101,8 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
            title="Redo (Ctrl-Shift-Z)"></i>
 
 
-        <div class="ms-auto d-flex flex-wrap">
+        <div id="toolbar-buttons" class="ms-auto d-flex flex-wrap">
             <div class="text-end d-flex flex-wrap ms-3">
-                <!--<div class="dropdown dropdown-menu-end me-1">
-                    <button class="btn-sm btn-primary dropdown-toggle h-100" type="button" data-bs-toggle="dropdown"
-                            aria-expanded="false" id="active-users-button">Active
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="active-users-button" id="active-users"
-                        style="width: 320px">
-                    </ul>
-                </div>-->
                 <button id="button-share" type="button" class="btn btn-primary me-1">
                     <i class="bi-share"></i>
                 </button>
@@ -114,97 +117,96 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
                     <i class="bi-cloud-upload-fill"></i>
                 </button>
             </div>
-    
-
         </div>
     </div>
 </div>
 
-    <main class="document-view">
-        <div id="editor" class="p-5">
-        </div>
-    </main>
 
-    <!-- Insert image modal -->
-    <div class="modal fade" id="insertImageModal" tabindex="-1" aria-labelledby="insertImageLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <form class="modal-content" method="post" action="/" id="insert-image-form">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="insertImageLabel">Insert image</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row mb-3">
-                        <label for="image-src" class="col-3 col-form-label">Image source</label>
-                        <div class="col-9">
-                            <input type="text" class="form-control" id="image-src"
-                                placeholder="https://example.com/image.jpeg" required>
-                            <div class="invalid-feedback">
-                                Please provide the source of the image
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label for="image-alt" class="col-3 col-form-label">Alternate text</label>
-                        <div class="col-9">
-                            <input type="text" class="form-control" id="image-alt"
-                                placeholder="Example image">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <input type="submit" class="btn btn-primary" id="action-insert-image" value="Insert">
-                </div>
-            </form>
-        </div>
+
+<main class="document-view">
+    <div id="editor" class="p-5">
     </div>
-    <!-- Rename modal -->
-    <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <form class="modal-content" method="post" action="/" id="rename-form">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="renameLabel">Rename file</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row mb-3">
-                        <label for="new-name" class="col-3 col-form-label">New name</label>
-                        <div class="col-9">
-                            <input type="text" class="form-control" id="new-name" value="<%= doc.title %>" required>
+</main>
+
+<!-- Insert image modal -->
+<div class="modal fade" id="insertImageModal" tabindex="-1" aria-labelledby="insertImageLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="post" action="/" id="insert-image-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="insertImageLabel">Insert image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <label for="image-src" class="col-3 col-form-label">Image source</label>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="image-src"
+                               placeholder="https://example.com/image.jpeg" required>
+                        <div class="invalid-feedback">
+                            Please provide the source of the image
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <input type="submit" class="btn btn-primary" id="action-rename" value="Rename">
+                <div class="row">
+                    <label for="image-alt" class="col-3 col-form-label">Alternate text</label>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="image-alt"
+                               placeholder="Example image">
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary" id="action-insert-image" value="Insert">
+            </div>
+        </form>
     </div>
-    <!-- Insert link modal -->
-    <div class="modal fade" id="insertLinkModal" tabindex="-1" aria-labelledby="inserLinkLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <form class="modal-content" method="post" action="/" id="insert-link-form">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="renameLabel">Insert link</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row mb-3">
-                        <label for="link-href" class="col-3 col-form-label">URL</label>
-                        <div class="col-9">
-                            <input type="url" class="form-control" id="link-href"
-                                placeholder="https://example.com" required>
-                        </div>
+</div>
+<!-- Rename modal -->
+<div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="post" action="/" id="rename-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renameLabel">Rename file</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <label for="new-name" class="col-3 col-form-label">New name</label>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="new-name" value="<%= doc.title %>" required>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <input type="submit" class="btn btn-primary" id="action-insert-link" value="Insert">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary" id="action-rename" value="Rename">
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Insert link modal -->
+<div class="modal fade" id="insertLinkModal" tabindex="-1" aria-labelledby="inserLinkLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="post" action="/" id="insert-link-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renameLabel">Insert link</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <label for="link-href" class="col-3 col-form-label">URL</label>
+                    <div class="col-9">
+                        <input type="url" class="form-control" id="link-href"
+                               placeholder="https://example.com" required>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary" id="action-insert-link" value="Insert">
+            </div>
+        </form>
     </div>
 </div>
 

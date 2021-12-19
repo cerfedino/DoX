@@ -35,7 +35,7 @@ class MenuView {
         })
     }
 
-    update() {
+    async update() {
         let activeMarks = getActiveMarkCodes(this.editorView);
         let availableNodes = getAvailableBlockTypes(this.editorView, this.editorView.state.schema);
 
@@ -70,14 +70,31 @@ class MenuView {
             }
         }
 
-        // Update color picker
-        let pos = this.editorView.state.selection.$head;
+        // Update color picker and font size picker
+        let pos = await this.editorView.state.doc.resolve(this.editorView.state.selection.head + 1);
         let color = '#000000'
+        let size = '16';
         for (let mark of pos.marks()) {
             if (mark.type === schema.marks.color) {
                 color = mark.attrs.color;
-                break;
+            } else if (mark.type === schema.marks.fontSize) {
+                size = mark.attrs.size.split('px')[0];
             }
+        }
+
+        const fontInc = document.getElementById('action-font-inc');
+        const fontDec = document.getElementById('action-font-dec');
+        const sizePicker = document.getElementById('font-size-picker');
+        if (currentLevel !== 'p') {
+            fontInc.classList.add('disabled');
+            fontDec.classList.add('disabled');
+            sizePicker.disabled = true;
+            sizePicker.readonly = true;
+        } else {
+            fontInc.classList.remove('disabled');
+            fontDec.classList.remove('disabled');
+            sizePicker.disabled = false;
+            sizePicker.readonly = false;
         }
         document.getElementById('action-pick-color').value = color;
     }
@@ -111,6 +128,19 @@ socket.on('init', async (data) => {
     console.info(data.document);
 
     editor = initEditor(schema.nodeFromJSON(data.document), data.version, data.permission === 'READ');
+    if (data.permission === 'READ') {
+        const toolbar = document.getElementById('actions');
+        for (const child of toolbar.children) {
+            if (child.id === 'toolbar-buttons') continue;
+            child.classList.add('d-none');
+        }
+        document.getElementById('button-share').classList.add('d-none');
+        document.getElementById('button-save').classList.add('d-none');
+
+        const text = document.createElement('span');
+        text.innerHTML = '<i class="bi-book"></i> You are in reading mode';
+        toolbar.insertBefore(text, document.getElementById('toolbar-buttons'));
+    }
 
     for (let client of Object.entries(data.connected)) {
         let usernameRes = await fetch('/users/' + client[1].userID, {
@@ -123,8 +153,9 @@ socket.on('init', async (data) => {
         }
 
         connectedClients[client[0]] = {
-            userID: client[1].userID,
             username,
+            isYou: socket.id === client[0],
+            userID: client[1].userID,
             permission: client[1].permission,
             selection: client[1].selection ? client[1].selection : {
                 from: 1,
@@ -139,9 +170,19 @@ socket.on('init', async (data) => {
         editor.state.tr.setMeta('update-selections', true)
     )
 })
-socket.on('client-connect', data => {
+socket.on('client-connect', async data => {
+    let usernameRes = await fetch('/users/' + data.userID, {
+        method: 'GET'
+    })
+    let username = "Unknown user";
+    if (usernameRes.ok) {
+        let data = await usernameRes.json();
+        username = data.username;
+    }
+
     connectedClients[data.id] = {
         userID: data.userID,
+        username,
         permission: data.permission,
         colors: pickColor()
     }
@@ -162,6 +203,9 @@ socket.on('update', ({version, steps, stepClientIDs}) => {
 
     editor.dispatch(
         collab.receiveTransaction(editor.state, newSteps, newClientIDs)
+    )
+    editor.dispatch(
+        editor.state.tr.setMeta('update-selections', true)
     )
 })
 socket.on('save-success', () => {
@@ -256,7 +300,7 @@ function SelectionUpdater() {
 function generateSelectionDecorations(doc) {
     let decos = [];
     for (let clientData of Object.entries(connectedClients)) {
-        if (clientData[0] === socket.id) continue;
+        if (clientData[0] === socket.id || clientData[1].permission === 'READ') continue;
 
         // As we send anchor and head instead of from and to, we should perform an additional check
         let from = clientData[1].selection.from < clientData[1].selection.to ?
@@ -272,7 +316,6 @@ function generateSelectionDecorations(doc) {
                 from,
                 to,
                 {nodeName: 'span', class: `selection client-${clientData[0]}`}
-                //{style: `background-color: ${clientData[1].colors[0]}; color: ${clientData[1].colors[1]}`}
             ))
         }
     }
@@ -320,7 +363,12 @@ function renderConnections() {
     let newHTML = '';
     for (let client of Object.values(connectedClients)) {
         newHTML +=
-            `<li><span style="color: ${client.colors}" class="dropdown-item-text"><b>${client.username}</b></span></li>`;
+            //`<li><span style="color: ${client.colors}" class="dropdown-item-text"><b>${client.username}</b></span></li>`
+            `<li><div class="dropdown-item-text d-flex flex-wrap align-items-center">
+    <div style="border-radius: 50%; width: 25px; height: 25px; background: ${client.colors}d9;"></div>
+    <span class="ms-2"><b>${client.username}</b></span>
+    <span class="ms-auto"><i>${client.isYou ? client.permission + ' (you)' : client.permission}</i></span>
+</div></li>`;
         newHTML +=
             '<li class="dropdown-divider"></li>';
     }
@@ -340,7 +388,7 @@ document.getElementById('insertImageModal').addEventListener('hidden.bs.modal', 
     document.getElementById('image-src').value = '';
     document.getElementById('image-alt').value = '';
 
-    editor.focus();
+    //editor.focus();
 });
 document.getElementById('insert-image-form').addEventListener('submit', insertImage);
 // Rename
@@ -348,7 +396,7 @@ document.getElementById('renameModal').addEventListener('shown.bs.modal', () => 
     document.getElementById('new-name').focus();
 });
 document.getElementById('renameModal').addEventListener('hidden.bs.modal', () => {
-    editor.focus();
+    //editor.focus();
 });
 document.getElementById('rename-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -381,7 +429,7 @@ document.getElementById('insertLinkModal').addEventListener('shown.bs.modal', ()
 })
 document.getElementById('insertLinkModal').addEventListener('hidden.bs.modal', () => {
     document.getElementById('link-href').value = '';
-    editor.focus();
+    //editor.focus();
 })
 document.getElementById('insert-link-form').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -395,9 +443,45 @@ document.getElementById('insert-link-form').addEventListener('submit', (e) => {
 })
 // Change color
 document.getElementById('action-pick-color').addEventListener('change', (e) => {
-    toggleColor(e.target.value)(editor.state, editor.dispatch);
+    forceToggleMark(schema.marks.color, {color: e.target.value})(editor.state, editor.dispatch);
     editor.focus();
 })
+// Change font size
+document.getElementById('action-font-inc').addEventListener('click', (e) => {
+    const sizeEl = document.getElementById('font-size-picker');
+    let val = Number(sizeEl.value);
+
+    if (isNaN(val)) val = 16;
+    else val += 1;
+
+    sizeEl.value = val;
+    forceToggleMark(schema.marks.fontSize, {size: val + 'px'})(editor.state, editor.dispatch);
+});
+document.getElementById('action-font-dec').addEventListener('click', () => {
+    const sizeEl = document.getElementById('font-size-picker');
+    let val = Number(sizeEl.value);
+
+    if (isNaN(val)) val = 16;
+    else val -= 1;
+
+    if (val <= 0) val = 1;
+
+    sizeEl.value = val;
+    forceToggleMark(schema.marks.fontSize, {size: val + 'px'})(editor.state, editor.dispatch);
+})
+document.getElementById('font-size-picker').addEventListener('click', (e) => {
+    e.target.focus();
+})
+document.getElementById('font-size-picker').addEventListener('change', (e) => {
+    const sizeEl = document.getElementById('font-size-picker');
+    let val = Number(sizeEl.value);
+
+    if (isNaN(val) || val <= 0) val = 16;
+
+    sizeEl.value = val;
+    forceToggleMark(schema.marks.fontSize, {size: val + 'px'})(editor.state, editor.dispatch);
+});
+
 
 // Document operations
 document.getElementById('button-save').addEventListener('click', save);
@@ -598,7 +682,7 @@ async function save() {
 
 async function exportPDF() {
     const title = document.getElementById('doc-title').innerText;
-    editor.focus();
+    //editor.focus();
 
     editor.dispatch(
         editor.state.tr.setMeta('hide-selections', true)
@@ -721,14 +805,9 @@ function markApplies(doc, ranges, type) {
     return false
 }
 
-/**
- * Toggles color mark on the current selection
- * @param color Color for the style attribute
- * @returns {(function(*, *): (boolean))|*} Command
- */
-function toggleColor(color) {
-    const markType = schema.marks.color;
-    const attrs = {color}
+function forceToggleMark(markType, attrs) {
+    //const markType = schema.marks.color;
+    //const attrs = {color}
     return function (state, dispatch) {
         let {empty, $cursor, ranges} = state.selection
         if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) return false
