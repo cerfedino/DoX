@@ -283,11 +283,9 @@ router.put('/docs/:id', checkAuthenticated, async (req,res)=> {
     if(tags.perm_read || tags.perm_edit) {
         var newperm = {}
         if(tags.perm_read)
-            newperm.perm_read = tags.perm_read
+            newperm.perm_read = await dbops.getValidObjectIds(tags.perm_read, dbops.isValidUser)
         if(tags.perm_edit)
-            newperm.perm_edit = tags.perm_edit
-
-        Object.keys(newperm).forEach(x=>newperm[x]=newperm[x].map(hex=>{return ObjectId(hex)}))
+            newperm.perm_edit = await dbops.getValidObjectIds(tags.perm_edit, dbops.isValidUser)
 
         await dbops.doc_set(ObjectId(req.params.id), newperm, false)
 
@@ -314,7 +312,8 @@ router.put('/docs/:id', checkAuthenticated, async (req,res)=> {
         delete tags.perm_read_remove; delete tags.perm_edit_remove
     }
     //
-    await dbops.doc_set(ObjectId(req.params.id), tags, false)
+    if(Object.keys(tags) > 0)
+        await dbops.doc_set(ObjectId(req.params.id), tags, false)
     console.log("[+] Updated document")
     req.flash("messageSuccess","Document has been updated")
     res.status(200).end()
