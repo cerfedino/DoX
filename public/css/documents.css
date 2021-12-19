@@ -171,8 +171,13 @@ svg#logo {
     background-color: var(--bg);
 }
 
-.filter .dropdown-menu {
+.filter .dropdown-menu, .sort .dropdown-menu {
     background-color: var(--bg);
+}
+
+.filter .dropdown-menu > *, .sort .dropdown-menu > * {
+    background-color: var(--bg);
+    color: var(--text);
 }
 
 #filters {
@@ -541,6 +546,7 @@ a {
 
 #no-documents {
     position: absolute;
+    z-index: -1;
     width: 100%;
     margin: 0;
     padding-top: 20px;
