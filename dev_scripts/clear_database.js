@@ -17,11 +17,6 @@ async function clear_db() {
     await model.docs.deleteMany({})
     console.log('[+] All docs have been deleted!');
     exit()
-    
-    // fs.emptyDir(dir, err =>{
-    //     if (err) return console.error(err);
-    //     console.log('All files have been deleted!')
-    // });
 }
 
 setTimeout(clear_db,1000)

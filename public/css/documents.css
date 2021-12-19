@@ -106,11 +106,34 @@ svg#logo {
 
 }
 
-.switch-list-grid {
+.switch-list-grid:hover .list-view, .switch-list-grid:hover .grid-view {
+    color: var(--bg);
+    background: var(--accent);
+}
+.list-view, .grid-view {
+    background-color: var(--bg-contrast);
     border-radius: 10px;
-    min-width: 80px;
-    display: flex;
-    flex-direction: row;
+    padding: 10px;
+    transition: color 0.3s, background 0.3s;
+}
+.list-view *, .grid-view *{
+    width: 20px;
+}
+.switch-list-grid .list-view, .switch-list-grid.list .grid-view {
+    display: none;
+}
+.switch-list-grid.list .list-view {
+    display: inline-block;
+}
+
+.sort {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    align-items: center;
+}
+
+.tool {
+    display: none;
 }
 
 .tools-bar a.new-doc {
@@ -127,29 +150,9 @@ svg#logo {
     letter-spacing: 1px;
     transition: letter-spacing 0.5s;
 }
-
 .tools-bar a.new-doc:hover {
     letter-spacing: 3px;
     transition: all 0.5s;
-}
-
-.list-view, .grid-view {
-    color: var(--text);
-    border-radius: 10px;
-    border:none;
-    padding: 10px;
-    flex: 1;
-    transition: color 0.5s;
-    transition: background-color 0.5s;
-}
-
-.grid-view {
-    color: var(--accent);
-    background-color: var(--bg-contrast);
-}
-
-.grid-view:hover {
-    color: var(--accent);
 }
 
 .active {
@@ -189,16 +192,7 @@ svg#logo {
 }
 
 input[name="filter-submit"] {
-    border-radius: 5px;
-    background-color: var(--bg-tool-bar-button);
-    color: var(--text-tool-bar-button);
-    width: 100%;
-    border: 0;
-    opacity: 1;
-}
-
-input[name="filter-submit"]:hover {
-    --bg-tool-bar-button: rgb(45, 84, 212);
+    display: none;
 }
 
 .active-filters {
@@ -261,7 +255,7 @@ a {
     display: grid;
 
     grid-template-columns: 1fr 3fr 1fr;
-    grid-template-rows: 2fr 2fr 0.5fr auto;
+    grid-template-rows: 3fr 1fr 0.5fr auto;
     box-shadow: -3px 3px 8px 2px var(--shadow);
 
     grid-template-areas:
@@ -285,28 +279,39 @@ a {
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* number of lines to show */
-            line-clamp: 3; 
+    -webkit-line-clamp: 2; /* number of lines to show */
+            line-clamp: 2; 
     -webkit-box-orient: vertical;
 
     line-height: 30px;
-    max-height: 90px;
+    max-height: 60px;
     word-wrap: break-word;
     grid-area: title;
     font-size:  x-large;
     font-weight: bold;
 }
-
-.cards .card-element > #icon {
-    grid-area: icon;
-    border-bottom: 1px solid black;
-    margin-left: auto;
-    margin-right: auto;
+.cards .card-element #icon {
+    display: none;
 }
 
-.cards .card-element #icon img {
-    height: 180px;
-    padding: 10px;
+.cards .card-element > #preview {
+    grid-area: icon;
+    /* border-bottom: 1px solid black; */
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5px;
+    width: 100%;
+    max-width: 230px;
+    height: 200px;
+    overflow: hidden;
+    /* box-shadow: -1px 1px 4px 1px var(--shadow); */
+    border: none;
+}
+
+.cards .card-element #preview img {
+    width:100%;
+    /* background-color: white; */
+    
 }
 
 
@@ -360,13 +365,11 @@ a {
 
 ##############################*/
 
-.list {
-    margin: 10px;
-
+#table-of-documents.list {
     flex-direction: column;
 }
 
-.list .list-element.head {
+#table-of-documents.list .list-element.head {
     display: grid;
     margin: 10px -10px;
     margin-top: -20px;
@@ -378,13 +381,19 @@ a {
     align-items: center;
 }
 
-.reverse-sort, .rev {
+.list-element.head .info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.reverse-sort, .not-display {
     display: none;
 }
 
 .active-sort-display {
+    margin-left: 5px;
     display: inline-block;
-    margin-top: 4px;
 }
 
 .list .card-element {
@@ -431,6 +440,9 @@ a {
     grid-area: title;
     font-size:  x-large;
     font-weight: bold;
+}
+.list .card-element #preview {
+    display: none;
 }
 
 .list .card-element #icon {
@@ -538,6 +550,14 @@ a {
     color: var(--text);
 }
 
-body.dark-theme .delete img, body.dark-theme img#threedots, body.dark-theme img#shared {
+body.dark-theme .delete img, body.dark-theme img#threedots, body.dark-theme img#shared, body.dark-theme #preview img {
     filter: invert(1);
+}
+
+
+#confirm-deletion-modal .modal-content{
+    background: var(--bg);
+}
+#confirm-deletion-modal span {
+    color: var(--contrast-text);
 }

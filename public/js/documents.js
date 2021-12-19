@@ -1,161 +1,319 @@
-let base_documents = []; // Array containing all the documents of the page (without filter)
 let call = false;
 let reverse = false;
 
+/**
+ * init_documents initializes the document with all the actual content and Listeners as requested
+ */
 function init_documents() {
+    setNotifyUpdateListeners();
 
     setSearchListener();
 
-    setDeleteListeners();
+    setSaveListeners();
 
     setSwitchButtonListener();
     
-    setEditListeners();
-
-    setEditReadUsernames();
-
-    setOwnersUsernames();
+    document.querySelectorAll('.card-element').forEach(card=>{
+        setup_Doc(card)
+    })
 
     setFilterRowClick();
-
-    setSaveListeners();
-
-    setBaseDocuments();
 
     setToolBarSortListeners();
 
     setSortListeners();
 
-    formatDates();
+    setModalDeleteListener();
+
+    checkAmountOfDocuments();
 }
 
-// Set search listener on any input to search between all the titles and owners
+
+function setNotifyUpdateListeners() {
+    document.body.addEventListener("notify-update",ev=>{handleUpdateNotify(ev.msg)})
+
+
+    function handleUpdateNotify(ev) {
+        if(ev.subject.type == "document") {
+            switch(ev.type) {
+                // TODO: Handle proper change instead of fetching whole doc everytime. Temporary solution because of time crunch.
+                case "change":
+                    document.querySelectorAll(`.card-element[id="${ev.subject._id}"]`).forEach(doc=>doc.remove())
+                case "add":
+                    fetch(`/docs/${ev.subject._id}`,
+                        {
+                            headers: {Accept:"application/json"}
+                        }).then(res=>res.json())
+                        .then(doc=>ejs.views_includes_doc_card({doc: doc.doc}))
+                        .then((html)=>{
+                            const el = document.createElement("div")
+                            el.insertAdjacentHTML("afterbegin", html)
+                            setup_Doc(el.firstElementChild)
+                            document.querySelector("#table-of-documents").appendChild(el.firstElementChild)
+                        })
+                        .catch((e)=>{
+                            console.log(e)
+                        })
+                        .finally(checkAmountOfDocuments)
+                    break;
+                case "remove":
+                    document.querySelectorAll(`.card-element[id="${ev.subject._id}"]`).forEach(doc=>doc.remove())
+                    checkAmountOfDocuments()
+                    break;
+            }
+        } else if(ev.subject.type == "user") {
+            switch(ev.type) {
+                case "add":
+                    break;
+                case "remove":
+                    break;
+                case "change":
+                    break;
+            }
+        }
+    }
+}
+
+/**
+ * setSearchListener sets search listener on any input to search between all the titles and owners
+ */
 function setSearchListener() {
     let search = document.getElementById('search');
-    search.oninput = function(){
+    search.oninput = function() {
         
-        // First we clean the section
-        let list = document.querySelector('section#table-of-documents');
+        // First we redisplay the section
         document.querySelectorAll('.card-element').forEach(doc=>{
-            list.removeChild(doc);
+            doc.hidden = false;
         })
 
-        // Then we add back every actual row
-        /* filteredDocuments */base_documents.forEach(row=>{
-            list.innerHTML += row.outerHTML;
-        })
-
+        // And then hide what doesn't match the search
         let text = search.value;
         document.querySelectorAll('.card-element').forEach((row)=>{
             let owner = row.querySelector('.info.owner').innerHTML;
             let title = row.querySelector('.title').innerHTML;
             if (!title.toLowerCase().includes(text.toLowerCase()) && !owner.toLowerCase().includes(text.toLowerCase())) {
-                row.remove();
+                row.hidden = true;
             }
         });
 
         document.querySelector('input[name="filter-submit"]').click();
+        checkAmountOfDocuments()
     };
 
 }
 
-// Set all the listeners for a Document (row in list view)
-function setDocumentListeners() {
-    setEditListeners();
-    setDeleteListeners();
-}
-
-// Set switch button between the list and grid view
+/**
+ * setSwitchButtonListener sets switch button between the list and grid view
+ */
 function setSwitchButtonListener(){
-    document.querySelector('.switch-list-grid a.grid-view').addEventListener('click', (event) => {
-        event.preventDefault();
+    document.querySelector('.switch-list-grid').addEventListener('click', function(e) {
+        e.preventDefault();
 
-        document.getElementById("table-of-documents").className = "cards";
-        document.querySelector('.switch-list-grid a.grid-view').style = "background-color: var(--bg-contrast); color: var(--accent)";
-        document.querySelector(".switch-list-grid a.list-view").style = "background-color: var(--bg); color: var(--text)";
-
+        this.classList.toggle("list")
+        document.getElementById("table-of-documents").className = this.classList.contains("list")?"list":"cards";
     })
-    
-
-    document.querySelector('.switch-list-grid a.list-view').addEventListener('click', (event) => {
-        event.preventDefault();
-
-        document.getElementById("table-of-documents").className = "list";
-        document.querySelector('.switch-list-grid a.list-view').style = "background-color: var(--bg-contrast); color: var(--accent)";
-        document.querySelector(".switch-list-grid a.grid-view").style = "background-color: var(--bg); color: var(--text)";
-
-    })
-    
-    
-    // querySelectorAll('a').forEach(x=>x.addEventListener('click',function(event){
-    //     event.preventDefault();
-
-
-    //     if (!this.classList.contains('active')){
-    //         let deactivate = document.querySelector('a.active').classList.contains('list-view') ? ".list" : ".card";
-    //         let activate = document.querySelector('a.active').classList.contains('list-view') ? ".card" : ".list";
-    //         document.querySelector("section"+deactivate).style.display = 'none';
-    //         document.querySelector('a.active').classList.remove('active');
-    //         document.querySelector("section"+activate).style.display = 'flex';
-    //         this.classList.add('active');
-    //     }
-    // }))
 }
 
-// Set both edit and delete listeners buttons
-function setDeleteListeners() {
+/**
+ * Sets all the active tools (Sort, filter and search)
+ */
+function setActiveTools(){
+    let actualSort = document.querySelector('.sort > .active-sort');
+    let filter = actualSort.getAttribute('data-toggle');
+    if (filter != null) {
+        document.querySelector(`.sort > .dropdown [rel="${filter}"]`).click();
+        document.querySelector(`.sort > .dropdown [rel="${filter}"]`).click();
+    }
+    document.querySelector('input[name="filter-submit"]').click();
+}
 
-    document.querySelectorAll(".svgimgform").forEach(btn => {
-        btn.addEventListener("click", deletecard)
-    })
+/**
+ * Sets all the listeners for a given document (row in list view or card in grid view)
+ * @param card  the card element to add the listener on
+ */
+function setup_Doc(card) {
+    set_Doc_EditListener(card);
+    set_Doc_DeleteListener(card);
+    set_Doc_ReadUsername(card);
+    set_Doc_OwnerUsername(card);
+    format_Doc_dates(card);
+}
 
-    function deletecard(e) {
-        let id = e.target.parentNode.id;
-        fetch(id, {
-            method: "DELETE"
-        }).then(res => {
-            console.log(res.status);
-            e.target.parentNode.parentNode.remove();
-        })
+function set_Doc_DeleteListener(card) {
+    let modal = document.querySelector("#confirm-deletion-modal")
+    let btn = card.querySelector(".delete");
+    if (btn != null) {
+        btn.addEventListener("click", function() {
+            modal.querySelector("#deletion-modal-doc-title").innerHTML = this.parentNode.querySelector(".title").innerHTML
+            modal.querySelector("#deletion-modal-confirm").dataset.delete_action =  this.dataset.delete_action
+        });
     }
 }
 
-// Set list edit links for each document and sort links for the header buttons
-function setEditListeners() {
-    document.querySelectorAll('.card-element').forEach(row=>{
-        row.childNodes.forEach(el=>{
-            if ((el.classList != undefined && !el.classList.contains('delete'))) {
-                el.addEventListener('click',function(event){
-                    window.location = row.querySelector('a#icon').href;
+/**
+ * set_Doc_EditListener sets list edit link for the given document
+ * @param card  the card element to add the listener on
+ */
+function set_Doc_EditListener(card) {
+    card.childNodes.forEach(el=>{
+        if ((el.classList != undefined && !el.classList.contains('delete'))) {
+            el.addEventListener('click',function(event) {
+                window.location = card.querySelector('a#icon').href;
+            })
+        }
+    })
+}
+
+/**
+ * setEditReadUsername sets the username instead of the Id in the permissions section of the document
+ * @param card  the card element to add the listener on
+ */
+function set_Doc_ReadUsername(card) {
+    let el = card.querySelector('a.perms#end');
+
+    let articles = document.createElement('SECTION');
+    articles.innerHTML = el.getAttribute('data-content');
+    let promises = [];
+    articles.querySelectorAll('.dropdown-item.user').forEach(item=>{
+        let user = item.querySelector(".user").innerHTML;
+
+        promises.push(new Promise((resolve,reject)=>{
+            setUsernameById(item.querySelector(".user"), user)
+                .then((dom)=>{
+                    resolve();
                 })
+        }))
+    })
+    Promise.all(promises)
+        .then(()=>{
+            el.setAttribute('data-content',articles.innerHTML);
+        })
+}
+
+/**
+ * setOwnerUsername sets usernames instead of Ids in the owner section of the document
+ * @param card  the card element to add the listener on
+ */
+function set_Doc_OwnerUsername(card) {
+    let x = card.querySelector('span.owner');
+    setUsernameById(x,x.getAttribute('data-toggle'));
+
+    let content = card.querySelector('.options').getAttribute('data-content');
+    let el = document.createElement('SECTION');
+    el.innerHTML = content;
+    let owner = el.querySelector('.owner > .content');
+    setUsernameById(owner, owner.innerHTML)
+    .then(dom=>{
+        card.querySelector('.options').setAttribute('data-content',el.innerHTML);
+    })
+}
+
+
+/**
+ * getUsernameById returns the username matching the given User's Id
+ * @param {String} id  the username Id to be matched
+ * @returns {Promise<String>}  the username matching the given id 
+ * if present in the db, otherwise rejects and returns "invalid user"
+ */
+ function getUsernameById(id) {
+    return new Promise((resolve,reject)=>{
+        fetch('/users/' + id)
+        .then(res=>res.json())
+        .then(user=>{
+            if (user.username == document.querySelector('#info > h2').innerHTML) {
+                resolve("<i>me</i>");
+            } else {
+                resolve(user.username);
             }
+        })
+        .catch(err=>{
+            reject("invalid user");
+        });
+        
+    })
+}
+
+/**
+ * setUsernameById sets the username matching the given User's Id in the given DOM element
+ * @param {HTMLElement} dom  the element whose innerHTML is replace with the username
+ * @param {String} id  the User's Id whose matching username will fill the
+ * @returns {Promise<HTMLElement>}  the modified element in any case
+ */
+function setUsernameById(dom, id) {
+    return new Promise((resolve,reject)=>{
+        getUsernameById(id)
+        .then(username=>{
+            dom.innerHTML = username;
+            resolve(dom);
+        })
+        .catch(username=>{
+            dom.innerHTML = username;
+            resolve(dom);
         })
     })
 }
 
-// Sets the tool bar sort listeners so that they act as the headline's buttons of the table
-function setToolBarSortListeners() {
-    let row = document.querySelector('.list-element.head');
 
-    let elements = document.querySelector('.dropdown.sort');
+// Set listener on delete modal
+function setModalDeleteListener() {
+    document.querySelector("#confirm-deletion-modal #deletion-modal-confirm")
+        .addEventListener("click", function() {
+            fetch(this.dataset.delete_action, {
+                method: "DELETE"
+            })
+        })
+}
+
+/**
+ * setToolBarSortListeners sets the tool bar sort listeners so that they act as the headline's buttons of the table
+ */
+function setToolBarSortListeners() {
+    let head = document.querySelector('.list-element.head');
+
+    let elements = document.querySelector('.sort').querySelector('.dropdown');
     elements.querySelectorAll('.dropdown-item').forEach(item=>{
-        item.addEventListener('click',function(event){
+        item.addEventListener('click',function(event) {
             event.preventDefault();
             let className = item.getAttribute('rel');
-            row.querySelector(`a[rel="${className}"]`).click();
+            head.querySelector(`a[rel="${className}"]`).click();
+            elements.parentElement.querySelector('.reverse-sort').classList.add('active-sort-display');
+        });
+    })
+    setReverseToolSortListener();
+}
+
+/**
+ * setReverseToolSort sets the tool bar Reverse icon to
+ * change the displayed icon and make reverse song on click
+ */
+ function setReverseToolSortListener() {
+    
+    // For both Letter and Number icons, we set the click to go clicking in the matching head button.
+    // In that button, we implement the complete sort, so here we just invoke that event
+
+    document.querySelectorAll('.tools-bar > .sort > .tool').forEach(btn=>{
+        btn.addEventListener('click',(event)=>{
+            event.preventDefault();
+            let head = document.querySelector('.list-element.head');
+            let actualSort = document.querySelector('.sort > .active-sort').getAttribute('data-toggle');
+            if (actualSort != null && actualSort != undefined && actualSort != '') {
+                head.querySelector(`.info > a[rel="${actualSort}`).click();
+            }
         });
     })
 }
 
-// Set sort on click over buttons in the head line of the list
+/**
+ * setSortListeners sets sort on click over buttons in the head line of the list
+ */
 function setSortListeners() {
 
     let row = document.querySelector('.list-element.head');
 
-    row.querySelectorAll('a').forEach(a=>a.addEventListener('click',function(event){
+    row.querySelectorAll('.info > a.sort-element').forEach(a=>a.addEventListener('click',function(event) {
         event.preventDefault();
 
-        debugger
+        // First, we get the class type of the element to search for (Understanding whichi sort we want to do).
         let type;
         let action = a.getAttribute('rel');
         if (action.endsWith('-date')) {
@@ -164,16 +322,57 @@ function setSortListeners() {
             type = '.' + action;
         }
 
+        // Then we hide all the displayed sort because we don't want any other to be displayed
+        row.querySelectorAll('.active-sort-display').forEach(item=>{
+            item.classList.remove('active-sort-display');
+        });
+        a.parentNode.querySelector('.reverse-sort').classList.add('active-sort-display');
+
+        // Then we set the active Sort in the hidden element and as the selected one
         let activeSort = document.querySelector('button.active-sort');
+        let precRel = activeSort.getAttribute('data-toggle');
         activeSort.setAttribute('data-toggle',action);
-        document.querySelector('div.sort > .btn-secondary.dropdown-toggle').innerHTML = action;
-        document.querySelectorAll('.reverse-sort').forEach(item=>{
-            if (item.classList.contains('active-sort-display')) {
-                item.classList.remove('active-sort-display');
+        let item = document.querySelector(`.sort > .dropdown > .dropdown-menu a[rel="${action}"]`);
+        document.querySelector('.sort > .dropdown > .btn-secondary.dropdown-toggle').innerHTML = item.innerHTML;
+
+        let barSortSection = document.querySelector('.tools-bar > .sort'); // Section sort in the tool bar
+        let rev = barSortSection.querySelector('.reverse-sort.tool'); // The active sort
+        
+        if (precRel != action) { // When the selected sort changes
+            if (action == 'shared' || precRel == 'shared') { // When we click or had clicked shared we swap the icons
+                                                             // between numbers and letters pairs
+                rev.classList.remove('reverse-sort');
+                rev.classList.remove('active-sort-display');
+                if (rev.classList.contains('letters')) {
+                    rev = document.querySelector('.sort > .numbers');
+                } else {
+                    rev = document.querySelector('.sort > .letters');
+                }
+                rev.classList.add('active-sort-display');
+                rev.classList.add('reverse-sort');
             }
-        })
-        debugger
-        this.parentNode.parentNode.querySelector('.reverse-sort').classList.add('active-sort-display');
+            // Since it's a new selection we reset the displayed icon to be the normal sort (default)
+            rev.querySelector('.not-display').classList.remove('not-display');
+            rev.querySelector('.rev').classList.add('not-display');
+
+        } else { // When the sort selection is the same as before we either reverse or not based on the displayed icon
+            let prev = rev.querySelector('.not-display');
+            prev.classList.remove('not-display');
+            if (prev.classList.contains('rev')) {
+                reverse = true;
+                rev.firstElementChild.classList.add('not-display');
+            } else {
+                rev.childNodes[3].classList.add('not-display');
+            }
+
+            let prec = a.parentNode.querySelector('.not-display');
+            prec.classList.remove('not-display');
+            if (prec.classList.contains('rev')) {
+                a.parentNode.querySelector('.reverse-sort').firstElementChild.classList.add('not-display');
+            } else {
+                a.parentNode.querySelector('.reverse-sort').childNodes[3].classList.add('not-display');
+            }
+        }
         
         // First, we take all the actual values
         let values = [];
@@ -210,8 +409,10 @@ function setSortListeners() {
                 }
             })
         })
+
+        // In this section we sort the values according to the specific cases (integer or dates)
         if (type.endsWith('-date')) {
-            values.sort(function(d1,d2){
+            values.sort(function(d1,d2) {
                 return new Date(d1) - new Date(d2);
             });
             sortedValues = values;
@@ -220,142 +421,70 @@ function setSortListeners() {
             sortedValues = values;
         }
 
+        if (reverse == true) {
+            sortedValues.reverse();
+            reverse = false;
+        }
+
         sortedValues.forEach(val=>{
             let done = false;
             documents_rows.forEach(doc=>{
-                if (!done && doc != undefined && doc.querySelector(type).innerHTML == String(val)){
-                    list.innerHTML += doc.outerHTML;
+                if (!done && doc != undefined && doc.querySelector(type).innerHTML == String(val)) {
+                    list.appendChild(doc);
                     documents_rows = documents_rows.filter(x=>(x != doc));
                     done = true;
                 }
             })
         });
-        
-        setEditListeners();
-        setSortListeners();
-        // setDocumentListeners();
-    }))
-}
 
-// Returns the username matching the given User's Id
-function getUsernameById(id){
-    return new Promise((resolve,reject)=>{
-        let filter = {_id: id};
-        fetch('/users/'+filter._id)
-        .then(res=>res.json())
-        .then(user=>{
-            if (user.username == document.querySelector('#info > h2').innerHTML) {
-                resolve("<i>me</i>");
-            } else {
-                resolve(user.username);
-            }
-        })
-        .catch(err=>{
-            reject("invalid user");
+    }));
+
+    row.querySelectorAll('.reverse-sort').forEach(rev=>{
+        rev.addEventListener('click',(event)=>{
+            event.preventDefault();
+            rev.parentNode.querySelector('a.sort-element').click();
         });
-        
-    })
+    });
 }
 
-// Sets the username matching the given User's Id in the given DOM element
-function setUsernameById(dom, id){
-    return new Promise((resolve,reject)=>{
-        getUsernameById(id)
-        .then(username=>{
-            dom.innerHTML = username;
-            resolve(dom);
-        })
-        .catch(username=>{
-            dom.innerHTML = username;
-            resolve(dom);
-        })
-    })
-}
-
-// Set usernames instead of Ids in the permissions section of the document
-function setEditReadUsernames() {
-    document.querySelectorAll('a.perms#end').forEach(el=>{
-        let articles = document.createElement('SECTION');
-        articles.innerHTML = el.getAttribute('data-content');
-        let promises = [];
-        articles.querySelectorAll('.dropdown-item.user').forEach(item=>{
-            let user = item.querySelector(".user").innerHTML;
-
-            promises.push(new Promise((resolve,reject)=>{
-                setUsernameById(item.querySelector(".user"), user)
-                .then((dom)=>{
-                    resolve();
-                })
-            }))
-        })
-        Promise.all(promises)
-        .then(()=>{  
-            el.setAttribute('data-content',articles.innerHTML);
-        })
-    })
-}
-
-// Set usernames instead of Ids in the owner section of the document
-function setOwnersUsernames() {
-    document.querySelectorAll('p.owner').forEach(x=>{
-        let span = x.parentNode.querySelector('span.owner');
-        setUsernameById(span,x.innerHTML);
-    })
-}
-
-// Set selection for filters so that you can select a filter without having to go on the checkbox
+/**
+ * setFilterRowClick sets selection for filters so that you can select a filter without having to go on the checkbox
+ */
 function setFilterRowClick() {
     document.getElementById('filters').querySelectorAll('.dropdown-item').forEach(item=>{
         let checkbox = item.querySelector('input');
-        item.addEventListener('click',function(event){
+        item.addEventListener('click',function(event) {
             checkbox.checked = !checkbox.checked;
+            document.querySelector('input[name="filter-submit"]').click();
         })
 
         // Set checkbox click so that it works even on itself
-        checkbox.addEventListener('change',function(event){
+        checkbox.addEventListener('change',function(event) {
             checkbox.checked = !checkbox.checked;
+            document.querySelector('input[name="filter-submit"]').click();
         })
     })
 }
 
-// Set listener for saving filters 
+/**
+ * setSaveListeners sets listener for saving filters
+ */
 function setSaveListeners() {
     // Save filters sets all the selected filters
-    document.querySelector('input[name="filter-submit"]').addEventListener('click',function(event){
+    document.querySelector('input[name="filter-submit"]').addEventListener('click',function(event) {
         event.preventDefault();
         
-        if (call == false){
+        if (call == false) {
             call = true;
             document.getElementById('search').oninput();
             call = false;
         }
 
-
-        // First reset the whole page so that the filters are all reapplied
-        let toBeReseted = [];
-        let list = document.getElementById('table-of-documents');
-        list.childNodes.forEach(child=>{
-            if (child.classList != undefined && !child.classList.contains('head')) {
-                toBeReseted.push(child);
-            }
-        })
-        let actualList = document.querySelectorAll('.card-element');
-
-        toBeReseted.forEach(doc=>{
-            list.removeChild(doc);
-        })
-
-        actualList.forEach(doc=>{
-            list.innerHTML += doc.outerHTML;
-        })
-
-        setDocumentListeners();
-        setSortListeners();
-
+        // Then set all the filters only if they're checked
         document.getElementById('filters').querySelectorAll('input[type="checkbox"]').forEach(checkbox=>{
             let active = document.querySelector('.active-filters');
             let item = checkbox.parentNode.querySelector('label[for="' + checkbox.name + '"]');
-            if (checkbox.checked == true){
+            if (checkbox.checked == true) {
                 if (active.querySelector('.active-filter.' + checkbox.name) == null) {
                     let button = document.createElement('BUTTON');
                     button.classList.add('active-filter');
@@ -375,6 +504,7 @@ function setSaveListeners() {
                 }
             }
         })
+        checkAmountOfDocuments();
     })
 }
 
@@ -382,59 +512,75 @@ function setSaveListeners() {
  * setActiveFilter sets the filter corresponding to the given checkbox
  * @param {HTMLElement} checkbox the checkbox filter
  */
-function setActiveFilter(checkbox){
+function setActiveFilter(checkbox) {
     if (checkbox.type != 'checkbox') {
         return undefined;
     }
-    debugger
-
+    
     let rows = [];
     document.querySelectorAll('.card-element').forEach(el=>{
-        if (!el.classList.contains('head')){
-            rows.push(el);
-        }
-    })
+        rows.push(el);
+    });
     let type = checkbox.name.split('-')[1];
-    debugger
-    if (type == 'owned'){
-        rows.forEach(row=>{
-            debugger
-            if (row.querySelector('.info.owner').innerHTML != '<i>me</i>'){
-                row.parentNode.removeChild(row);
+
+    /**
+     * removeRow checks on the row if check is never true, then it hides the row, otherwise leaves it there 
+     * @param {HTMLElement} row the row to be removed
+     * @param {Function} check the function to check for the element
+     */
+    function removeRow(row, check = true) {
+        let articles = document.createElement('SECTION');
+        articles.innerHTML = row.querySelector('a.perms').getAttribute('data-content');
+        let found = false;
+        articles.querySelectorAll('.dropdown-item').forEach(item=>{
+            if (!item.innerHTML.includes('Document not shared')) {
+                let role = item.querySelector('.role').innerHTML;
+                let user = item.querySelector('.user').innerHTML;
+                if (check(role, user)) {
+                    found = true;
+                }
             }
         })
-    } else if (type == 'read' || type == 'edit'){
+        if (found == false) {
+            row.hidden = true;
+        }
+    }
+
+
+    if (type == 'owned') {
         rows.forEach(row=>{
-            debugger
-            let articles = document.createElement('SECTION');
-            articles.innerHTML = row.querySelector('a.perms').getAttribute('data-content');
-            articles.querySelectorAll('.dropdown-item').forEach(item=>{
-                if (!item.innerHTML.includes('Document not shared')) {
-                    let role = item.querySelector('.role').innerHTML;
-                    let user = item.querySelector('.user').innerHTML;
-                    if (role != type || user != '<i>me</i>'){
-                        row.parentNode.removeChild(row);
-                    }
-                }
+            if (row.querySelector('.info.owner').innerHTML != '<i>me</i>') {
+                row.hidden = true;
+            }
+        })
+    } else if (type == 'read') {
+        rows.forEach(row=>{
+            removeRow(row,(role,user)=>{
+                return role == type && user == '<i>me</i>';
+            })
+        })
+    } else if (type == 'edit') {
+        rows.forEach(row=>{
+            if (row.querySelector('.info.owner').innerHTML != '<i>me</i>') {
+                removeRow(row,(role,user)=>{
+                    return role == type && user == '<i>me</i>';
+                });
+            }
+        })
+    } else if (type == 'notmine') {
+        rows.forEach(row=>{
+            removeRow(row,(role,user)=>{
+                return role != 'owner' && user == '<i>me</i>';
             })
         })
     } else {
         rows.forEach(row=>{
-            debugger
             let n = parseInt(row.querySelector('p.shared').innerHTML);
             if (n == 0) {
-                row.parentNode.removeChild(row);
+                row.hidden = true;
             }
         })
     }
-}
-
-// Set base documents variable
-function setBaseDocuments() {
-    base_documents = [];
-    document.querySelectorAll('.card-element').forEach(el=>{
-        base_documents.push(el);
-    })
 }
 
 // Time Formatting Functions
@@ -451,13 +597,11 @@ function setBaseDocuments() {
 // - If the document was created more than one month ago it specifies the full date
 // eg: On 07/12/2021
 
-function formatDates() {
-    document.querySelectorAll('.card-element').forEach((doc) => {
-        let date = doc.querySelector(".creation-date")
-        let editdate = doc.querySelector(".edit-date");
-        editdate.innerHTML = formatTime(editdate.innerHTML)
-        date.innerHTML = formatTime(date.innerHTML)
-    })
+function format_Doc_dates(doc) {
+    let date = doc.querySelector(".creation-date")
+    let editdate = doc.querySelector(".edit-date");
+    editdate.innerHTML = formatTime(editdate.innerHTML)
+    date.innerHTML = formatTime(date.innerHTML)
 }
 
 function formatTime(date) {
@@ -483,11 +627,11 @@ function formatTime(date) {
         return "Yesterday at " + hour + ":" + minutes;
     }
     
-    if ((((now.getTime() - date.getTime()) / 86400000) <= 7) && ((now.getTime() - date.getTime()) / 86400000) >= 2){
+    if ((((now.getTime() - date.getTime()) / 86400000) <= 7) && ((now.getTime() - date.getTime()) / 86400000) >= 2) {
         return Math.floor(((now.getTime() - date.getTime()) / 86400000)) + " days ago"
     }
 
-    if ((((now.getTime() - date.getTime()) / (86400000 * 7)) <= 4) && ((now.getTime() - date.getTime()) / (86400000 * 7) >= 1)){
+    if ((((now.getTime() - date.getTime()) / (86400000 * 7)) <= 4) && ((now.getTime() - date.getTime()) / (86400000 * 7) >= 1)) {
         return Math.floor(((now.getTime() - date.getTime()) / (86400000 * 7))) + " weeks ago"
     }
 
@@ -506,11 +650,11 @@ function checkLess(n) {
  * insertionSort takes an array of integers and sorts it in numerical order
  * @param {Array[Integer]} a the array of integers to be sorted 
  */
-function insertionSort(a){
-    for(let i = 1; i < a.length; i++){
+function insertionSort(a) {
+    for(let i = 1; i < a.length; i++) {
         let value = a[i];
         let j = i - 1;
-        while (j >= 0 && a[j] > value){
+        while (j >= 0 && a[j] > value) {
             a[j + 1] = a[j];
             j--;
         }
@@ -520,28 +664,90 @@ function insertionSort(a){
 
 
 
+function generateDocumentCard(doc) {
+    var el = `<article id="${doc._id}" class="card-element">
+                    <a id="icon" href="docs/${doc._id}>">
+                        <img src="/media/svg/notebook_icon.svg" alt="Card image cap">
+                    </a>
+                    <span class="title">${doc.title}</span>
+                    
+                    <p class="actual-creation-date">${doc.created_date}</p>
+                    <span class="info creation-date">${doc.created_date}</span>
+                    
+                    <p class="actual-edit-date">${doc.edit_date}</p>
+                    <span class="info edit-date">${doc.edit_date}</span>
+                    <span class="info"></span>
+                    
+                    <p class="owner">${doc.owner}</p>
+                    <span class="info owner"></span>
+                    <a class="delete" data-delete_action="docs/${doc._id}" type="button" class="btn btn-primary"
+                       data-toggle="modal" data-target="#confirm-deletion-modal">
+                        <img src="/media/svg/delete.svg" class="svgimgform"></img>
+                    </a>`
 
+    let doc_perms = []
+    doc_perms.push(`
+        <a class="dropdown-item user" href="#">
+            <span class="user">${doc.owner}</span>
+            <span class="role">owner</span>
+        </a>`)
+    doc.perm_edit.forEach(u=>{
+        if (String(doc.owner) != String(u)) {
+            doc_perms.push(`
+            <a class="dropdown-item user" href="#">
+                <span class="user">${u}</span>
+                <span class="role">edit</span>
+            </a> `)
+        }
+    })
+    doc.perm_read.forEach(u=>{
+        if (String(doc.owner) != String(u)) {
+            let contained = false;
+            doc_perms.forEach(p=>{
+                if (p.includes(String(u))) {
+                    contained = true;
+                }
+            });
+            if (!contained) {
+                doc_perms.push(`
+                    <a class="dropdown-item user" href="#">
+                        <span class="user">${u}</span>
+                        <span class="role">read</span>
+                    </a>`);
+            }
+        }
+    })
+    el += `<p class="shared">
+            ${doc_perms.length - 1}</p>
+            <a class="perms" id="end" href="#" data-html="true" data-placement="top" data-toggle="popover"
+               data-trigger="hover" data-title='<div class="popovertitle">Shared with</div>'
+               data-content='`
 
+                doc_perms.forEach(usr=> {
+                    el += `${usr}`
+                })
+                if (doc_perms.length == 1) {
+                    el += `<a class="dropdown-item doc">Document not shared</a>`
+                }
+                el += `'>${doc_perms.length-1} <img id="shared" src="/media/svg/share.svg" alt="Options"></a>
+                                <a class="options" id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title='<div class="popovertitle">Document Information</div>'
+                                    data-content="<span>Created on: ${doc.created_date.toDateString()}</span><br>
+                                    <span>Owner: ${doc.owner} </span><br>
+                                    <span>Size: ${ doc.size}  </span>
+                                    "><img id="threedots" src="/media/svg/options.svg" alt="Options"></a>
+    </article>`
+    return el
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function checkAmountOfDocuments() {
+    var n = document.body.querySelectorAll("#table-of-documents .card-element:not([hidden])").length
+    document.querySelector("#no-documents").hidden = n<1?false:true;
+}
 
 
 ///////////////////////////////// TESTING
 
-// document.querySelector("#send_put").addEventListener('submit',function(e){
+// document.querySelector("#send_put").addEventListener('submit',function(e) {
 //     e.preventDefault();
     
 //     fetch(`/docs/61b5f0ea7c3c3522425dfb72`,{
