@@ -285,7 +285,7 @@ function SelectionUpdater() {
 function generateSelectionDecorations(doc) {
     let decos = [];
     for (let clientData of Object.entries(connectedClients)) {
-        if (clientData[0] === socket.id) continue;
+        if (clientData[0] === socket.id || clientData[1].permission === 'READ') continue;
 
         // As we send anchor and head instead of from and to, we should perform an additional check
         let from = clientData[1].selection.from < clientData[1].selection.to ?
