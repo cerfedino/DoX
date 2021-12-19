@@ -2,17 +2,21 @@
 
     <div id="logo" onclick="window.location='/docs';"></div>
 
-
     <% if(extra) { %>
         <div id="extra">
 
             <% if (extra === "search") { %>
                 <input id="search" type="text" placeholder="Search...">
 
-
             <% } else if ( extra === "editor") { %>
 
-                <h1 id="doc-title" data-bs-toggle="modal" data-bs-target="#renameModal"><%= doc.title %></h1>
+                <h1>
+                    <a class="text-decoration-none text-black" href="" data-bs-toggle="modal"
+                       data-bs-target="#renameModal">
+                        <i data-bs-toggle="tooltip" data-bs-placement="top" title="Rename document"
+                           class="bi-pencil-square"></i></a>
+                    <span id="doc-title"><%= doc.title %></span>
+                </h1>
 
                 <!-- <div style="display: flex;">
                     <button>Share</button>
@@ -24,59 +28,113 @@
                         </button>
                     </div>
                 </div> -->
+                <div class="dropstart">
+                    <button type="button" class="btn btn-primary p-4" data-bs-offset="0, 7"
+                            id="active-users-button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-people-fill"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="active-users-button" id="active-users"
+                        style="width: 300px">
 
-                <button type="button-share" class="btn btn-warning px-3"><i class="bi bi-people"></i></button>
-
+                    </ul>
+                </div>
             <% } %>
         </div>
     <% } %>
 
-
     <div id="profile_pic">
         <% if (isUserAuthenticated) { %>
-            <!-- <img id="profile_pic" src='<%= user.profile_pic %>' onerror="if (this.src != './media/profile_pics/img_avatar.png') this.src = '../media/profile_pics/img_avatar.png';"alt="<%= user.username %>"> -->
-            <img id="profile_pic" src='./media/profile_pics/<%= user._id %>.png' onerror="if (this.src != './media/profile_pics/img_avatar.png') this.src = '../media/profile_pics/img_avatar.png';"alt="<%= user.username %>">
-
-            <!-- <img id="profile_pic" src="<%= user.profile_pic %>" alt="<%= user.username %>"> -->
+            <img id="profile_pic" src='/media/profile_pics/<%= user._id %>.png' onerror="this.src = '/media/profile_pics/img_avatar.png'" alt="<%= user.username %>">
         <% } %>
     </div>
-    
-    
+
+
     <div class="modal-user">
         <div class="modal-content">
-            
+
             <div class="modal-header">
-                <img id="profile_pic" src='./media/profile_pics/img_avatar.png' onerror="if (this.src != './media/profile_pics/img_avatar.png') this.src = '../media/profile_pics/img_avatar.png';"alt="<%= user.username %>">
-                <!-- <img id="profile_pic" src="<%= user.profile_pic %>" alt="<%= user.username %>"> -->
+                <img id="profile_pic" onclick="change_picture()" src='/media/profile_pics/<%= user._id %>.png' onerror="this.src = '/media/profile_pics/img_avatar.png'" alt="<%= user.username %>">
             </div>
+            
             <div class="modal-body">
                 <div id="info">
                     <h2><%= user.username %></h2>
                     <p><%= user.email %></p>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="change_username()">Edit username</button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="change_password()">Edit password</button>
+                    
 
                 </div>
-                <form style="display:none" method="post" action="/user?_method=PUT" encType="multipart/form-data">
+                <!-- <form style="display:none" method="post" action="/user?_method=PUT" encType="multipart/form-data">
                     <div>
                         <p style="margin:0; text-align:left; color: rgb(117,117,117);"> New username:</p>
                         <input type="text" id="username" name='username' value="<%= user.username %>">
                     </div>
                     <div>
-                        <input style="border: 1px solid #c9c9c9; border-radius:3px;" type="password" id="password" name="password" placeholder="New password">
+                        <input style="border: 1px solid #c9c9c9; border-radius:3px;" type="password" id="password"
+                               name="password" placeholder="New password">
                     </div>
                     <div>
-                        <input style="border: 1px solid #c9c9c9; border-radius:3px;" type="password" id="cpassword" name="cpassword" placeholder="Confirm password">
+                        <input style="border: 1px solid #c9c9c9; border-radius:3px;" type="password" id="cpassword"
+                               name="cpassword" placeholder="Confirm password">
                     </div>
-                    
+
                     <div class="form-floating">
                         <input type="file" id="img" name="file">
                     </div>
-        
+
                     <div>
                         <input type="submit" id="profilemodal" class="btn btn-sm btn-warning">
                     </div>
+                </form> -->
+                <form id="changeusernameform" style="display: none" method="post" action="/user/changeusername?_method=PUT">
+                    <div>
+                        <p style="margin:0; text-align:left; color: rgb(117,117,117);"> New username:</p>
+                        <input type="text" id="username" name='username' value="<%= user.username %>">
+                    </div>
+                    <div>
+                        <button type="button" onclick="show_user_info()" class="btn btn-sm btn-warning">Cancel</button>
+                        <input type="submit" class="btn btn-sm btn-warning">
+                        <div id="useralertsmodal"></div>
+                    </div>
                 </form>
-                
-                
+
+                <form id="changepasswordform" style="display: none" method="post" action="/user/changepassword?_method=PUT">
+                    <div>
+                        <input type="password" id="password" name='password' placeholder="New password">
+                        <input type="password" id="cpassword" name='password' placeholder="Confirm password">
+                    </div>
+                    <div>
+                        <button type="button" onclick="show_user_info()" class="btn btn-sm btn-warning">Cancel</button>
+                        <input type="submit" class="btn btn-sm btn-warning">
+                        <div id="passwordalertsmodal"></div>
+                    </div>
+                </form>
+
+                <form id="changepictureform" style="display: none" method="post" action="/user/changepicture?_method=PUT" encType="multipart/form-data">
+                    <div class="form-floating">
+                        <input type="file" id="img" name="file">
+                    </div>
+                    <div>
+                        <button type="button" onclick="show_user_info()" class="btn btn-sm btn-warning">Cancel</button>
+                        <input type="submit" class="btn btn-sm btn-warning">
+                        <div id="picturealertsmodal"></div>
+                    </div>
+                </form>
+
+                <form id="changeemailform" style="display: none" method="post" action="/user/changeemail?_method=PUT">
+                    <div>
+                        <input type="text" id="email" name='email' placeholder="New email">
+                        <input type="text" id="cemail" name='cemail' placeholder="Confirm email">
+                    </div>
+                    <div>
+                        <button type="button" onclick="show_user_info()" class="btn btn-sm btn-warning">Cancel</button>
+                        <input type="submit" class="btn btn-sm btn-warning">
+                        <div id="emailalertsmodal"></div>
+                    </div>
+                </form>
+
+
             </div>
             <div class="modal-footer">
                 <div class="dark-mode">
@@ -84,44 +142,42 @@
                     <label for="dark-mode">Dark mode</label>
                 </div>
                 <div id="button">
-                    <button class="btn btn-sm btn-warning" onclick="show_edit_user_form()">Edit</button>
+                    <button class="btn btn-sm btn-warning" onclick="change_email()">Edit email</button>
                 </div>
 
                 <form action="/auth/logout?_method=DELETE" method="post" class="logout">
-                    <input type="submit" class="btn btn-sm btn-danger" value="Log out"></input> 
+                    <input type="submit" class="btn btn-sm btn-danger" value="Log out"></input>
                 </form>
-                
+
             </div>
         </div>
     </div>
-    
+
 </header>
 
-<script src="/js/common.mjs"></script>
 
 <script>
     // Get the modal
     var modal = document.querySelector(".modal-user");
-    
+
     // Get the button that opens the modal
     var btn = document.getElementById("profile_pic");
-    
+
     // When the user clicks the button, open the modal 
-    btn.onclick = function() {
-      modal.style.display = "block";
+    btn.onclick = function () {
+        modal.style.display = "block";
     }
-    
+
     // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
     }
 
     function show_user_info() {
         document.querySelector('.modal-body #info').style = "display:block";
-        document.querySelector('.modal-body form').style = "display:none";
-        document.querySelector('.modal-footer #button').innerHTML = `<button onclick="show_edit_user_form()" class="btn btn-sm btn-warning">Edit</button>`;
+        document.querySelectorAll('.modal-body form').forEach((form) => form.style.display = "none");
 
     }
 
@@ -131,5 +187,30 @@
         document.querySelector('.modal-footer #button').innerHTML = `<button onclick="show_user_info()" class="btn btn-sm btn-warning">Cancel</button>`;
     }
 
+    function change_username() {
+        document.querySelector('.modal-body #info').style = "display:none";
+        document.getElementById("changeusernameform").style = "display:block";
+    }
+
+    function change_password() {
+        document.querySelector('.modal-body #info').style = "display:none";
+        document.getElementById("changepasswordform").style = "display:block";
+    }
+
+    function change_picture() {
+        document.querySelector('.modal-body #info').style = "display:none";
+        document.getElementById("changepictureform").style = "display:block";
+    }
+
+    function change_email() {
+        document.querySelector('.modal-body #info').style = "display:none";
+        document.getElementById("changepasswordform").style = "display:none";
+        document.getElementById("changeusernameform").style = "display:none";
+        document.getElementById("changepictureform").style = "display:none";
+        document.getElementById("changeemailform").style = "display:block";
+    }
+
 </script>
+
+
 

@@ -62,7 +62,7 @@ function user_count(filter={}) {
 /**
  * Counts the documents in the database that meet a specific filter.
  * @param filter the filter to count matching documents with.
- * @returns {number} the number of elements matching that filter.
+ * @returns {Promise<number>} the number of elements matching that filter.
  */
 function doc_count(filter={}) {
     return model.docs.countDocuments(filter)
@@ -102,7 +102,7 @@ function user_create(username, email, password, token = '', returnnew = true) {
             joined_date: new Date()
         }
         model.users.insertOne(new_user).then(() => {
-            console.log("[+] Inserted user:",new_user)
+            console.log("[+] Inserted user")
             send_event("notify-update","add",{type:"user",_id:new_user._id.toHexString()})
             resolve(returnnew? new_user : undefined)
         });
@@ -131,6 +131,10 @@ function doc_create(owner_id, title = "Untitled", returnnew = true) {
         const new_doc = {
             title : title,
 
+            char_count: 0,
+            char_count_noSpaces: 0,
+            word_count: 0,
+
             content: {
                 "type": "doc",
                 "content": [
@@ -153,7 +157,7 @@ function doc_create(owner_id, title = "Untitled", returnnew = true) {
         }
 
         model.docs.insertOne(new_doc).then( (res) => {
-            console.log("[+] Inserted doc:",new_doc)
+            console.log("[+] Inserted doc")
 
             send_event("notify-update","add",{type:"document",_id:new_doc._id.toHexString()})
             resolve(returnnew? new_doc: undefined)
@@ -355,13 +359,24 @@ function doc_add_permissions(doc_id, perms = {perm_read_add: [], perm_edit_add: 
         if (!(await doc_exists({_id: doc_id})))
             reject("Document does not exist")
 
-        model.docs.findOneAndUpdate (
-            {_id :doc_id},
-            { edit_date : new Date(), 
-              $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
-                           perm_read: { $each: perms.perm_read_add || []} }})
+        // Checks whether this operation will change something in the database or if it is redundant
+        const redundant = await doc_exists(
+            {
+                _id :doc_id,
+                "$expr": {"$setEquals" : [ [],  {"$setDifference": [perms.perm_edit_add,"$perm_edit"]},
+                                                {"$setDifference": [perms.perm_read_add,"$perm_read"]}] }
+            })
+        if(!redundant) {
+            await model.docs.findOneAndUpdate (
+                {_id :doc_id},
+                { $set: {edit_date : new Date()},
+                    $addToSet: { perm_edit: { $each: perms.perm_edit_add || []},
+                        perm_read: { $each: perms.perm_read_add || []}
+                    }
+                })
 
-        send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
+            send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
+        }
         resolve(returnnew ? await doc_find({_id:doc_id}) : undefined)
     })
 }
@@ -383,16 +398,26 @@ function doc_remove_permissions(doc_id, perms = {perm_read_remove: [], perm_edit
         if (!(await doc_exists({_id: doc_id})))
             reject("Document does not exist")
 
-      console.log(await model.docs.findOne({_id : doc_id}))
-        model.docs.findOneAndUpdate (
-            {_id : doc_id},
-            {  edit_date : new Date(),
-               "$pullAll": { perm_edit: perms.perm_edit_remove || [],
-                    perm_read: perms.perm_read_remove || [] }})
+        // Checks whether this operation will change something in the database or if it is redundant
+        const redundant = await doc_count(
+            {
+                _id : doc_id,
+                "$expr" : {"$and" :[{"$setEquals": ["$perm_edit", {"$setDifference": ["$perm_edit", perms.perm_edit_remove]}]},
+                                    {"$setEquals": ["$perm_read", {"$setDifference": ["$perm_read", perms.perm_read_remove]}]} ]}
+            })
+        if(!redundant) {
+            await model.docs.findOneAndUpdate(
+                { _id: doc_id },
+                {
+                    $set: {edit_date: new Date()},
+                    "$pullAll": {
+                        perm_edit: perms.perm_edit_remove || [],
+                        perm_read: perms.perm_read_remove || []
+                    }
+                })
 
-        send_event("notify-update","change",{type:"document",_id:doc_id.toHexString()},perms)
-        console.log(await model.docs.findOne({_id : doc_id}))
-
+            send_event("notify-update", "change", {type: "document", _id: doc_id.toHexString()}, perms)
+        }
         resolve(returnnew ? await doc_find({_id: doc_id}) : undefined)
     })
 }

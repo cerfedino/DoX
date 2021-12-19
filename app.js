@@ -53,6 +53,8 @@ app.use(express.json());    // parse application/json
 app.use(methodOverride('_method'));
 app.use(fileUpload());
 
+require('./ejs-compile.js')
+
 app.set('view engine', 'ejs');
 
 // INIT session

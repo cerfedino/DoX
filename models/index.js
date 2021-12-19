@@ -54,7 +54,6 @@ MongoClient
             model[k] = model.db.collection(k)
         })
         console.log("[+] Fetched MongoDB database and collections")
-        // require('./sync').check(model.music, "public/music").then(console.log);
     })
 
 exports.model = model

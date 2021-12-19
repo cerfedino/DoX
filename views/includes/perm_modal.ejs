@@ -1,0 +1,111 @@
+<% 
+if(!doc)
+    throw "doc is not defined"
+%> 
+
+<!-- Share and manage perms modal -->
+<% let doc_share_perms = []
+doc_share_perms.push(`
+    <tr class="user">
+        <td> <span class="user" data-id=${doc.owner}>${doc.owner}</span> </td>
+        
+        <td class="perm">
+            <select class="form-select" name="permission" disabled>
+                <option value="read">read</option>
+                <option value="edit">write</option>
+                <option value="owner" selected>owner</option>
+            </select>
+        </td>
+    </tr>`)
+doc.perm_edit.forEach(u=>{
+    if (String(doc.owner) != String(u)) {
+
+        let entry = `<tr class="user">
+            <td> <span class="user" data-id=${u}>${u}</span> </td>
+            <td class="perm">`
+
+        if (doc.owner == userid) {
+            entry += '<select class="form-select" name="permission">'
+        } else { 
+            entry +='<select class="form-select" name="permission" disabled>'
+        }
+        entry += `<option value="read">read</option>
+                <option value="edit" selected>write</option>
+                <option value="noperm">remove user</option>
+            </select>
+        </td>
+        </tr>`
+        doc_share_perms.push(entry)
+    }
+})
+doc.perm_read.forEach(u=>{
+    if (String(doc.owner) != String(u)) {
+        let contained = false;
+        doc_share_perms.forEach(p=>{
+            if (p.includes(String(u))) {
+                contained = true;
+            }
+        });
+        if (!contained) {
+            let entry = `<tr class="user">
+                <td> <span class="user" data-id=${u}>${u}</span> </td>
+                <td class="perm">`
+    
+            if (doc.owner == userid) {
+                entry += '<select class="form-select" name="permission">'
+            } else { 
+                entry +='<select class="form-select" name="permission" disabled>'
+            }
+            entry += `<option value="read" selected>read</option>
+                    <option value="edit">write</option>
+                    <option value="noperm">remove user</option>
+                </select>
+            </td>
+            </tr>`
+            doc_share_perms.push(entry)
+        }
+    }
+}) %>
+
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="inserLinkLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <% if (doc.owner == userid) { %>
+                    <h4 class="modal-title">Edit document permissions</h4>
+                <% } else { %>
+                    <h4 class="modal-title">Shared with</h4>
+                <% } %>
+
+
+            </div>
+            <div class="modal-body">
+                <div id="no_user" hidden>Username does not exists</div>
+    
+                <% if (doc.owner == userid) { %>
+                    <form action="">
+                        <input id="perm_modal_search" name="perm_modal_search" type="text" class="form-control" required placeholder="enter username">
+                    </form>
+                <% } %>
+                
+                <table class="table" style="table-layout: fixed;">
+                    <tbody>
+                        <% for(idx in doc_share_perms) { %>
+                            <%- doc_share_perms[idx] %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <!-- <div class="modal-footer"> -->
+                <!-- <h5 class="modal-title" id="confirm-deletion-modalLabel"><span>Generate public link:</span></h5>
+                read-only
+                edit -->
+
+                <!-- <form id="send_put">
+                    <input type="submit" value="Submit"> </form>
+                </form> -->
+            <!-- </div> -->
+        </div>
+    </div>
+    <script src="/js/perm_modal.js"  onload="init_perm_modal()"></script>
+</div>
