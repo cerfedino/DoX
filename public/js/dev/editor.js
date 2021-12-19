@@ -196,7 +196,7 @@ socket.on('client-disconnect', id => {
     )
 })
 socket.on('update', ({version, steps, stepClientIDs}) => {
-    console.info(`Received UPDATE event. Version: ${version}. With data: `, steps, stepClientIDs);
+    // console.info(`Received UPDATE event. Version: ${version}. With data: `, steps, stepClientIDs);
     let currentVersion = collab.getVersion(editor.state);
     let newSteps = steps.slice(currentVersion).map(step => Step.fromJSON(schema, step));
     let newClientIDs = stepClientIDs.slice(currentVersion);
@@ -615,7 +615,7 @@ function initEditor(doc, version, readonly = false) {
                 editorView.updateState(newState);
                 let sendable = collab.sendableSteps(newState);
                 if (sendable) {
-                    console.info('Emitting UPDATE event with data: ', sendable);
+                    // console.info('Emitting UPDATE event with data: ', sendable);
                     socket.emit('update', sendable);
                 }
             }
