@@ -60,7 +60,11 @@ function setNotifyUpdateListeners() {
                         .finally(checkAmountOfDocuments)
                     break;
                 case "remove":
+                    document.querySelectorAll(`.card-element[id="${ev.subject._id}"]`).forEach(doc=>doc.remove())
+                    checkAmountOfDocuments()
                 case "unavailable":
+                    if(ev.data.message != "no-read")
+                        break;
                     document.querySelectorAll(`.card-element[id="${ev.subject._id}"]`).forEach(doc=>doc.remove())
                     checkAmountOfDocuments()
                     break;
