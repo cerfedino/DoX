@@ -70,7 +70,7 @@ class MenuView {
         }
 
         // Update color picker and font size picker
-        let pos = this.editorView.state.selection.$head;
+        let pos = this.editorView.doc.resolve(this.editorView.state.selection.head + 1);
         let color = '#000000'
         let size = '16';
         console.log(pos.marks());
