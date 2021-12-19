@@ -501,7 +501,7 @@ router.put("/user/changeemail", checkAuthenticated, async (req, res) => {
     
         let tkn = generate_random_token();
         tags.token = tkn;
-        let verification_link = `${config.webserver.https_enabled ? 'https:' : 'http:'}//${config.webserver.domain}${config.webserver.https_enabled?":80":":"+config.webserver.port}/auth/changeemail/${req.user.user_id}/${tkn}`
+        let verification_link = `${config.webserver.https_enabled ? 'https:' : 'http:'}//${config.webserver.domain}${config.webserver.https_enabled?"":":"+config.webserver.port}/auth/changeemail/${req.user.user_id}/${tkn}`
         mailing.send_email_change(u, req.body.email, verification_link)
     }
 
