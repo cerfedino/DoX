@@ -89,7 +89,7 @@ DoX, Lugano, Switzerland, ${new Date().toUTCString()}
  */
 function generate_html_message(user, address, verification_link) {
 	return `<!DOCTYPE html>
-	<header style="padding:30px; background-color: #E63946;"><h1>DoX (logo?)</h1></header>
+	<header style="padding:30px; background-color: #E63946;"><h1 style="text-align: center; color:white">DoX</h1></header>
 	
 	<div style="border: 1px solid gray; border-radius: 20px; margin:20px 10%; padding:20px; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;" >
 		
@@ -134,7 +134,7 @@ function generate_html_message(user, address, verification_link) {
  */
  function generate_email_html_message(user, address, verification_link) {
 	return `<!DOCTYPE html>
-	<header style="padding:30px; background-color: #E63946;"><h1>DoX (logo?)</h1></header>
+	<header style="padding:30px; background-color: #E63946;"><h1 style="text-align: center; color:white">DoX</h1></header>
 	
 	<div style="border: 1px solid gray; border-radius: 20px; margin:20px 10%; padding:20px; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;" >
 		
@@ -220,6 +220,4 @@ function send_mail(user, address, verification_link) {
 }
 
 
-
-module.exports = {send_mail};
-module.exports = {send_email_change}
+module.exports = {send_mail, send_email_change}
