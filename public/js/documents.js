@@ -736,6 +736,8 @@ function generateDocumentCard(doc) {
 function checkAmountOfDocuments() {
     var n = document.body.querySelectorAll("#table-of-documents .card-element:not([hidden])").length
     document.querySelector("#no-documents").hidden = n<1?false:true;
+    document.querySelector("#table-of-documents").hidden = n<1?true:false;
+    
 }
 
 
