@@ -313,7 +313,7 @@ router.put('/docs/:id', checkAuthenticated, async (req,res)=> {
         delete tags.perm_read_remove; delete tags.perm_edit_remove
     }
     //
-    if(Object.keys(tags) > 0)
+    if(Object.keys(tags).length > 0)
         await dbops.doc_set(ObjectId(req.params.id), tags, false)
     console.log("[+] Updated document")
     req.flash("messageSuccess","Document has been updated")
