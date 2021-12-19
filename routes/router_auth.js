@@ -70,8 +70,45 @@ router.get('/verify/:id/:token', async function(req, res) {
     }
 })
 
+router.get('/changeemail/:id/:token', async function(req, res) {
 
+    if (!ObjectId.isValid(req.params.id)) {
+        if(req.accepts("text/html")) {
+            res.status(404).render('../views/error.ejs', {s: 404, m: `Invalid user ID. Check if there is a typo in: ${req.url}`});
+        } else {
+            res.status(404).send(`Invalid user ID. Check if there is a typo in: ${req.url}`).end();
+        }
+        return
+    }
 
+    let user = await dbops.user_find({_id : ObjectId(req.params.id)});
+    if (!user) { // this case should not happen (only if the user manually modify the link)
+        if(req.accepts("text/html")) {
+            res.status(404).render('../views/error.ejs', {s: 404, m: `Invalid user ID. Check if there is a typo in: ${req.url}`});
+        } else {
+            res.status(404).send(`Invalid user ID. Check if there is a typo in: ${req.url}`).end();
+        }
+        return
+    }
+
+    let tags = {}
+
+    if (user.token == req.params.token) {
+        tags.email = user.tmp_email;
+        dbops.user_set(new ObjectId(req.params.id), tags).then(newuser => {
+            
+            req.flash('messageSuccess', 'Email changed!')
+            res.redirect('/docs');
+        })
+    } else {
+        if(req.accepts('text/html')) {
+            res.status(401).render('../views/error.ejs', {s: 401, m: `Token does not match. Check if there is a typo in: ${req.url}`});
+        } else {
+            res.status(401).send(`Token does not match. Check if there is a typo in: ${req.url}`).end();
+        }
+        
+    }
+})
 
 // ###############
 // POST REQUESTS
