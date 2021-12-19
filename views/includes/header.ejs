@@ -44,7 +44,7 @@
 
     <div id="profile_pic">
         <% if (isUserAuthenticated) { %>
-            <img id="profile_pic" src='/media/profile_pics/<%= user._id %>.png' alt="<%= user.username %>">
+            <img id="profile_pic" src='/media/profile_pics/<%= user._id %>.png' onerror="this.src = '/media/profile_pics/img_avatar.png'" alt="<%= user.username %>">
         <% } %>
     </div>
 
@@ -53,7 +53,7 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <img id="profile_pic" onclick="change_picture()" src='/media/profile_pics/<%= user._id %>.png' alt="<%= user.username %>">
+                <img id="profile_pic" onclick="change_picture()" src='/media/profile_pics/<%= user._id %>.png' onerror="this.src = '/media/profile_pics/img_avatar.png'" alt="<%= user.username %>">
             </div>
             
             <div class="modal-body">
