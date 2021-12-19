@@ -78,6 +78,7 @@ header {
     background-color: var(--bg);
     /* box-shadow: 0 10px 30px 15px var(--bg-contrast); */
     margin-bottom: 20px;
+    z-index: 99999999;
 }
 
 header #logo {
@@ -253,7 +254,6 @@ button.close span {
     }
 }
 
-
 .modal-user .modal-body input {
     width: 100%;
     margin-bottom: 10px;
@@ -319,5 +319,4 @@ input[type=file]:active::before {
 .modal-content input.form-control {
     color: var(--contrast-text);
     background-color: var(--bg);
-
 }
