@@ -7,7 +7,11 @@ function init_perm_modal() {
         fetch('/users/' + id)
         .then(res=>res.json())
         .then(user=>{
-            userDOM.innerHTML = user.username;
+            if (user.username == document.querySelector('#info > h2').innerHTML) {
+                userDOM.innerHTML = "<i>me</i>";
+            } else {
+                userDOM.innerHTML = user.username;
+            }
         })
         .catch(err=>{
             // invalid user;
@@ -15,6 +19,9 @@ function init_perm_modal() {
     })
 
     modal.querySelectorAll("tbody tr.user").forEach(row=>{setup_perm_row_listeners(row)})
+
+    // console.log("AAAAAAAAAAAAAAAAAAAAAA" + userid + "BBBBBBBBBBBBBBB" + doc)
+    // modal.querySelectorAll("tbody tr.user").forEach(row=>{setup_perm_row_listeners(row)})
 
     search_Field.parentNode.addEventListener('submit', function (e) {
         e.preventDefault()
