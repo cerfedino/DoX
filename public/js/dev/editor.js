@@ -176,6 +176,9 @@ socket.on('update', ({version, steps, stepClientIDs}) => {
     editor.dispatch(
         collab.receiveTransaction(editor.state, newSteps, newClientIDs)
     )
+    editor.dispatch(
+        editor.state.tr.setMeta('update-selections', true)
+    )
 })
 socket.on('save-success', () => {
     console.info('Received SAVE-SUCCESS event');
@@ -285,7 +288,6 @@ function generateSelectionDecorations(doc) {
                 from,
                 to,
                 {nodeName: 'span', class: `selection client-${clientData[0]}`}
-                //{style: `background-color: ${clientData[1].colors[0]}; color: ${clientData[1].colors[1]}`}
             ))
         }
     }
@@ -446,8 +448,7 @@ document.getElementById('font-size-picker').addEventListener('change', (e) => {
     const sizeEl = document.getElementById('font-size-picker');
     let val = Number(sizeEl.value);
 
-    if (isNaN(val)) val = 16;
-    if (val <= 0) val = 1;
+    if (isNaN(val) || val <= 0) val = 16;
 
     sizeEl.value = val;
     forceToggleMark(schema.marks.fontSize, {size: val + 'px'})(editor.state, editor.dispatch);
