@@ -2,17 +2,21 @@
 
     <div id="logo" onclick="window.location='/docs';"></div>
 
-
     <% if(extra) { %>
         <div id="extra">
 
             <% if (extra === "search") { %>
                 <input id="search" type="text" placeholder="Search...">
 
-
             <% } else if ( extra === "editor") { %>
 
-                <h1 id="doc-title" data-bs-toggle="modal" data-bs-target="#renameModal"><%= doc.title %></h1>
+                <h1>
+                    <a class="text-decoration-none text-black" href="" data-bs-toggle="modal"
+                       data-bs-target="#renameModal">
+                        <i data-bs-toggle="tooltip" data-bs-placement="top" title="Rename document"
+                           class="bi-pencil-square"></i></a>
+                    <span id="doc-title"><%= doc.title %></span>
+                </h1>
 
                 <!-- <div style="display: flex;">
                     <button>Share</button>
@@ -24,26 +28,32 @@
                         </button>
                     </div>
                 </div> -->
+                <div class="dropstart">
+                    <button type="button" class="btn btn-primary p-4" data-bs-offset="0, 7"
+                            id="active-users-button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-people-fill"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="active-users-button" id="active-users"
+                        style="width: 300px">
 
-                <button type="button-share" class="btn btn-warning px-3"><i class="bi bi-people"></i></button>
-
+                    </ul>
+                </div>
             <% } %>
         </div>
     <% } %>
 
-
     <div id="profile_pic">
         <% if (isUserAuthenticated) { %>
-            <img id="profile_pic" src='/media/profile_pics/<%= user._id %>.png' onerror="this.src = '/media/profile_pics/img_avatar.png'" alt="<%= user.username %>">
+            <img id="profile_pic" src='/media/profile_pics/<%= user._id %>.png' alt="<%= user.username %>">
         <% } %>
     </div>
-    
-    
+
+
     <div class="modal-user">
         <div class="modal-content">
-            
+
             <div class="modal-header">
-                <img id="profile_pic" onclick="change_picture()" src='/media/profile_pics/<%= user._id %>.png' onerror="this.src = '/media/profile_pics/img_avatar.png'" alt="<%= user.username %>">
+                <img id="profile_pic" onclick="change_picture()" src='/media/profile_pics/<%= user._id %>.png' alt="<%= user.username %>">
             </div>
             
             <div class="modal-body">
@@ -61,16 +71,18 @@
                         <input type="text" id="username" name='username' value="<%= user.username %>">
                     </div>
                     <div>
-                        <input style="border: 1px solid #c9c9c9; border-radius:3px;" type="password" id="password" name="password" placeholder="New password">
+                        <input style="border: 1px solid #c9c9c9; border-radius:3px;" type="password" id="password"
+                               name="password" placeholder="New password">
                     </div>
                     <div>
-                        <input style="border: 1px solid #c9c9c9; border-radius:3px;" type="password" id="cpassword" name="cpassword" placeholder="Confirm password">
+                        <input style="border: 1px solid #c9c9c9; border-radius:3px;" type="password" id="cpassword"
+                               name="cpassword" placeholder="Confirm password">
                     </div>
-                    
+
                     <div class="form-floating">
                         <input type="file" id="img" name="file">
                     </div>
-        
+
                     <div>
                         <input type="submit" id="profilemodal" class="btn btn-sm btn-warning">
                     </div>
@@ -121,8 +133,8 @@
                         <div id="emailalertsmodal"></div>
                     </div>
                 </form>
-                
-                
+
+
             </div>
             <div class="modal-footer">
                 <div class="dark-mode">
@@ -134,34 +146,33 @@
                 </div>
 
                 <form action="/auth/logout?_method=DELETE" method="post" class="logout">
-                    <input type="submit" class="btn btn-sm btn-danger" value="Log out"></input> 
+                    <input type="submit" class="btn btn-sm btn-danger" value="Log out"></input>
                 </form>
-                
+
             </div>
         </div>
     </div>
-    
+
 </header>
 
-<script src="/js/common.mjs"></script>
 
 <script>
     // Get the modal
     var modal = document.querySelector(".modal-user");
-    
+
     // Get the button that opens the modal
     var btn = document.getElementById("profile_pic");
-    
+
     // When the user clicks the button, open the modal 
-    btn.onclick = function() {
-      modal.style.display = "block";
+    btn.onclick = function () {
+        modal.style.display = "block";
     }
-    
+
     // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
     }
 
     function show_user_info() {

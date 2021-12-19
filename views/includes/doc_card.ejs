@@ -1,0 +1,91 @@
+<%
+    if(!doc) {
+        throw "doc is not defined !"
+    }
+    if(typeof doc.created_date == "string") {
+        doc.created_date = new Date(doc.created_date)
+    }
+    if(typeof doc.edit_date == "string") {
+        doc.edit_date = new Date(doc.edit_date)
+    }
+%>
+<article id="<%= doc._id %>" class="card-element">
+    <a id="preview" href="docs/<%= doc._id %>" >
+        <img src='<%= doc.doc_preview %>'>
+    </a>
+    <a id="icon" href="docs/<%= doc._id %>" >
+        <img src="/media/svg/notebook_icon.svg" alt="Card image cap">
+    </a>
+    <span class="title"><%= doc.title %></span>
+    <p class="actual-creation-date"><%= doc.created_date %></p>
+    <span class="info creation-date"><%= doc.created_date %></span>
+    <p class="actual-edit-date"><%= doc.edit_date %></p>
+    <span class="info edit-date" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-content="<%= doc.created_date.toLocaleString() %>"><%= doc.edit_date %></span>
+    <span class="info"></span>
+    <span class="info owner" data-toggle="<%= doc.owner %>"></span>
+
+    <% if (doc.owner == userid) { %>
+        <a data-delete_action="docs/<%=doc._id%>" type="button" class="delete" data-toggle="modal" data-target="#confirm-deletion-modal" >
+            <img src="/media/svg/delete.svg" class="svgimgform"></img>
+        </a>
+    <% } %>
+
+    <% let doc_perms = []
+    doc_perms.push(`
+                            <a class="dropdown-item user" href="#">
+                                <span class="user">${doc.owner}</span>
+                                <span class="role">owner</span>
+                            </a>`)
+    doc.perm_edit.forEach(u=> {
+        if (String(doc.owner) != String(u)) {
+            doc_perms.push(`
+                                    <a class="dropdown-item user" href="#">
+                                        <span class="user">${u}</span>
+                                        <span class="role">edit</span>
+                                    </a>`)
+        }
+    })
+    doc.perm_read.forEach(u=>{
+        if (String(doc.owner) != String(u)) {
+            let contained = false;
+            doc_perms.forEach(p=>{
+                if (p.includes(String(u))) {
+                    contained = true;
+                }
+            });
+            if (!contained) {
+                doc_perms.push(`
+                                        <a class="dropdown-item user" href="#">
+                                            <span class="user">${u}</span>
+                                            <span class="role">read</span>
+                                        </a>`);
+            }
+        }
+    }) %>
+    <p class="shared"><%= doc_perms.length - 1 %></p>
+    <a class="perms" id="end" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title='<div class="popovertitle">Shared with</div>'
+       data-content='
+
+                        <% doc_perms.forEach(u=>{ %>
+                            <%- u %>
+                        <% })
+       if (doc_perms.length == 1) { %>
+                            <a class="dropdown-item doc">Document not shared</a>
+                        <% } %>
+
+                        '><%= doc_perms.length -1 %> <img id="shared" src="/media/svg/share.svg" alt="Options">
+    </a>
+
+    <a class="options" id="start" href="#" data-html="true" data-placement="top" data-toggle="popover" data-trigger="hover" data-title='<div class="popovertitle">Document Information</div>'
+       data-content="<span>Created on: <%= doc.created_date.toDateString() %></span><br>
+                        <span class='owner'>
+                            <span class='type'>Owner: </span>
+                            <span class='content'><%= doc.owner %></span>
+                        </span>
+                        <br>
+                        <span>Last edit: <%= doc.edit_date.toDateString() %></span><br>
+                        <span>words: <%= doc.word_count %> </span><br>
+                        <span>characters: <%= doc.char_count %> </span>
+
+                        "><img id="threedots" src="/media/svg/options.svg" alt="Options"></a>
+</article>

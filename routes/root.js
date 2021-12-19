@@ -100,7 +100,7 @@ router.get('/docs/new', checkAuthenticated, async function (req, res) {
 })
 
 /*
-    GET /docs/:id
+    GET /docs/:id?
     Renders the document edit view for the specified document.
     IF the user only has read access to it, renders accordingly.
         IF the user has NO access to it, denies access to it.
@@ -108,7 +108,6 @@ router.get('/docs/new', checkAuthenticated, async function (req, res) {
 router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
     // Check first if ObjectID is valid
     if (req.params.id && !ObjectId.isValid(req.params.id)) {
-        
         if(req.accepts("text/html")) {
             res.status(404).render('../views/error.ejs', {s: 404, m: `Invalid document ID. Check if there is a typo in: ${req.url}`});
         } else {
@@ -142,8 +141,7 @@ router.get('/docs/:id?', checkAuthenticated, async function (req, res) {
         }
     } else { // Render document list
         if(req.accepts("text/html")) {
-            console.log(await dbops.docs_available(ObjectId(req.user.user_id)))
-            res.status(200).render('../views/documents.ejs', 
+            res.status(200).render('../views/documents.ejs',
                 {
                     docs: await dbops.docs_available(ObjectId(req.user.user_id)),
                     user : await dbops.user_find({_id : ObjectId(req.user.user_id)})
@@ -177,6 +175,48 @@ router.get('/users/:id', async function (req, res){
     } else {
         res.status(406).end();
     }
+})
+
+
+/* 
+    GET /users?username=""
+    Returns the username matching the given user ID
+*/
+router.get('/users', checkAuthenticated, async function (req, res){
+    if(!req.query.username) {
+        res.status(400).end()
+    }
+    const user = await dbops.user_find({username : req.query.username},{_id:1});
+
+    if (req.accepts("application/json")){
+        if (user == undefined || user == null) {
+            res.status(404).end();
+        } else {
+            res.json(user);
+        }
+    } else {
+        res.status(406).end();
+    }
+})
+
+// Gets user profile picture based on ID
+router.get("/pic/users/:id", async function (req, res){
+    let id;
+    try {
+        id = ObjectId(req.params.id);
+    } catch(err) {
+        res.status(404).end();
+    }
+    let user = await dbops.user_find({_id : id});
+    if (user) { 
+        if (req.accepts("image/png")) {
+            res.sendFile(user.profile_pic);
+        } else {
+            console.log("err")
+        } 
+    } else {
+        res.status(404).end();
+    } 
 })
 
 // ###############
@@ -244,11 +284,9 @@ router.put('/docs/:id', checkAuthenticated, async (req,res)=> {
     if(tags.perm_read || tags.perm_edit) {
         var newperm = {}
         if(tags.perm_read)
-            newperm.perm_read = tags.perm_read
+            newperm.perm_read = await dbops.getValidObjectIds(tags.perm_read, dbops.isValidUser)
         if(tags.perm_edit)
-            newperm.perm_edit = tags.perm_edit
-
-        Object.keys(newperm).forEach(x=>newperm[x]=newperm[x].map(hex=>{return ObjectId(hex)}))
+            newperm.perm_edit = await dbops.getValidObjectIds(tags.perm_edit, dbops.isValidUser)
 
         await dbops.doc_set(ObjectId(req.params.id), newperm, false)
 
@@ -275,7 +313,8 @@ router.put('/docs/:id', checkAuthenticated, async (req,res)=> {
         delete tags.perm_read_remove; delete tags.perm_edit_remove
     }
     //
-    await dbops.doc_set(ObjectId(req.params.id), tags, false)
+    if(Object.keys(tags) > 0)
+        await dbops.doc_set(ObjectId(req.params.id), tags, false)
     console.log("[+] Updated document")
     req.flash("messageSuccess","Document has been updated")
     res.status(200).end()
@@ -307,7 +346,7 @@ function get_editable_doc_fields(obj={}) {
 }
 
 
-router.put("/user/changeusername", async (req, res) => {
+router.put("/user/changeusername", checkAuthenticated, async (req, res) => {
 
     let check = 0;
 
@@ -358,7 +397,7 @@ router.put("/user/changeusername", async (req, res) => {
 })
 
 
-router.put("/user/changepassword", async (req, res) => {
+router.put("/user/changepassword", checkAuthenticated, async (req, res) => {
 
     if (!ObjectId.isValid(req.user.user_id)) {
         res.status(400).send(`Invalid user ID.`);
@@ -388,8 +427,7 @@ router.put("/user/changepassword", async (req, res) => {
     
 })
 
-router.put("/user/changepicture", async (req, res) => {
-
+router.put("/user/changepicture", checkAuthenticated, async (req, res) => {
 
     if (!ObjectId.isValid(req.user.user_id)) {
         res.status(400).send(`Invalid user ID.`);
@@ -436,7 +474,7 @@ router.put("/user/changepicture", async (req, res) => {
     
 })
 
-router.put("/user/changeemail", async (req, res) => {
+router.put("/user/changeemail", checkAuthenticated, async (req, res) => {
     let u = ""
     if (!ObjectId.isValid(req.user.user_id)) {
         res.status(400).send(`Invalid user ID.`);
@@ -484,9 +522,10 @@ router.put("/user/changeemail", async (req, res) => {
 
     Updates user only if the request is coming from the user himself.
 */
-router.put('/user', async (req,res)=> {
+router.put('/user', checkAuthenticated, async (req,res)=> {
     let check = 1;
     let u = "";
+  
     if (!ObjectId.isValid(req.user.user_id)) {
         res.status(400).send(`Invalid user ID.`);
         return
@@ -547,23 +586,16 @@ router.put('/user', async (req,res)=> {
 
     if(check == 1) { 
         dbops.user_set(new ObjectId(req.user.user_id), tags).then(newuser => {
-
-            req.flash("messageSuccess","Username changed successfully!")
-            res.send(newuser);
-    
+          console.log("[+] Updated user")
+          req.flash("messageSuccess","User has been updated")
+          res.redirect("/docs");
         })
     } else {
         res.send({error: check})
     }
-    
-    
-    
 })
 
 
-
-
-  
 // ###############
 // DELETE REQUESTS
 // ###############
@@ -572,7 +604,7 @@ router.put('/user', async (req,res)=> {
     DELETE /docs/:id
     Deletes a document.
  */
-router.delete("/docs/:id", async (req, res) => {
+router.delete("/docs/:id", checkAuthenticated, async (req, res) => {
     
     // Check first if ObjectID is valid
     if (!ObjectId.isValid(req.params.id)) {

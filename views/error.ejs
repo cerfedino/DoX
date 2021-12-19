@@ -1,13 +1,4 @@
-<!-- trying to fix white flashes when opening a page using dark mode-->
-<script>
-    if (localStorage.getItem("dark_mode") == 'true') {
-        document.body.classList.add("dark-theme")
-        document.querySelector("#dark-mode-toggle").checked = true
-    } else {
-        document.body.classList.remove('dark-theme')
-        document.querySelector("#dark-mode-toggle").checked = false
-    }
-</script>
+
 
 <% 
 var messagesuccess = messageSuccess != '' ? `<script>showAlert(document.querySelector('#alerts'),"success","${messageSuccess}", true)</script>` : '';
@@ -30,28 +21,38 @@ var messagefailure = messageFailure != '' ? `<script>showAlert(document.querySel
     </style>
 </head>
 <body class="text-center">
-<script src="/socket.io/socket.io.js"></script>
-<script  onload="init_socket()" src="/js/socket.js"></script>
+    <!-- trying to fix white flashes when opening a page using dark mode-->
+    <script>
+        if (localStorage.getItem("dark_mode") == 'true') {
+            document.body.classList.add("dark-theme")
+            document.querySelector("#dark-mode-toggle").checked = true
+        } else if (document.body.classList.contains('dark-theme')) {
+            document.body.classList.remove('dark-theme')
+            document.querySelector("#dark-mode-toggle").checked = false
+        }
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script  onload="init_socket()" src="/js/socket.js"></script>
 
 
-<main class="login-form">
-    <svg id="logo" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595.06 133.62"><defs><style>.cls-1{font-size:175px;font-family:jumper_XBdIt, Jumper;font-weight:700;font-style:italic;}.cls-2{letter-spacing:-0.01em;}</style></defs><text class="cls-1" transform="translate(0 126.81)"><tspan class="cls-2"></tspan><tspan x="102.9" y="0">DoX</tspan></text></svg>
-    <p>ERROR <b><%= s %></b></p> 
-    <p><%= m %></p>
-    <a href="/docs"> Go back</a>
-    
-</main>
+    <main class="login-form">
+        <svg id="logo" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595.06 133.62"><defs><style>.cls-1{font-size:175px;font-family:jumper_XBdIt, Jumper;font-weight:700;font-style:italic;}.cls-2{letter-spacing:-0.01em;}</style></defs><text class="cls-1" transform="translate(0 126.81)"><tspan class="cls-2"></tspan><tspan x="102.9" y="0">DoX</tspan></text></svg>
+        <p>ERROR <b><%= s %></b></p> 
+        <p><%= m %></p>
+        <a href="/docs"> Go back</a>
+        
+    </main>
 
-<div id="alerts"></div>
+    <div id="alerts"></div>
 
-<input id="dark-mode-toggle" type="checkbox">
+    <input id="dark-mode-toggle" type="checkbox">
 
-<%- messagesuccess %>
-<%- messagefailure %>
+    <%- messagesuccess %>
+    <%- messagefailure %>
 
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
 </html>
 
