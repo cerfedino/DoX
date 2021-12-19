@@ -73,13 +73,27 @@ class MenuView {
         let pos = await this.editorView.state.doc.resolve(this.editorView.state.selection.head + 1);
         let color = '#000000'
         let size = '16';
-        console.log(pos.marks());
         for (let mark of pos.marks()) {
             if (mark.type === schema.marks.color) {
                 color = mark.attrs.color;
             } else if (mark.type === schema.marks.fontSize) {
                 size = mark.attrs.size.split('px')[0];
             }
+        }
+
+        const fontInc = document.getElementById('action-font-inc');
+        const fontDec = document.getElementById('action-font-dec');
+        const sizePicker = document.getElementById('font-size-picker');
+        if (currentLevel !== 'p') {
+            fontInc.classList.add('disabled');
+            fontDec.classList.add('disabled');
+            sizePicker.disabled = true;
+            sizePicker.readonly = true;
+        } else {
+            fontInc.classList.remove('disabled');
+            fontDec.classList.remove('disabled');
+            sizePicker.disabled = false;
+            sizePicker.readonly = false;
         }
         document.getElementById('action-pick-color').value = color;
     }
