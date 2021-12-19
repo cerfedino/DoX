@@ -51,7 +51,6 @@ const spec = {
 
 spec.nodes.heading.marks = 'link em strong underline color'
 
-debugger
 const base = new Schema(spec);
 const schema = new Schema({
     nodes: addListNodes(base.spec.nodes, 'paragraph block*', 'block'),
