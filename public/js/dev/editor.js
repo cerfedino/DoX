@@ -34,7 +34,7 @@ class MenuView {
         })
     }
 
-    update() {
+    async update() {
         let activeMarks = getActiveMarkCodes(this.editorView);
         let availableNodes = getAvailableBlockTypes(this.editorView, this.editorView.state.schema);
 
@@ -70,7 +70,7 @@ class MenuView {
         }
 
         // Update color picker and font size picker
-        let pos = this.editorView.doc.resolve(this.editorView.state.selection.head + 1);
+        let pos = await this.editorView.state.doc.resolve(this.editorView.state.selection.head + 1);
         let color = '#000000'
         let size = '16';
         console.log(pos.marks());
@@ -113,6 +113,19 @@ socket.on('init', async (data) => {
     console.info(data.document);
 
     editor = initEditor(schema.nodeFromJSON(data.document), data.version, data.permission === 'READ');
+    if (data.permission === 'READ') {
+        const toolbar = document.getElementById('actions');
+        for (const child of toolbar.children) {
+            if (child.id === 'toolbar-buttons') continue;
+            child.classList.add('d-none');
+        }
+        document.getElementById('button-share').classList.add('d-none');
+        document.getElementById('button-save').classList.add('d-none');
+
+        const text = document.createElement('span');
+        text.innerHTML = '<i class="bi-book"></i> You are in reading mode';
+        toolbar.insertBefore(text, document.getElementById('toolbar-buttons'));
+    }
 
     for (let client of Object.entries(data.connected)) {
         let usernameRes = await fetch('/users/' + client[1].userID, {
