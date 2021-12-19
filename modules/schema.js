@@ -2,34 +2,60 @@ const {addListNodes} = require("prosemirror-schema-list");
 const basicSchema = require("prosemirror-schema-basic");
 const {Schema} = require("prosemirror-model");
 
-// Base scheme loaded from prosemirror-scheme-basic and prosemirror-scheme-list
-let base = {
-    nodes: addListNodes(basicSchema.schema.spec.nodes, 'paragraph block*', 'block'),
-    marks: basicSchema.schema.spec.marks
+const spec = {
+    nodes: {
+        ...basicSchema.nodes,
+    },
+    marks: {
+        ...basicSchema.marks,
+        color: {
+            attrs: {
+                color: {default: '#000'}
+            },
+            toDOM(node) {
+                return ['span', {class: 'color', style: 'color: ' + node.attrs.color}]
+            },
+            parseDOM: [{
+                tag: 'span.color',
+                getAttrs(dom) {
+                    return {
+                        color: dom.style.split(': ')[1], // 'style="color: #fff", will return #fff
+                    }
+                }
+            }]
+        },
+        fontSize: {
+            attrs: {
+                size: {default: '16px'}
+            },
+            toDOM(node) {
+                return ['span', {class: 'font-size', style: 'font-size: ' + node.attrs.size}]
+            },
+            parseDOM: [{
+                tag: 'span.font-size',
+                getAttrs(dom) {
+                    return {
+                        size: dom.style.split(': ')[1],
+                    }
+                }
+            }]
+        },
+        underline: {
+            toDOM() {
+                return ['u', 0]
+            },
+            parseDOM: [{tag: 'u'}]
+        }
+    }
 }
 
-base.marks = base.marks.addToEnd('color', {
-    attrs: {
-        color: {default: '#000'}
-    },
-    toDOM(node) {
-        return ['span', {class: 'color', style: 'color: ' + node.attrs.color}]
-    },
-    parseDOM: [{
-        tag: 'span.color',
-        getAttrs(dom) {
-            return {
-                color: dom.style.split(': ')[1], // 'style="color: #fff", will return #fff
-            }
-        }
-    }]
+spec.nodes.heading.marks = 'link em strong underline color'
+
+debugger
+const base = new Schema(spec);
+const schema = new Schema({
+    nodes: addListNodes(base.spec.nodes, 'paragraph block*', 'block'),
+    marks: base.spec.marks
 });
-base.marks = base.marks.addToEnd('underline', {
-    toDOM() {
-        return ['u', 0]
-    },
-    parseDOM: [{tag: 'u'}]
-})
-let schema = new Schema(base);
 
 module.exports = schema;
