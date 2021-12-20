@@ -93,6 +93,10 @@ header #logo {
 
 @media only screen and (max-width: 1000px) {
     header #logo {
+        width: 50px;
+        min-width: 75px;
+        max-width: 75px;
+        margin-right: 50px;
         background-image: url('../media/svg/notebook_icon.svg');
     }
 }
