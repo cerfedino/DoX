@@ -133,7 +133,7 @@ module.exports.init = function (server) {
                             word_count: words,
                             content: memoryDocs[documentID].doc.toJSON(),
                         }
-                        if (doc.startsWith('data:image/png;base64')) {doc_tags_to_update.doc_preview = doc}
+                        if (doc?.startsWith('data:image/png;base64')) {doc_tags_to_update.doc_preview = doc}
                         await doc_set(new ObjectId(documentID), doc_tags_to_update)
                         console.info(`SOCKETS Document ${documentID} was successfully saved`);
                         io.to(`document:${msg._id}/editor/write`).emit('save-success');
