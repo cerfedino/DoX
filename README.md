@@ -38,8 +38,6 @@ Developed as part of the final group project for _Software Atelier 3: The Web SA
 Real-time **collaborative editing** between users.\
 **Document sharing** through **links** and/or by granting **permissions** to individual users.\
 **Email confirmations** sent by the server through the DoX mailserver.\
-Document VoIP call.
-
 
 # Technologies involved
 ### [**NodeJS**](https://nodejs.org)
