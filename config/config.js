@@ -17,7 +17,7 @@ const HOST = (arg !== "remote") ? "localhost" : "doxeditor.herokuapp.com"
 const HTTPS_ENABLED = (arg !== "remote") ? false : true
 
 // Leave blank if not required
-const MONGODB_PWD = "a0ouQ1k2jPbaeYvOyvdR"
+const MONGODB_PWD = ""
 const MONGODB_URI = (arg !== "remote") ? `mongodb://localhost:27017` : `mongodb+srv://doxdatabase:${MONGODB_PWD}@doxeditor.0rima.mongodb.net/test`
 
 ///////////////////
@@ -59,8 +59,8 @@ const settings = {
     },
 
     mailing: {
-        user: 'noreply.mailserver.dox@gmail.com',   // Mailer address
-        pass: 'srcaszbhkohfmlnn',                    // Application token (prevents from logging in through browser)
+        user: '',                    // Mailer address
+        pass: '',                    // Application token (prevents from logging in through browser)
 
         verification_link_expiry : 1000*60*60*24,    // Confirmation links expire in 24 hours
         verification_links_check : 1000*60*10        // Mailing checks for expired confirmation links every 10 minutes
@@ -68,7 +68,7 @@ const settings = {
 
     ssl: {
         // Get updates if SSL certificate is expiring ecc.
-        email: "cerfea@usi.ch"
+        email: ""
     }
 
 }
