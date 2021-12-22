@@ -15,6 +15,8 @@ Table of Contents
     - [**Socket.io**](#socketio)
     - [**Bcrypt**](#bcrypt)
     - [**Bootstrap 4**](#bootstrap-4)
+- [**Project videos**](#project-videos)
+  - [Trailer](#trailer)
 - [The DoX team 👨‍💻](#the-dox-team-)
 - [Guide to compiling :rocket:](#guide-to-compiling-rocket)
     - [1. Install dependencies](#1-install-dependencies)
@@ -76,6 +78,8 @@ Hashing of user passwords.
 <img style="width: 30%;" src="./documentation/resources/README/boostrap.png">\
 Responsive and pre-styled DOM elements.
 
+# **Project videos**
+## [Trailer](https://vimeo.com/659344915)
 
 # The DoX team 👨‍💻
 
