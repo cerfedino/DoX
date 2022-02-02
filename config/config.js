@@ -18,6 +18,7 @@ const HTTPS_ENABLED = (arg !== "remote") ? false : true
 
 const MONGODB_URI = (arg !== "remote") ? `mongodb://localhost:27017` : process.env.MONGODB_URI
 
+
 const MAILSEVER_USER      = (arg !== "remote") ? "" : process.env.MAILSERVER_USER
 const MAILSERVER_PASSWORD = (arg !== "remote") ? "" : process.env.MAILSERVER_PASSWORD
 

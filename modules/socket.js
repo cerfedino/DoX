@@ -1,4 +1,4 @@
-const io = require("socket.io")({'pingTimeout': 1000, 'pingInterval': 2000})
+const io = require("socket.io")({'pingTimeout': 3000, 'pingInterval': 3000})
 const {events} = require("./dbops.js")
 const app = require('../app')
 const dbops = require('./dbops.js')

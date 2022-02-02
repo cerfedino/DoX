@@ -15,6 +15,8 @@ Table of Contents
     - [**Socket.io**](#socketio)
     - [**Bcrypt**](#bcrypt)
     - [**Bootstrap 4**](#bootstrap-4)
+- [**Project videos**](#project-videos)
+  - [Trailer](#trailer)
 - [The DoX team 👨‍💻](#the-dox-team-)
 - [Guide to compiling :rocket:](#guide-to-compiling-rocket)
     - [1. Install dependencies](#1-install-dependencies)
@@ -29,7 +31,7 @@ DoX is clearly inspired to well known online word processors such as [**Google D
 \
 \
 \
-This project spans from *22 November 2021* to *22 December 2021* (30 days).\
+This project spans from *22 November 2021* to *20 December 2021* (28 days).\
 Developed as part of the final group project for _Software Atelier 3: The Web SA 2020-2021_, part of BSc INF at USI Lugano.
 
 # Features :zap:
@@ -37,9 +39,7 @@ Developed as part of the final group project for _Software Atelier 3: The Web SA
 **Store** documents on the servers database.\
 Real-time **collaborative editing** between users.\
 **Document sharing** through **links** and/or by granting **permissions** to individual users.\
-**Email confirmations** sent by the server through the DoX mailserver.\
-Document VoIP call.
-
+**Email confirmations** sent by the server through the DoX mailserver.
 
 # Technologies involved
 ### [**NodeJS**](https://nodejs.org)
@@ -78,6 +78,8 @@ Hashing of user passwords.
 <img style="width: 30%;" src="./documentation/resources/README/boostrap.png">\
 Responsive and pre-styled DOM elements.
 
+# **Project videos**
+## [Trailer](https://vimeo.com/659344915)
 
 # The DoX team 👨‍💻
 
