@@ -34,6 +34,9 @@ DoX is clearly inspired to well known online word processors such as [**Google D
 This project spans from *22 November 2021* to *20 December 2021* (28 days).\
 Developed as part of the final group project for _Software Atelier 3: The Web SA 2020-2021_, part of BSc INF at USI Lugano.
 
+\
+You can check out Dox at [**https://doxeditor.herokuapp.com**](https://doxeditor.herokuapp.com)
+
 # Features :zap:
 **Create** and **edit** documents on a per-user basis.\
 **Store** documents on the servers database.\
