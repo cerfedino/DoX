@@ -39,7 +39,7 @@ Developed as part of the final group project for _Software Atelier 3: The Web SA
 **Store** documents on the servers database.\
 Real-time **collaborative editing** between users.\
 **Document sharing** through **links** and/or by granting **permissions** to individual users.\
-**Email confirmations** sent by the server through the DoX mailserver.\
+**Email confirmations** sent by the server through the DoX mailserver.
 
 # Technologies involved
 ### [**NodeJS**](https://nodejs.org)
