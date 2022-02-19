@@ -17,6 +17,7 @@ Table of Contents
     - [**Bootstrap 4**](#bootstrap-4)
 - [**Project videos**](#project-videos)
   - [Trailer](#trailer)
+  - [Demo](#demo)
 - [The DoX team 👨‍💻](#the-dox-team-)
 - [Guide to compiling :rocket:](#guide-to-compiling-rocket)
     - [1. Install dependencies](#1-install-dependencies)
