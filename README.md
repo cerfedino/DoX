@@ -31,11 +31,11 @@ The **DoX Editor** aims to be a web text editor application that allows users to
 DoX is clearly inspired to well known online word processors such as [**Google Docs**](https://docs.google.com/document/u/0/)
 \
 \
-\
-This project spans from *22 November 2021* to *20 December 2021* (28 days).\
-Developed as part of the final group project for _Software Atelier 3: The Web SA 2021-2022_, part of BSc INF at USI Lugano.
+This project spans from *22 November 2021* to *20 December 2021* (28 days).
 
-\
+Developed as part of the final group project for the [*Software Atelier 3: The Web*](https://search.usi.ch/index.php/en/courses/35265709/software-atelier-3-the-web) 9 ECTS course.\
+The course is part of BSc INF (2nd year) at [Università della Svizzera Italiana (USI)](https://www.usi.ch/en), in Lugano.
+
 You can check out Dox at [**https://doxeditor.herokuapp.com**](https://doxeditor.herokuapp.com)
 
 # Features :zap:
