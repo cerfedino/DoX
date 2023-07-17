@@ -1,0 +1,46 @@
+version: '3.9'
+name: 'dox-dev'
+networks:
+  DoX_net:
+
+services:
+  DoX_app:
+    image: node:16.13.1
+    volumes:
+      - ../../:/src/
+    working_dir: /src
+    command: npx nodemon --ignore docker/docker-compose/data/* --ignore public/js/views.js server.js
+
+    container_name: DoX_app
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - DoX_net
+
+    depends_on:
+      - mongodb
+    env_file:
+      - ../../.env
+    environment:
+      - SCHEME=http://
+      - HOST=localhost
+      - PORT=80
+      - MAILSERVER_PASSWORD=
+      - MAILSERVER_USER=
+      - MONGODB_URI=mongodb://root:root@db:27017
+
+  mongodb:
+    image: mongo:7.0.0-rc7
+    container_name: db
+    restart: unless-stopped
+    expose:
+      - "27017:27017"
+    networks:
+      - DoX_net
+    volumes:
+      - ./data/db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: DoX_db
