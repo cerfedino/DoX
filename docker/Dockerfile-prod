@@ -1,0 +1,9 @@
+FROM node:16.13.1
+
+WORKDIR /src
+
+COPY . .
+
+RUN npm ci --omit=dev
+
+RUN npm run build

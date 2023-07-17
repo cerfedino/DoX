@@ -40,10 +40,6 @@ const serve_auth_info_toViews = require('./modules/auth_middleware/auth_info_vie
 const app = express();
 
 
-// add middleware to force requests to domain
-const domain = webserver.domain
-// app.use(setDomain(domain));
-
 app.use(webserver.rate.generic_limiter)
 app.use(logger('dev'));
 app.use(xss()) // Parses req attributes to make sure they can't be considered part of an XSS attack
@@ -137,12 +133,12 @@ app.use(function (err, req, res, next) {
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Start server
-app.set('port', webserver.port)
+app.set('port', webserver.listen_port)
 
 const server = require('http').createServer(app);
 
 server.on('listening', function () {
-    console.log(`Express server listening on ${domain}:${server.address().port}`);
+    console.log(`Express server listening on port ${server.address().port}`);
 });
 
 

@@ -23,9 +23,8 @@ async function check_expired_verification_links() {
 	for(var i = 0; i<users.length; i++) {
 		await dbops.user_delete(users[i]._id)
 	}
-	setTimeout(check_expired_verification_links, email_credentials.verification_links_check)
 }
-setTimeout(check_expired_verification_links, 1000)
+setInterval(check_expired_verification_links, email_credentials.verification_links_check)
 
 /**
  * Generates a text message (for users who do not support html)
