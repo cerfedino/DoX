@@ -14,7 +14,7 @@ services:
     container_name: DoX_app
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "80:8888"
     networks:
       - DoX_net
 
@@ -23,9 +23,8 @@ services:
     env_file:
       - ../../.env
     environment:
-      - SCHEME=http://
-      - HOST=localhost
-      - PORT=80
+      - LISTEN_PORT=8888
+      - ENDPOINT_URL=http://localhost:80
       - MAILSERVER_PASSWORD=
       - MAILSERVER_USER=
       - MONGODB_URI=mongodb://root:root@db:27017

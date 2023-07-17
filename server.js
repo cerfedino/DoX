@@ -5,4 +5,4 @@ const websocket = require("./modules/socket.js")
 
 const server = require('http').createServer(app);
 websocket.init(server)
-server.listen(config.webserver.port);
+server.listen(config.webserver.listen_port);
