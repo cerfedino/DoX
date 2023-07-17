@@ -1,5 +1,5 @@
 // Hashing
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 const saltRounds = 10;
 
 /**
@@ -8,7 +8,7 @@ const saltRounds = 10;
  * @returns a crypted version of the given password
  */
 function encrypt_pwd(pwd) {
-    return bcrypt.hash(pwd, saltRounds)
+    return bcryptjs.hash(pwd, saltRounds)
 }
 
 /**
@@ -18,7 +18,7 @@ function encrypt_pwd(pwd) {
  * @returns true if password match
  */
 function check_pwd(pwd,hash) {
-    return bcrypt.compareSync(pwd,hash)
+    return bcryptjs.compareSync(pwd,hash)
 }
 
 module.exports = {encrypt_pwd, check_pwd}
