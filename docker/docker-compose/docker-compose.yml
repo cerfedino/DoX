@@ -1,31 +1,28 @@
 version: '3.9'
-name: 'dox-dev'
+name: 'dox-prod'
 networks:
   DoX_net:
 
 services:
   DoX_app:
-    image: node:16.13.1
-    volumes:
-      - ../../:/src/
-    working_dir: /src
-    command: npx nodemon --ignore docker/docker-compose/data/* --ignore public/js/views.js server.js
+    image: dox_app-prod
+    build:
+      context: ../../
+      dockerfile: docker/Dockerfile-prod
+    command: node server.js
 
     container_name: DoX_app
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "80:8888"
     networks:
       - DoX_net
 
     depends_on:
       - mongodb
-    env_file:
-      - ../../.env
     environment:
-      - SCHEME=http://
-      - HOST=localhost
-      - PORT=80
+      - LISTEN_PORT=8888
+      - ENDPOINT_URL=http://localhost:80
       - MAILSERVER_PASSWORD=
       - MAILSERVER_USER=
       - MONGODB_URI=mongodb://root:root@db:27017

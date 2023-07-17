@@ -41,7 +41,6 @@
     "mongodb": "^4.2.0",
     "morgan": "^1.10.0",
     "nodemailer": "^6.7.2",
-    "nodemon": "^3.0.1",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
@@ -57,7 +56,9 @@
     "prosemirror-view": "^1.23.3",
     "socket.io": "^4.4.0",
     "socket.io-client": "^4.4.0",
-    "true": "^0.0.4"
+    "true": "^0.0.4",
+    "browserify": "^17.0.0",
+    "minify": "^8.0.3"
   },
   "eslintConfig": {
     "parserOptions": {
@@ -65,8 +66,7 @@
     }
   },
   "devDependencies": {
-    "browserify": "^17.0.0",
-    "minify": "^8.0.3",
-    "snyk": "^1.790.0"
+    "snyk": "^1.790.0",
+    "nodemon": "^3.0.1"
   }
 }

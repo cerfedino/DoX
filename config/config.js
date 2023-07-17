@@ -9,24 +9,19 @@ const rate_limit = require("express-rate-limit");
 
 ///////////////////
 // Reads env vars
-const PORT = process.env.PORT
-const HOST = process.env.HOST
-const SCHEME = process.env.SCHEME
+const LISTEN_PORT = process.env.LISTEN_PORT
+const ENDPOINT_URL = process.env.ENDPOINT_URL
 
 const MONGODB_URI = process.env.MONGODB_URI
 
 const MAILSERVER_USER = process.env.MAILSERVER_USER
 const MAILSERVER_PASSWORD = process.env.MAILSERVER_PASSWORD
-
-
-const SSL_EMAIL = process.env.SSL_EMAIL
 ///////////////////
 
 const settings = {
     webserver: {
-        scheme: SCHEME,
-        domain: HOST,
-        port: PORT,
+        listen_port: LISTEN_PORT,
+        endpoint_url: ENDPOINT_URL,
 
         rate : {
             login_register_limiter:
