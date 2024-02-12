@@ -1,8 +1,6 @@
 node_modules
 .git/
 .gitignore
-
-docker/docker-compose/data/
-
 build-*.js
 /public/js/views.js
+docker/docker-compose/data/

@@ -14,6 +14,9 @@ const ENDPOINT_URL = process.env.ENDPOINT_URL
 
 const MONGODB_URI = process.env.MONGODB_URI
 
+const MAILSERVER_SENDER_ADDRESS = process.env.MAILSERVER_SENDER_ADDRESS
+const MAILSERVER_HOST = process.env.MAILSERVER_HOST
+const MAILSERVER_PORT = process.env.MAILSERVER_PORT
 const MAILSERVER_USER = process.env.MAILSERVER_USER
 const MAILSERVER_PASSWORD = process.env.MAILSERVER_PASSWORD
 ///////////////////
@@ -55,6 +58,9 @@ const settings = {
     mailing: {
         user: MAILSERVER_USER,           // Mailer address
         pass: MAILSERVER_PASSWORD,      // Application token (prevents from logging in through browser)
+        host: MAILSERVER_HOST,
+        port: MAILSERVER_PORT,
+        sender: MAILSERVER_SENDER_ADDRESS,
 
         verification_link_expiry : 1000*60*60*24,    // Confirmation links expire in 24 hours
         verification_links_check : 1000*60*10        // Mailing checks for expired confirmation links every 10 minutes
