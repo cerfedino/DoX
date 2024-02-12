@@ -54,6 +54,10 @@ MongoClient
             model[k] = model.db.collection(k)
         })
         console.log("[+] Fetched MongoDB database and collections")
+        setInterval(async ()=>{
+            //  Prevent session timeout
+            await model.db.command({ping: 1})
+        }, 2000)
     })
 
 exports.model = model

@@ -13,8 +13,16 @@ const email_credentials = require('../config/config.js').mailing;
 
 // to send email, it provides the service and the email credentials
 var transporter = nodemailer.createTransport({
-	service: 'gmail',
-  	auth: email_credentials
+	host: email_credentials.host,
+	port: email_credentials.port,
+	secure: false,
+	auth: {
+		user: email_credentials.user,
+		pass: email_credentials.pass,
+	},
+	tls: {
+        ciphers:'SSLv3'
+    }
 });
 
 // Periodically checks for expired verification links
@@ -178,7 +186,7 @@ function generate_html_message(user, address, verification_link) {
  */
 function send_mail(user, address, verification_link) {
 	let mailOptions = {
-		from: 'noreply.mailserver.dox@gmail.com',
+		from: email_credentials.sender,
 		to: address,
 		subject: 'DoX: verify your email',
 		text: generate_text_message(user, address, verification_link),
@@ -189,7 +197,7 @@ function send_mail(user, address, verification_link) {
 		if (error) {
 			return console.log(error.message);
 		}
-		console.log('[+] Sent verification email to:', address);
+		console.log('[+] Sent verification email to:', address, " with verification link: ", verification_link);
 	});
 
 }
@@ -202,7 +210,7 @@ function send_mail(user, address, verification_link) {
  */
  function send_email_change(user, address, verification_link) {
 	let mailOptions = {
-		from: 'noreply.mailserver.dox@gmail.com',
+		from: email_credentials.sender,
 		to: address,
 		subject: 'DoX: change your email',
 		text: generate_email_text_message(user, address, verification_link),
@@ -213,7 +221,7 @@ function send_mail(user, address, verification_link) {
 		if (error) {
 			return console.log(error.message);
 		}
-		console.log('Sent email change request email to:', address);
+		console.log('Sent email change request email to:', address," with verification link: ", verification_link);
 	});
 
 }

@@ -24,14 +24,18 @@ services:
       - ../../.env
     environment:
       - LISTEN_PORT=8888
-      - ENDPOINT_URL=http://localhost:80
+      - ENDPOINT_URL=http://localhost:8888
+      - MAILSERVER_SENDER_ADDRESS=
+      - MAILSERVER_HOST=
+      - MAILSERVER_PORT=
       - MAILSERVER_PASSWORD=
       - MAILSERVER_USER=
-      - MONGODB_URI=mongodb://root:root@db:27017
+      - MONGODB_URI=mongodb://root:root@DoX_db-dev:27017
+
 
   mongodb:
     image: mongo:7.0.0-rc7
-    container_name: db
+    container_name: DoX_db-dev
     restart: unless-stopped
     expose:
       - "27017:27017"
