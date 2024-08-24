@@ -1,22 +1,22 @@
-version: '3.9'
+
 name: 'dox-prod'
 networks:
-  DoX_net:
+  dox_net:
 
 services:
-  DoX_app:
+  dox_app:
     image: dox_app-prod
     build:
       context: ../../
       dockerfile: docker/Dockerfile-prod
     command: node server.js
 
-    container_name: DoX_app-prod
+    container_name: dox_app-prod
     restart: unless-stopped
     ports:
       - "80:8888"
     networks:
-      - DoX_net
+      - dox_net
 
     depends_on:
       - mongodb
@@ -30,20 +30,21 @@ services:
       - MAILSERVER_PORT=
       - MAILSERVER_PASSWORD=
       - MAILSERVER_USER=
-      - MONGODB_URI=mongodb://root:root@DoX_db-prod:27017
+      - MONGODB_URI=mongodb://root:root@dox_db-prod:27017
+
 
 
   mongodb:
     image: mongo:7.0.0-rc7
-    container_name: DoX_db-prod
+    container_name: dox_db-prod
     restart: unless-stopped
     expose:
       - "27017:27017"
     networks:
-      - DoX_net
+      - dox_net
     volumes:
       - ./data/db:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
-      MONGO_INITDB_DATABASE: DoX_db
+      MONGO_INITDB_DATABASE: dox_db
