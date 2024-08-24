@@ -3,27 +3,27 @@
 
 Table of Contents
 ---
-- [**Introduction**](#introduction)
-- [**Features :zap:**](#features-zap)
-- [**Technologies involved**](#technologies-involved)
-    - [NodeJS](#nodejs)
-    - [MongoDB](#mongodb)
-    - [ProseMirror](#prosemirror)
-    - [Nodemailer](#nodemailer)
-    - [Express.js](#expressjs)
-    - [Passport.js](#passportjs)
-    - [Socket.io](#socketio)
-    - [Bcrypt](#bcrypt)
-    - [Bootstrap 4](#bootstrap-4)
+- [Introduction](#introduction)
+- [Features :zap:](#features-zap)
+- [Technologies involved](#technologies-involved)
+    - [**NodeJS**](#nodejs)
+    - [**MongoDB**](#mongodb)
+    - [**ProseMirror**](#prosemirror)
+    - [**Nodemailer**](#nodemailer)
+    - [**Express.js**](#expressjs)
+    - [**Passport.js**](#passportjs)
+    - [**Socket.io**](#socketio)
+    - [**Bcrypt**](#bcrypt)
+    - [**Bootstrap 4**](#bootstrap-4)
 - [**Project videos**](#project-videos)
   - [Trailer](#trailer)
   - [Demo](#demo)
-- [**The DoX team 👨‍💻**](#the-dox-team-)
-- [**Guide to compiling :rocket:**](#guide-to-compiling-rocket)
+- [The DoX team 👨‍💻](#the-dox-team-)
+- [Guide to compiling :rocket:](#guide-to-compiling-rocket)
     - [1. Install dependencies](#1-install-dependencies)
     - [2. Build the application](#2-build-the-application)
     - [3. Run the application](#3-run-the-application)
-- [**InternalWiki**](#internalwiki)
+- [InternalWiki](#internalwiki)
 ---
 # Introduction
 The **DoX Editor** aims to be a web text editor application that allows users to create, edit, store and share several documents. 
@@ -36,7 +36,7 @@ This project spans from *22 November 2021* to *20 December 2021* (28 days).
 Developed as part of the final group project for the [*Software Atelier 3: The Web*](https://search.usi.ch/index.php/en/courses/35265709/software-atelier-3-the-web) 9 ECTS course.\
 The course is part of BSc INF (2nd year) at [Università della Svizzera Italiana (USI)](https://www.usi.ch/en), in Lugano.
 
-You can check out Dox at [**https://dox.crfda.co**](https://dox.crfda.com)
+You can check out Dox at [**https://dox.crfda.com**](https://dox.crfda.com)
 
 # Features :zap:
 **Create** and **edit** documents on a per-user basis.\
