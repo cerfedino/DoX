@@ -5,7 +5,6 @@ networks:
 
 services:
   dox_app:
-    image: dox_app-prod
     build:
       context: ../../
       dockerfile: docker/Dockerfile-prod
